@@ -7,7 +7,7 @@ from system_administration.system_error_handling import ErrorHandling
 from system_administration.system_logs import System_Logs
 
 # Models to exclude from logging
-EXCLUDED_MODELS = ['General_Log', 'ContentType', 'Task_Log','Migration', 'Permission', 'SystemErrors', 'Session', 'LogEntry']
+EXCLUDED_MODELS = ['General_Log', 'ContentType', 'Task_Log','Migration', 'Permission', 'SystemErrors', 'Session', 'LogEntry', 'adminUsers']
 # List of app labels to exclude (default Django apps)
 EXCLUDED_APP_LABELS = [
     'admin',
