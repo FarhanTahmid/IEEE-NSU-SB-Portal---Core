@@ -1,6 +1,6 @@
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 import json
 import logging
@@ -205,10 +205,17 @@ class WalletManager:
         
         now = datetime.now()
 
-        start = datetime(now.year, now.month, 1)
+        # Start of the current month
+        start = datetime(now.year, 1, 1)
 
-        # Safely compute the first day of the next month
-        end = datetime(now.year, now.month, 31)
+        # Compute the first day of the next month
+        if now.month == 12:
+            next_month = datetime(now.year + 1, 1, 1)
+        else:
+            next_month = datetime(now.year, now.month + 1, 1)
+
+        # End of the current month = one second before the next month starts
+        end = next_month - timedelta(seconds=1)
 
         # Fetch monthly cash in/out data
         raw_entries = WalletEntry.objects.filter(
@@ -239,8 +246,17 @@ class WalletManager:
 
         now = datetime.now()
 
-        start = (datetime(now.year, now.month, 1))
-        end = (datetime(now.year, now.month, 31))
+        # Start of the current month
+        start = datetime(now.year, now.month, 1)
+
+        # Compute the first day of the next month
+        if now.month == 12:
+            next_month = datetime(now.year + 1, 1, 1)
+        else:
+            next_month = datetime(now.year, now.month + 1, 1)
+
+        # End of the current month = one second before the next month starts
+        end = next_month - timedelta(seconds=1)
 
         # Fetch daily entries for the current month
         entries = WalletEntry.objects.filter(
