@@ -89,7 +89,7 @@ def authorize(request, primary=None):
         return redirect('central_branch:event_control')
 
 def oauth2callback(request):
-    # try:
+    try:
         if(request.META['HTTP_HOST'] == "127.0.0.1:8000" or request.META['HTTP_HOST'] == "localhost:8000"):
             os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         state = request.GET.get('state')
@@ -111,10 +111,13 @@ def oauth2callback(request):
             GoogleAuthorisationHandler.save_credentials(credentials)
 
         messages.success(request, "Authorized")
+        if states[1] != 'None':
+            return redirect('chapters_and_affinity_group:event_control_homepage', int(states[1]))
+        else:
+            return redirect('central_branch:event_control')
+    except:
+        messages.warning(request, "Access Denied!")
         return redirect('central_branch:event_control')
-    # except:
-        # messages.warning(request, "Access Denied!")
-        # return redirect('central_branch:event_control')
 
 def deauthorise(request, primary=None):
 
