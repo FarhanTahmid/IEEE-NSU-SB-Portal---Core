@@ -135,6 +135,7 @@ def deauthorise(request, primary=None):
                 global gmail_service
                 gmail_service = None
             else:
+                GoogleAuthorisationHandler.delete_credentials(creds, primary)
                 GmailHandler.update_sc_ag_gmail_service(primary, None)
             pass
         else:
