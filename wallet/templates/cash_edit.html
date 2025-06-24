@@ -1,0 +1,918 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <title>Wallet</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %}
+    {% include "common_css.html" %}
+    {% endblock common_css %}
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* font-family: -apple-system, system-ui, "Helvetica Neue", Arial, sans-serif; */
+        }
+
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            /* margin-bottom: 5px; */
+            /* margin-top: 20px; */
+        }
+
+        .tooltip-container.right {
+            float: right;
+            margin-right: 0;
+        }
+
+        .image-button:hover+.tooltip-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(10px);
+        }
+
+        .image-button img {
+            width: 40px;
+            /* Adjust as needed */
+            height: auto;
+            /* Maintain aspect ratio */
+            border-radius: 50%;
+            /* Add rounded corners if desired */
+            box-shadow: 2px 2px 5px 0px #80808054;
+        }
+
+        .tooltip-text {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            /* background-color: #f2f2f2; */
+        }
+
+        .back-button {
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .title {
+            margin-top: 45px;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 500;
+            flex-grow: 1;
+
+            color: #000000;
+
+        }
+
+        .wallet-balance {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .form-container {
+            padding: 16px;
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 16px;
+        }
+
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .required {
+            color: #ff5722;
+            font-size: 12px;
+            position: absolute;
+            top: -20px;
+            right: 0;
+        }
+
+        .required-text {
+            color: #FF5722;
+            font-size: 12px;
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
+        .file-upload {
+            border: 1px dashed #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .file-upload i {
+            margin-right: 5px;
+        }
+
+        .file-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preview-item {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #ddd;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .preview-item-close {
+            border: 1px solid #3e3e3e;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background-color: rgb(255 255 255);
+            color: #3e3e3e;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .categories-container {
+            margin-top: 10px;
+        }
+
+        /* Improved dropdown styles */
+        .custom-selectC {
+            position: relative;
+            margin-top: 8px;
+        }
+
+        #categoryInput {
+            cursor: pointer;
+            background-color: white;
+        }
+
+        #categoryDropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* time details */
+
+        .entry_details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 24px;
+            color: #666666;
+            font-weight: bold;
+        }
+
+        /* Selected tags styles */
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 8px;
+            border-radius: 16px;
+            font-size: 14px;
+            color: white;
+            margin-right: 8px;
+            background-color: #7986CB;
+            border: 1px solid black;
+        }
+
+        /* Specific category tag colors */
+        /* Specific category tag colors */
+        {% for category in categories %}
+        .tag[data-cat='{{category.name}}']{
+            background-color: {{category.background_colour}};
+            color: {{category.text_colour}};
+            border: 1px solid white;
+        }
+        {% endfor %}
+
+        .tag-close {
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .payment-mode {
+            margin-top: 24px;
+        }
+
+        .payment-label {
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .payment-option {
+            text-align: center;
+            padding: 2px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            transition: all 0.2s ease;
+            background-color: #f1f1f1;
+            color: #666;
+        }
+
+        .payment-option.cash {
+            background-color: #98EAC2;
+            color: #31AE70;
+        }
+
+        .payment-option:hover {
+            opacity: 0.9;
+        }
+
+        .save-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .save-button {
+            background-color: #31AE70;
+            color: white;
+            width: auto;
+            min-width: 300px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #31AE70;
+        }
+
+        .save-button:hover {
+            background-color: #43A047;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .label-text {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .default-note {
+            font-size: 12px;
+            color: #ff5722;
+        }
+
+        .remove-btn {
+            text-decoration: none;
+            border: none;
+            color: #ef4444;
+            font-size: 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            cursor: pointer;
+            background: #ffcccc;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .remove-btn:hover {
+            color: #ec1616;
+        }
+
+        .remove-btn p{
+            margin: 0;
+        }
+        .app-body{
+            margin: 0 15%;
+        }
+        @media (max-width: 992px) {
+            .container {
+                padding: 15px;
+            }
+
+            .input-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 20px;
+            }
+
+            .payment-options {
+                flex-wrap: wrap;
+            }
+
+            .payment-option {
+                flex: 1;
+                min-width: 80px;
+            }
+
+            .file-upload {
+                display: flex;
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 10px;
+                border-radius: 0;
+            }
+
+            .payment-options {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .payment-option {
+                width: 100%;
+            }
+
+            .save-button {
+                width: 100%;
+            }
+            .app-body{
+                margin:5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app" style="background-color: white;">
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+                {% if primary == 1 %}
+                    {% block navbar %}
+                        {% include 'navbar.html' %}
+                    {% endblock navbar %}
+                {% else %}
+                    {% block sc_ag_navbar %}
+                        {% include 'sc_ag_navbar.html' %}
+                    {% endblock sc_ag_navbar %}
+                {% endif %}
+        </div>
+        <!--navbar content end-->
+
+        <!-- ############ PAGE START-->
+        <div ui-view class="app-body" style="" id="view">
+            <div class="container">
+                <div class="title">Edit Entry</div>
+                <div class="header">
+                    <div class="tooltip-container">
+                        <a href="{% if primary == 1 %}{% if entry.entry_event %}{% url 'central_branch:wallet:entries_event' entry.entry_event %}{% else %}{% url 'central_branch:wallet:wallet_homepage' %}{% endif %}{% else %}{% if entry.entry_event %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary entry.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}{% endif %}" class="image-button">
+                            <img src="/static/back-arrow.png" alt="Go back to session">
+                        </a>
+                        <span class="tooltip-text">Go back</span>
+                    </div>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="event_id" value="{{entry.entry_event.id}}">
+                        <button type="submit" class="remove-btn" name="delete_entry">
+                            <p>Delete </p><i class="fa fa-trash action-btn" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
+
+
+                <div class="form-container">
+                    <div class="entry_details">
+                        <p class="last_updated">
+                            Last updated at {{entry.update_date_time}}
+                        </p>
+                        <p class="entry_created">Entry created at {{entry.creation_date_time}}</p>
+                    </div>
+                    <form method="POST" id="cashEntryForm" onsubmit="disableSubmit(this)" enctype='multipart/form-data'>
+                        {% csrf_token %}
+                        <input type="hidden" name="event_id" value="{{entry.entry_event.id}}">
+                        <div class="form-row input-group">
+                            <div class="input-container">
+                                <input type="decimal" placeholder="Amount" id="amount" name="entry_amount" value="{{entry.amount}}" required>
+                            </div>
+
+                            <div class="input-container">
+                                <input type="datetime-local" id="datetime" name="entry_date_time" value="{{ entry.entry_date_time|date:"Y-m-d\\TH:i" }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row input-group">
+                            <div class="input-container">
+                                <input type="text" placeholder="(Customer, Supplier)" id="customerSupplier" name="name" value="{% if entry.name %}{{entry.name}}{% endif %}" required>
+                            </div>
+
+                            <div class="input-container">
+                                <input type="text" placeholder="Contact" id="contact" name="contact" value="{% if entry.contact %}{{entry.contact}}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-container">
+                                <textarea id="remark" placeholder="Remark (Item, Person Name, Quantity)" name="entry_remark" required>{{entry.remarks}}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="file-upload" id="uploadButton">
+                                <i>📎</i> Attach Image or PDF
+                            </div>
+                            <input type="file" id="fileInput" name='entry_files' accept="image/*,application/pdf" multiple>
+
+                            <div class="file-preview" id="filePreviewContainer">
+            
+                                {% for file in files %}
+                                {% if file.mimetype.0 == 'image' %}
+                                <div class="preview-item" data-file-id="file-1" onclick="createFilePreviewWithImageServer('{{media_url}}{{file.document}}')">
+                                    <span class="preview-item-close" onclick="event.stopPropagation(); delete_file({{file.id}});">×</span>
+                                    <img src="{{media_url}}{{file.document}}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                {% else %}
+                                <div class="preview-wrapper" data-file-id="file-0" style="position: relative; display: inline-block;">
+                                    <div class="preview-item-close" onclick="event.stopPropagation(); delete_file({{file.id}});" style="position: absolute; top: 4px; right: 4px; z-index: 2; background: white; border-radius: 50%; padding: 2px 6px; cursor: pointer;
+                                    ">×</div>
+
+                                    <a href="{{media_url}}{{file.document}}" target="_blank"
+                                        class="preview-item"
+                                        style="display: flex; align-items: center; justify-content: center; padding: 10px; text-decoration: none;">
+                                        <span style="font-size: 12px;">{{file.mimetype.1}}</span>
+                                    </a>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                                <div class="preview-item" id="addMoreFiles">+</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-container">
+
+                                <div class="custom-selectC">
+                                    <input type="text" id="categoryInput" placeholder="Select categories..." readonly>
+                                    <div class="select-dropdownC" id="categoryDropdown">
+                                        {% for category in categories %}
+                                        {% if category not in entry.categories.all %}
+                                        <div class="dropdown-item" data-value="{{category.name}}" data-id="{{category.id}}">{{category.name}}</div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <input type="hidden" id="category" name="entry_categories" value="{% for entry_category in entry.categories.all %}{{entry_category.id}}{% if not forloop.last %},{% endif %}{% endfor %}" required>
+
+                                <div class="selected-tags" id="selectedTags">
+                                    <!-- Selected tags will appear here -->
+                                    {% for entry_category in entry.categories.all %}
+                                    <div class="tag {{entry_category.name}}" data-id="{{entry_category.id}}" data-cat="{{entry_category.name}}">{{entry_category.name}} <span class="tag-close" onclick="deleteTag(this)">×</span></div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="payment-mode">
+                            <span class="payment-label">Payment Mode </span>
+                            <div class="payment-options">
+                                <div class="payment-option" {% if entry.payment_mode == 'CASH' %}style="background-color: #98EAC2; color: #31AE70"{% else %}style="backgroundColor: #f1f1f1; color: #666"{% endif %} data-payment="CASH">Cash</div>
+                                <div class="payment-option" {% if entry.payment_mode == 'CARD' %}style="background-color: #98EAC2; color: #31AE70"{% else %}style="backgroundColor: #f1f1f1; color: #666"{% endif %} data-payment="CARD">Card</div>
+                                <div class="payment-option" {% if entry.payment_mode == 'BKASH' %}style="background-color: #98EAC2; color: #31AE70"{% else %}style="backgroundColor: #f1f1f1; color: #666"{% endif %} data-payment="BKASH">Bkash</div>
+                                <div class="payment-option" {% if entry.payment_mode == 'NAGAD' %}style="background-color: #98EAC2; color: #31AE70"{% else %}style="backgroundColor: #f1f1f1; color: #666"{% endif %} data-payment="NAGAD">Nagad</div>
+                                <input type="hidden" id="selectedPaymentInput" name="payment_mode" value="{{entry.payment_mode}}">
+                            </div>
+                        </div>
+
+                        <div class="save-button-container">
+                            <input type="hidden" name="update_entry"/>
+                            <button type="submit" class="save-button" id="update_entry">SAVE</button>
+                        </div>
+                    </form>
+
+                    <form method="POST" id="delete_form">
+                        {% csrf_token %}
+                        <input type="hidden" id="delete_file" name="delete_file">
+                    </form>
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <script>
+            const categoryInput = document.getElementById('categoryInput');
+            const categoryDropdown = document.getElementById('categoryDropdown');
+            const selectedTags = document.getElementById('selectedTags');
+            const hiddenCategoryInput = document.getElementById('category');
+            const selectedCategories = [{% for entry_category in entry.categories.all %}'{{entry_category.id}}'{% if not forloop.last %},{% endif %}{% endfor %}];
+
+            const categoryColors = {
+                {% for category in categories %}
+                '{{category.name}}': '{{category.colour}}',
+                {% endfor %}
+            };
+
+            // Toggle dropdown
+            categoryInput.addEventListener('click', function () {
+                const isOpen = categoryDropdown.style.display === 'block';
+                categoryDropdown.style.display = isOpen ? 'none' : 'block';
+
+                document.querySelectorAll('.select-dropdownC').forEach(dropdown => {
+                    if (dropdown !== categoryDropdown) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!categoryInput.contains(e.target) && !categoryDropdown.contains(e.target)) {
+                    categoryDropdown.style.display = 'none';
+                }
+            });
+
+            // Style and setup dropdown items
+            setupDropdownItems();
+
+            // Function to setup dropdown items
+            function setupDropdownItems() {
+                categoryDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                    const category = item.dataset.value;
+                    const id = item.dataset.id;
+
+                    // Only apply once
+                    if (!item.dataset.styled) {
+                        if (categoryColors[category]) {
+                            item.style.borderLeft = `4px solid ${categoryColors[category]}`;
+                            item.style.paddingLeft = '11px';
+                        }
+
+                        item.addEventListener('mouseenter', function () {
+                            this.style.backgroundColor = '#f5f5f5';
+                        });
+
+                        item.addEventListener('mouseleave', function () {
+                            this.style.backgroundColor = '';
+                        });
+
+                        item.dataset.styled = true;
+                    }
+
+                    item.onclick = function (e) {
+                        e.stopPropagation();
+
+                        if (!selectedCategories.includes(id)) {
+                            selectedCategories.push(id);
+                            updateHiddenInput();
+                            createTag(category, id);
+                            this.remove(); // Remove selected from dropdown
+                            categoryDropdown.style.display = 'none';
+                            console.log("Selected categories:", selectedCategories);
+                        }
+                    };
+                });
+            }
+
+            function deleteTag(closeButton) {
+                const tag = closeButton.parentElement;
+                var id = tag.dataset.id;
+                var category = tag.dataset.cat;
+                const index = selectedCategories.indexOf(id);
+                if (index > -1) {
+                    selectedCategories.splice(index, 1);
+                    updateHiddenInput();
+                }
+
+                // Add back to dropdown
+                const dropdownItem = document.createElement('div');
+                dropdownItem.className = `dropdown-item`;
+                dropdownItem.dataset.value = category;
+                dropdownItem.dataset.id = id;
+                dropdownItem.textContent = category;
+                categoryDropdown.appendChild(dropdownItem);
+                setupDropdownItems(); // Reattach handlers to new item
+
+                tag.remove();
+                console.log("Selected categories:", selectedCategories);
+            }
+
+            // Create category tag
+            function createTag(category, id) {
+                const tag = `<div class=tag ${category} data-id="${id}" data-cat="${category}">${category} <span class="tag-close" onclick="deleteTag(this)">×</span></div>`;
+
+                selectedTags.innerHTML += tag;
+            }
+
+            // Update hidden input with selected values
+            function updateHiddenInput() {
+                hiddenCategoryInput.value = selectedCategories;
+            }
+
+            // Handle payment mode selection
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            let selectedPayment = 'CASH'; // Default selected
+            const hiddenInput = document.getElementById('selectedPaymentInput'); // Get hidden input
+
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    paymentOptions.forEach(opt => {
+                        opt.style.backgroundColor = '#f1f1f1';
+                        opt.style.color = '#666';
+                    });
+
+                    option.style.backgroundColor = '#98EAC2';
+                    option.style.color = '#31AE70';
+                    
+                    selectedPayment = option.dataset.payment;
+                    hiddenInput.value = selectedPayment; // Update hidden input
+                });
+            });
+
+            // Handle file input
+            const fileInput = document.getElementById('fileInput');
+            const uploadButton = document.getElementById('uploadButton');
+            const addMoreFiles = document.getElementById('addMoreFiles');
+            const filePreviewContainer = document.getElementById('filePreviewContainer');
+
+            // Store references to uploaded files
+            const uploadedFiles = new Map();
+            let fileCounter = 0;
+
+            // Function to handle file selection
+            function handleFileSelect(e) {
+                const files = e.target.files;
+
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const fileId = 'file-' + fileCounter++;
+                        uploadedFiles.set(fileId, file);
+                        createFilePreview(file, fileId);
+                    }
+                }
+            }
+
+            // Function to create file preview
+            function createFilePreview(file, fileId) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+
+                    if (file.type.startsWith('image/')) {
+                        // Create image preview
+                        var previewItem = `<div class="preview-item" data-file-id="file-1" onclick="createFilePreviewWithImageData('${e.target.result}')">
+                            <span class="preview-item-close" onclick="event.stopPropagation(); removeFileInput(this.parentElement, '${fileId}')">×</span>
+                            <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>`
+
+                        addMoreFiles.insertAdjacentHTML('beforebegin', previewItem);
+                    } else if (file.type === 'application/pdf') {
+                        var previewItem = `<div class="preview-wrapper" data-file-id="file-0" style="position: relative; display: inline-block;">
+                                <div class="preview-item-close" onclick="removeFileInput(this.parentElement)" style="position: absolute; top: 4px; right: 4px; z-index: 2; background: white; border-radius: 50%; padding: 2px 6px; cursor: pointer;
+                                ">×</div>
+
+                                <a href="${URL.createObjectURL(file)}" download="${file.name}" target="_blank"
+                                    class="preview-item"
+                                    style="display: flex; align-items: center; justify-content: center; padding: 10px; text-decoration: none;">
+                                    <span style="font-size: 12px;">${file.type.split('/')[1].toUpperCase()}</span>
+                                </a>
+                            </div>`
+
+
+                        addMoreFiles.insertAdjacentHTML('beforebegin', previewItem);
+                        return;
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            function createFilePreviewWithImageServer(file_url, filetype) {
+                var previewItem = `<div onclick="closePreviewModal(this)" style="position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; cursor: pointer;">
+                                        <img src="${file_url}" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                                    </div>`;
+
+                // Disable scrolling
+                document.body.style.overflow = 'hidden';
+
+                // Insert the new preview before the "+" button
+                addMoreFiles.insertAdjacentHTML('beforebegin', previewItem);
+            }
+
+            function createFilePreviewWithImageData(image_data) {
+                var previewItem = `<div onclick="closePreviewModal(this)" style="position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; cursor: pointer;">
+                                        <img src="${image_data}" style="max-width: 90%; max-height: 90%; object-fit: contain;">
+                                    </div>`;
+
+                // Disable scrolling
+                document.body.style.overflow = 'hidden';
+
+                // Insert the new preview before the "+" button
+                addMoreFiles.insertAdjacentHTML('beforebegin', previewItem);
+            }
+
+            function closePreviewModal(modal) {
+                
+                // Enable scrolling
+                document.body.style.overflow = '';
+
+                modal.remove();
+            }
+
+            function removeFileInput(previewItem, file_id) {
+                // Remove from DOM
+                previewItem.remove();
+                // Remove from stored files
+                uploadedFiles.delete(file_id);
+            }
+
+            // Event listener for file input change
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Open file dialog when clicking the upload button
+            uploadButton.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Open file dialog when clicking the "+" button
+            addMoreFiles.addEventListener('click', () => {
+                fileInput.click();
+            });
+            // Handle form submission
+            const form = document.getElementById('cashEntryForm');
+
+            form.addEventListener('submit', (e) => {                
+
+                // Check if required fields are filled
+                const amount = document.getElementById('amount').value;
+                const datetime = document.getElementById('datetime').value;
+                const remark = document.getElementById('remark').value;
+                const category = document.getElementById('category').value;
+
+                if (!amount || !datetime || !remark || !category) {
+                    e.preventDefault();
+                    alert('Please fill all required fields!');
+                    return;
+                }
+            });
+
+            const deleteForm = document.getElementById('delete_form')
+            const fileIdInput = document.getElementById('delete_file');
+
+            function delete_file(fileId) {
+                fileIdInput.value = fileId;
+                delete_form.submit();
+            }
+
+            function disableSubmit(form) {
+                const button = form.querySelector('button[id="update_entry"]');
+                button.disabled = true;
+                button.innerText = "Submitting...";
+            }
+        </script>
+        <script>
+        {% for message in messages %}
+    
+        Swal.fire({
+            icon:"{{message.tags}}",
+            title:"{{message}}",
+            
+        })
+        {% endfor %}
+    </script>
+</body>
+{% block common_js %}
+{% include "common_js.html" %}
+{% endblock common_js %}
+
+</html>

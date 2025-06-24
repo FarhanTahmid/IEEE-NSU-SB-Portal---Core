@@ -245,6 +245,15 @@
           justify-content: center;
           flex-wrap: wrap;
         }
+        .task-btn {
+        display: flex;
+        flex-direction: column;
+      }
+      .tb_search{
+        width: auto;
+        margin-bottom: 10px;
+        float: none;
+      }
       }
 
       .check-task-button{
@@ -294,6 +303,10 @@
       border-color: #f10e25;
       color: #f10e25;
   }
+  .filter_box{
+    width: auto;
+    float: right;
+  }
     </style>
   </head>
   {% block preloader %}
@@ -333,7 +346,7 @@
             >Create Task</a
           >
 
-          <button
+          {% comment %} <button
             type="button"
             class="check-task-button"
             data-toggle="modal"
@@ -341,7 +354,7 @@
             style="margin-bottom: 15px; cursor: pointer"
           >
             Create Task Category
-          </button>
+          </button> {% endcomment %}
 
           {% endif %}
           
@@ -396,7 +409,7 @@
         >
           <div class="container" style="justify-content: center">
             <div class="header_wrap">
-              <div class="num_rows">
+              <div class="filter_box" style="margin-left: 8px; width: 100px;">
                 <div class="form-group">
                   <!--		Show Numbers Of Rows 		-->
                   <select
@@ -412,6 +425,18 @@
                   </select>
                 </div>
               </div>
+              <div class="filter_box">
+                <div class="form-group">
+                    <!--		Show Numbers Of Rows 		-->
+                    <form id="panelForm1">
+                        <select class="form-control search_box" name="panel" id="maxRows1" onchange="panelSelect();">
+                            {% for panel in all_branch_panels %}
+                            <option {% if panel.year == branch_panel.year %}selected{% endif %} value="{{panel.year}}">{{panel.year}}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
               <div class="tb_search">
                 <input
                   type="text"
@@ -671,6 +696,12 @@
     {% endcomment %}
     <script src="{% static 'script/ajax.js'%}"></script>
     <script>
+      var form = document.getElementById('panelForm1');
+
+      function panelSelect() {
+          form.submit();
+      }
+
       getPagination("#table-id");
       $("#maxRows").trigger("change");
       function getPagination(table) {

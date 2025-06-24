@@ -406,7 +406,7 @@
           {% endif %}
   
 
-          <button
+          {% comment %} <button
             type="button"
             class="check-task-button"
             data-toggle="modal"
@@ -414,7 +414,7 @@
             style="margin-bottom: 15px; cursor: pointer"
           >
             Create Task Category
-          </button>
+          </button> {% endcomment %}
         </div>
         {% endif %}
 
@@ -450,6 +450,18 @@
                     <option value="5000">Show all rows</option>
                   </select>
                 </div>
+              </div>
+              <div class="num_rows" style="">
+                  <div class="form-group">
+                      <!--		Show Numbers Of Rows 		-->
+                      <form id="panelForm1">
+                          <select class="form-control search_box" name="panel" id="maxRows1" onchange="panelSelect();">
+                              {% for panel in all_branch_panels %}
+                              <option {% if panel.year == branch_panel.year %}selected{% endif %} value="{{panel.year}}">{{panel.year}}</option>
+                              {% endfor %}
+                          </select>
+                      </form>
+                  </div>
               </div>
               <div class="tb_search">
                 <input
@@ -666,6 +678,12 @@
     {% endcomment %}
     <script src="{% static 'script/ajax.js'%}"></script>
     <script>
+      var form = document.getElementById('panelForm1');
+
+      function panelSelect() {
+          form.submit();
+      }
+      
       getPagination("#table-id");
       $("#maxRows").trigger("change");
       function getPagination(table) {

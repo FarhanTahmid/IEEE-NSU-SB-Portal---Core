@@ -54,6 +54,14 @@
   .app-header ~ .app-body {
     padding-top: 0rem;
 }
+.form-check{
+  font-size: larger;
+  position: relative;
+  left: 20px;
+}
+.form-check label{
+  padding: 0;
+}
   </style>
 </head>
 <body>
@@ -422,15 +430,14 @@
 
                             <div class="form-group">
                               <label>Select Skillsets:</label>
-                              <select multiple class="form-control" name="skill_sets">
-                                  <option value="null" selected>--------------------</option>
-                                  {% for skill in all_skills %}
-                                      <option value="{{ skill.id }}"> 
-                                          {{ skill.skill_type }}
-                                      </option>
-                                  {% endfor %}
-                              </select>
+                              {% for skill in all_skills %}
+                                  <div class="form-check">
+                                      <input type="checkbox" class="form-check-input" name="skill_sets" value="{{ skill.id }}">
+                                      <label class="form-check-label">{{ skill.skill_type }}</label>
+                                  </div>
+                              {% endfor %}
                           </div>
+                          
                             
                             <div class="box-header" style="text-align:center;">
                             <h1>For Official Use</h1>

@@ -1,0 +1,250 @@
+{% block manage_about_ieee %}
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <title>About IEEE | IEEE NSU Student Branch</title>
+        <!-- CKEditor CDN -->
+        <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+
+        {% block common_css %}
+            {% include "common_css.html" %}
+        {% endblock common_css %}
+
+        <style>
+            body, html {
+                
+                margin: 0;
+                
+                align-items: center;
+                justify-content: center;
+            }
+
+            .row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+            }
+            .row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+            }
+            .btn-container {
+                text-align: center;
+            }
+            
+            .btn {
+                max-width: 100%;
+                width: auto;
+                display: inline-block;
+                white-space: normal; /* Allow text to wrap within the button */
+                word-wrap: break-word; /* Break long words if necessary */
+                font-size: 16px; /* Adjust the font size as needed */
+            }
+            
+            /* Media query for smaller screens (adjust the breakpoint as needed) */
+            @media (max-width: 768px) {
+                .btn {
+                    width: 100%; /* Make the button full width on smaller screens */
+                }
+            }
+
+            h1{
+                text-align:center;
+                font-size:30px;
+                font-weight:bold;
+            }
+        
+            label{
+                font-size:20px;
+            }
+
+            .app-body{
+                justify-content:center; 
+                margin-left:15%;
+                margin-right:15%;
+            }
+            
+            @media (max-width: 760px) {
+                .app-body {
+                    margin-left: 5%;
+                    margin-right: 5%;
+                }
+            }
+        
+            .circle-btn {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 45px; /* Set minimum width */
+                height: 45px; /* Set minimum height */
+                background-color: transparent; /* Set to transparent or any other color for the inside */
+                border: 2px solid #78BE20; /* Border color is green */
+                border-radius: 50%;
+                color: #78BE20; /* Text color is green */
+                font-size: 24px; /* Adjust the font size as needed */
+                cursor: pointer;
+                transition: background-color 0.3s, color 0.3s; /* Add smooth transition effect */
+            }
+        
+            .circle-btn:hover {
+                background-color: #78BE20; /* Hover background color is green */
+                color: #fff; /* Hover text color is white */
+            }
+        
+            .plus-sign::before {
+                content: '+';
+            }
+        
+        
+            
+            .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
+                max-width: 80%; 
+                height: 90%; 
+                z-index: 1500;
+            }
+
+            .contact_container{
+                display: flex;
+                flex-direction: column; 
+                padding: 5% 5% 0% 5%;  
+                background-color: #fff;
+                border-radius: 6px;
+                box-shadow: 0px 0px 0px white;
+            }
+            .contact_container label{
+                font-size: 16px;
+            }
+            .contact_container input{
+                border: none;
+                border-bottom: 1px solid #ddd;
+                margin-bottom: 24px;
+            }
+            .contact_label{
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+            }
+            .save_btn {
+                margin-top: 16px;
+                background-color: #6495ED;
+                color: white;
+                text-align: center;
+                transition: all .3s ease-in-out;
+                padding: 8px 15px;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            
+            .save_btn:hover {
+                color: #6495ED;
+                background-color: white;
+            }
+
+            @media screen and (max-width:700px){
+                .modal-dialog.modal-dialog-centered.modal-lg.preview_modal_box{
+                    max-width:100%;
+                }
+                .contact_label{
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+
+
+
+    <body>
+        <div class="app" id="app">
+            <!-- aside -->
+            <div id="aside" class="app-aside modal nav-dropdown">
+
+                {% block sidebar %}
+                    {% include 'users/sidebar.html' %}
+                {% endblock %}
+
+            </div>
+            <!-- aside end -->
+
+            <!-- navbar content -->
+            <div id="content" class="app-content box-shadow-z0" role="main">
+                {% block navbar %}
+                    {% include 'Manage Website/manage_web_navbar.html' %}
+                {% endblock navbar %}
+
+            </div>
+            <!--navbar content-->
+
+            <div ui-view class="app-body" id="view">
+                    
+                <!--Start from here-->
+                <br>
+                <br>
+                <h2 style="text-align: center;margin-bottom:15px;">Manage the <b>About Section</b> of the Central Website of <span style="color:#00629B;"><b>IEEE NSU Student Branch</b></span></h2>
+                <br>
+                {% block publications_tab %}
+                {% include "Manage Website/About/about_tabs.html" %}
+                {% endblock publications_tab %}
+
+                <br>
+                <h4 style="justify-content:center;text-align:center;"><b>Contact Us Section</b></h2>
+
+                <!--for error messages-->
+                <div class="container">
+                    {% for message in messages  %}
+                        <p>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <p style="margin: 0;">{{message}}</p>
+                            </div>
+                        </p>
+                    {% endfor %}
+                    <br>
+                </div>
+                <!--for error messages end-->
+
+                <form method="POST" class="contact_container">
+                    {% csrf_token %}
+                    <div class="contact_label">    
+                        <label for="address">Address</label>
+                        <input type="text" name="address" value="{% if contact_info.address %}{{contact_info.address}}{% endif %}">
+                    </div>
+                    <div class="contact_label">
+                    <label for="nsu_ieee_email">NSU IEEE Email</label>
+                    <input type="text" name="nsu_ieee_email" value="{% if contact_info.nsu_ieee_email %}{{contact_info.nsu_ieee_email}}{% endif %}">
+                    </div>
+                    <div class="contact_label">
+                    <label for="chair_email">Chair Email</label>
+                    <input type="text" name="chair_email" value="{% if contact_info.chair_email %}{{contact_info.chair_email}}{% endif %}">
+                    </div>
+                    <div class="contact_label">
+                    <label for="membership_num">Membership Queries Number</label>
+                    <input type="text" name="membership_queries_number" value="{% if contact_info.membership_queries_number %}{{contact_info.membership_queries_number}}{% endif %}">
+                    </div>
+                    <div class="contact_label">
+                    <label for="corporate_num">Corporate Engagement Number</label>
+                    <input type="text" name="corporate_engagement_number" value="{% if contact_info.corporate_engagement_number %}{{contact_info.corporate_engagement_number}}{% endif %}">
+                    </div>
+                    <input type="submit" value="Save" name="save_info" class="save_btn" style="border: 1px solid #6495ED;">
+                </form>
+            </div>
+
+            <!--Theme Switcher-->
+            {% block theme_switcher %}
+                {% include "theme_switcher.html" %}
+            {% endblock theme_switcher %}
+        </div>
+
+        {% block common_js %}
+            {% include "common_js.html" %}
+        {% endblock common_js %}
+    </body>
+</html>
+{% endblock manage_about_ieee %}

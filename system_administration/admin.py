@@ -1,6 +1,8 @@
 from django.contrib import admin
 from . models import adminUsers,MDT_Data_Access,Developer_criteria,Project_Developers,Project_leads,LAO_Data_Access,CWP_Data_Access,Promotions_Data_Access
 from .models import WDT_Data_Access,Media_Data_Access,Graphics_Data_Access,Branch_Data_Access,FCT_Data_Access
+from django.db import models
+from django_json_widget.widgets import JSONEditorWidget
 # Register your models here.
 
 from . models import system
@@ -69,3 +71,16 @@ from .models import SC_AG_Data_Access
 class SC_AG_Data_Access(admin.ModelAdmin):
     list_display=['member','data_access_of']
 
+
+# code for logging models in the admin interface.
+
+from .models import General_Log
+@admin.register(General_Log)
+class General_LogAdmin(admin.ModelAdmin):
+    list_display = ['id', 'content_type', 'object_id', 'update_number']
+    list_filter = ['content_type']
+    search_fields = ['object_id']
+
+    formfield_overrides = {
+        models.JSONField: {'widget': JSONEditorWidget(options={'mode': 'view'})},
+    }

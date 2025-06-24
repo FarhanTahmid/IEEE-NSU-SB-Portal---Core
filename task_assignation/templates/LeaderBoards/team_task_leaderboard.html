@@ -169,6 +169,18 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="num_rows">
+                            <div class="form-group">
+                                <!--		Show Numbers Of Rows 		-->
+                                <form id="panelForm2">
+                                    <select class="form-control search_box" name="panel" id="maxRows" onchange="panelSelect2();">
+                                        {% for panel in all_panels_of_branch %}
+                                        <option {% if panel.year == branch_panel.year %}selected{% endif %} value="{{panel.year}}">{{panel.year}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
                         <div class="tb_search">
                             <input type="text" id="search_input_team" onkeyup="FilterkeyWord__table()"
                                 placeholder="Search.." class="form-control search_box" />
@@ -193,6 +205,7 @@
                             </thead>
                             <tbody id="nostripe">
                                 {% for team in all_teams %}
+                                {% if branch_panel.current %}
                                 <tr>
                                     <td>{{forloop.counter}}</td>
                                     <td>
@@ -204,6 +217,19 @@
                                     </td>
                                     <td class="task-points">{{team.completed_task_points}}</td>
                                 </tr>
+                                {% else %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>
+                                        {% if has_common_access %}
+                                        <a style="color: #00629b" href="{% url 'central_branch:team_task_history' team.team.primary %}">{{team.team.team_name}}</a>
+                                        {% else %}
+                                        {{team.team.team_name}}
+                                        {% endif %}
+                                    </td>
+                                    <td class="task-points">{{team.points}}</td>
+                                </tr>
+                                {% endif %}
                                 {% endfor %}
                             
                             </tbody>
@@ -227,6 +253,12 @@
     {% include "common_js.html" %}
     {% endblock common_js %}
     <script>
+        var form2 = document.getElementById('panelForm2');
+
+        function panelSelect2() {
+            form2.submit();
+          }
+
         getPagination("#team-table");
         $("#maxRows").trigger("change");
         function getPagination(table) {

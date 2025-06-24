@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Budget</title>
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {% block common_css %}
+    {% include "common_css.html" %}
+    {% endblock common_css %}
+</head>
+
+<body>
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app">
+
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+            {% block navbar %}
+            {% include 'finance_and_corporate_team/finance_navbar.html' %}
+            {% endblock navbar %}
+        </div>
+
+        <!--budget page content-->
+        <div style="padding-top: 72px;">
+            {% block budget_form_content %}
+            {% include "finance_and_corporate_team/budgetPageContent.html" %}
+            {% endblock budget_form_content %}
+        </div>
+    </div>
+</body>
+
+{% block common_js %} 
+{% include "common_js.html" %} 
+{% endblock common_js %}
+</html>

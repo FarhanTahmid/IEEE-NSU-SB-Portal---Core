@@ -283,6 +283,15 @@
                                         <input type="checkbox" class="checkbox" value="manage_team_access" name="manage_team_access">
                                         <label for="manage_team_access">Manage Team Access</label><br>
                                         {% endif %}
+
+                                        {% if data_access.create_budget_access %}
+                                        <input type="checkbox" checked="True" class="checkbox" value="create_budget_access" name="create_budget_access">
+                                        <label for="create_budget_access">Create Budget Access
+                                        </label><br>
+                                        {% else %}
+                                        <input type="checkbox" class="checkbox" value="create_budget_access" name="create_budget_access">
+                                        <label for="create_budget_access">Create Budget Access</label><br>
+                                        {% endif %}
                                             
                                     </td>
                                 

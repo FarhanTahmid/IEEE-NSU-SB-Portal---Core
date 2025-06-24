@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Budget | Finance & Corporate Team</title>
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <link rel="stylesheet" href="{% static 'newTable.css' %}" type="text/css" />
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %} 
+    {% include "common_css.html" %} 
+    {% endblock common_css %}
+
+    <style>
+      /* IEEE Brand Color Palette */
+      :root {
+        --ieee-blue: #0f77b3;
+        --ieee-light-blue: #0083ca;
+        --ieee-teal: #00843d;
+        --ieee-light-gray: #e4e4e4;
+        --ieee-medium-gray: #d9d9d9;
+        --ieee-dark-gray: #666666;
+        --ieee-black: #000000;
+        --white: ##f0f0f0;
+      }
+
+      body,
+      html {
+        margin: 0;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+      }
+
+      .row {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background-color: #e4e4e4;
+      }
+
+      .budget-container {
+        width: 100%;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .top-actions {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .search-filter {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
+
+      .search-box {
+        flex-grow: 1;
+      }
+
+      .budget-btn {
+        background-color: #2a9d8f;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .budget-btn.primary {
+        background-color: #2a9d8f;
+        color: #fff;
+        border: 1px solid #2a9d8f;
+      }
+
+      .budget-btn.primary:hover {
+        border: 1px solid #2a9d8f;
+        background-color: #fff;
+        color: #2a9d8f;
+      }
+
+      .budget-input {
+        padding: 6px 10px;
+        border-radius: 3px;
+        border: 2px solid #d3d3d3;
+        color: black;
+        transition: 0.4s;
+        box-shadow: 2px 2px 5px 0px #80808054;
+        border: 2px solid white;
+      }
+
+      .budget-table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #e4e4e4;
+      }
+
+      .budget-table th {
+        padding: 10px;
+      }
+
+      .budget-table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--ieee-light-gray);
+      }
+
+      .budget-table tr:hover {
+        background-color: var(--ieee-medium-gray);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .search-filter {
+          flex-direction: column;
+        }
+
+        .search-box {
+          margin-bottom: 10px;
+        }
+
+        .budget-table th,
+        .budget-table td {
+          padding: 10px;
+        }
+      }
+      .fa-download,
+      .fa-users {
+        cursor: pointer;
+      }
+      .fa-download:hover,
+      .fa-users:hover {
+        color: #00629b;
+      }
+      .modal-1-content::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .modal-1-content::-webkit-scrollbar-thumb {
+        background-color: #e7eeef;
+        transition: all 0.4s ease-in-out;
+        border-radius: 4px;
+      }
+      .modal-1-content::-webkit-scrollbar-thumb:hover {
+        background-color: rgb(169, 170, 170);
+      }
+      .modal-1-content {
+        background-color: #fefefe;
+        margin: auto 45%;
+        padding: 20px;
+        border: 1px solid rgb(136, 136, 136);
+        width: 250px;
+        border-radius: 6px;
+      }
+      .modal-2-content::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .modal-2-content::-webkit-scrollbar-thumb {
+        background-color: #e7eeef;
+        transition: all 0.4s ease-in-out;
+        border-radius: 4px;
+      }
+      .modal-2-content::-webkit-scrollbar-thumb:hover {
+        background-color: rgb(169, 170, 170);
+      }
+      .modal-2-content {
+        background-color: #fefefe;
+        margin: auto 35%;
+        padding: 20px;
+        border: 1px solid rgb(136, 136, 136);
+        width: 40%;
+        border-radius: 6px;
+      }
+      .download_modal {
+        opacity: 0;
+        position: fixed;
+        z-index: -1;
+        padding-top: 50px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 120%;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.5);
+        transition: all 0.3s ease-in-out;
+        transform: translateY(-20px);
+        overflow: auto;
+      }
+      .close_1,
+      .close_2 {
+        color: #000;
+        font-size: 28px;
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+        bottom: 4px;
+      }
+
+      .close_1:hover,
+      .close_2:hover,
+      .close_1:focus,
+      .close_2:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      @media screen and (max-width: 1024px) {
+        .modal-1-content {
+          left: 0px;
+          margin: auto;
+        }
+        .modal-2-content {
+          left: 0px;
+          margin: auto;
+        }
+      }
+      @media screen and (max-width: 650px) {
+        .modal-1-content {
+          width: auto;
+        }
+        .modal-2-content {
+          width: auto;
+        }
+      }
+      .cancel_download {
+        padding: 2px 26px;
+        color: #e23737;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #e23737;
+        transition: all ease-in-out 0.3s;
+      }
+      .cancel_download:hover {
+        color: white;
+        background: #e23737;
+        border-color: transparent;
+      }
+      .cancel_btn {
+        padding: 4px 26px;
+        color: #e23737;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #e23737;
+        transition: all ease-in-out 0.3s;
+      }
+      .cancel_btn:hover {
+        color: white;
+        background: #e23737;
+        border-color: transparent;
+      }
+      .confirm_download {
+        padding: 2px 26px;
+        border-radius: 4px;
+        border: 1px solid #059669;
+        transition: all ease-in-out 0.3s;
+        background: white;
+        color: #059669;
+      }
+      .confirm_download:hover {
+        color: white;
+        background: #059669;
+        border-color: #059669;
+      }
+      .submit {
+        padding: 2px 26px;
+        border-radius: 4px;
+        border: 1px solid #059669;
+        transition: all ease-in-out 0.3s;
+        background: white;
+        color: #059669;
+      }
+      .submit:hover {
+        color: white;
+        background: #059669;
+        border-color: #059669;
+      }
+      .modal-1-content input,
+      .modal-2-content input {
+        width: auto;
+      }
+      .download-btn {
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: transparent;
+        color: #00629b;
+        border-radius: 50%;
+      }
+
+      .download-btn:hover {
+        color: white;
+        background-color: rgba(0, 98, 155, 0.75);
+      }
+
+      .user-btn {
+        border: none;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: transparent;
+        color: #00629b;
+        border-radius: 50%;
+      }
+
+      .user-btn:hover {
+        color: white;
+        background-color: rgba(0, 98, 155, 0.75);
+      }
+      td a {
+        color: #2d5ea2;
+      }
+      td a:hover {
+        color: #1d5db6;
+      }
+      th {
+        background-color: #00629b;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app">
+      <!-- aside -->
+      <div id="aside" class="app-aside modal nav-dropdown">
+        {% block sidebar %} 
+        {% include 'users/sidebar.html' %} 
+        {% endblock %}
+      </div>
+      <!-- aside end -->
+
+      <!-- navbar content -->
+      <div id="content" class="app-content box-shadow-z0" role="main">
+        {% block navbar %} 
+        {% include 'finance_and_corporate_team/finance_navbar.html' %} 
+        {% endblock navbar %}
+      </div>
+      <!--navbar content end-->
+
+      <!-- ############ PAGE START-->
+      <div
+        ui-view
+        class="app-body"
+        style="justify-content: center; margin-left: 15%; margin-right: 15%"
+        id="view"
+      >
+        <br />
+        <h2
+          style="
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 15px;
+          "
+        >
+          <span style="color: #00629b">
+            <b>The Finance & Corporate Team</b></span
+          >'s <b>Budget Page</b>
+        </h2>
+
+        <div class="budget-container">
+          {% comment %}
+          <div class="top-actions">
+            <a
+              href="{% url 'finance_and_corporate_team:create_budget' %}"
+              id="addBudgetBtn"
+              class="budget-btn primary"
+              >Add Budget</a
+            >
+          </div>
+          {% endcomment %}
+
+          <div class="search-filter">
+            <div class="search-box">
+              <input
+                type="text"
+                id="searchInput"
+                class="budget-input"
+                onkeyup="FilterkeyWord_all_table()"
+                placeholder="Search.."
+                class="form-control"
+              />
+            </div>
+            {% comment %} <div class="form-group">
+              <!--		Show Numbers Of Rows 		-->
+              <select
+                class="form-control budget-input"
+                name="state"
+                id="maxRows"
+              >
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="5000">Previous Year's</option>
+              </select>
+            </div> {% endcomment %}
+          </div>
+          <div class="table-responsive" style="border-radius: 4px 4px 0 0">
+            <table class="table table-striped table-class">
+              <thead>
+                <tr>
+                  <th>SL</th>
+                  <th>Event</th>
+                  {% if eb_common_access %}
+                  <th>Manage Access</th>
+                  {% endif %}
+                  <th>Download</th>
+                </tr>
+              </thead>
+              <tbody id="budgetTableBody">
+                <!-- Table data will be dynamically loaded -->
+                {% for budget_sheet in all_budget_sheets %}
+                <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td style="color: blue">
+                    <a
+                      href="{% url 'finance_and_corporate_team:edit_budget' budget_sheet.pk %}"
+                      >{{budget_sheet.name}}</a
+                    >
+                  </td>                  
+                  {% if eb_common_access %}
+                  <td>
+                    <i
+                      class="fa fa-users user-btn"
+                      aria-hidden="true"
+                      data-sid="{{budget_sheet.pk}}"
+                    ></i>
+                  </td>
+                  {% endif %}
+                  <td>
+                    <i
+                      class="fa fa-download download-btn"
+                      aria-hidden="true"
+                      data-sid="{{budget_sheet.pk}}"
+                    ></i>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="modal_1" class="download_modal">
+        <!-- Modal content -->
+        <div class="modal-1-content">
+          <form
+            method="GET"
+            action="{% url 'finance_and_corporate_team:download_budget_sheet' %}"
+            target="_blank"
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 30px;
+                align-items: center;
+              "
+            >
+              <h5>Download</h5>
+              <span class="close_1">&times;</span>
+            </div>
+            <div style="font-size: larger">
+              <input type="radio" name="download_type" value="pdf" id="pdf" />
+              <label for="pdf">PDF</label>
+              <br />
+              <input
+                type="radio"
+                name="download_type"
+                value="excel"
+                id="excel"
+              />
+              <label for="excel">Excel</label>
+            </div>
+            <input
+              type="hidden"
+              id="sheet_id"
+              name="sheet_id"
+              value="{{budget_sheet.pk}}"
+            />
+            <div
+              style="
+                display: flex;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+                gap: 5px;
+                align-items: center;
+                margin-top: 20px;
+              "
+            >
+              <a href="#" class="cancel_download">Cancel</a>
+              <button
+                type="submit"
+                class="confirm_download"
+                name="confirm_download"
+              >
+                Confirm
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- User Modal -->
+      <div id="modal_2" class="download_modal">
+        <div class="modal-2-content">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 30px;
+              align-items: center;
+            "
+          >
+            <h5>Manage Access</h5>
+            <span class="close_2">&times;</span>
+          </div>
+          <form method="POST">
+            {% csrf_token %}
+            <div class="table-responsive" style="border-radius: 4px 4px 0 0">
+              <table class="table table-striped table-class">
+                <thead>
+                  <tr>
+                    <th>SL</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Action</th>
+                    <!-- Updated header title -->
+                  </tr>
+                </thead>
+                <tbody id="manageAccessTableBody">
+                  <!-- Table data will be dynamically loaded -->
+                </tbody>
+              </table>
+
+              <div style="display: flex; justify-content: right; gap: 6px">
+                <a href="#" class="cancel_btn">Cancel</a>
+                <button type="submit" class="submit">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ############ PAGE END -->
+
+      <!--Theme Switcher-->
+      {% block theme_switcher %} 
+      {% include "theme_switcher.html" %} 
+      {% endblock theme_switcher %}
+    </div>
+    <!-- app end-->
+
+    {% block common_js %} 
+    {% include "common_js.html" %} 
+    {% endblock common_js %}
+
+    <script>
+      // Populate table with sample data
+      function populateTable(data) {
+        const tableBody = document.getElementById("budgetTableBody");
+        tableBody.innerHTML = "";
+
+        data.forEach((item) => {
+          const row = document.createElement("tr");
+
+          const serialCell = document.createElement("td");
+          serialCell.textContent = item.serial;
+
+          const sheetNameCell = document.createElement("td");
+          sheetNameCell.textContent = item.sheetName;
+
+          // const downloadCell = document.createElement('td');
+          // const downloadBtn = document.createElement('button');
+          // downloadBtn.textContent = "Download";
+          // downloadBtn.className = "download-btn";
+          // downloadBtn.addEventListener('click', () => {
+          //     alert(`Downloading ${item.sheetName}`);
+          // });
+          // downloadCell.appendChild(downloadBtn);
+
+          row.appendChild(serialCell);
+          row.appendChild(sheetNameCell);
+          // row.appendChild(downloadCell);
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Initialize the table
+      document.addEventListener("DOMContentLoaded", () => {
+        // Search functionality
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredData = sampleData.filter(
+              (item) =>
+                item.serial.toLowerCase().includes(searchTerm) ||
+                item.sheetName.toLowerCase().includes(searchTerm)
+            );
+            populateTable(filteredData);
+          });
+      });
+    </script>
+    <script>
+      // Get all modal buttons
+      var btns = document.querySelectorAll(".download-btn");
+      var download_sheet_id = document.getElementById("sheet_id");
+
+      // Loop through each button
+      btns.forEach(function (btn) {
+        var modal_1 = document.getElementById("modal_1");
+        var span_1 = modal_1.getElementsByClassName("close_1")[0];
+        var cancel = modal_1.getElementsByClassName("cancel_download")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+          modal_1.style.transform = "translateY(0px)";
+          modal_1.style.zIndex = "103100";
+          modal_1.style.opacity = "1";
+          download_sheet_id.value = btn.dataset.sid;
+        };
+
+        // Close modal on span click
+        span_1.onclick = function () {
+          modal_1.style.transform = "translateY(-50px)";
+          modal_1.style.zIndex = "-100";
+          modal_1.style.opacity = "0";
+        };
+
+        // Close modal on cancel click
+        cancel.onclick = function () {
+          modal_1.style.transform = "translateY(-50px)";
+          modal_1.style.zIndex = "-100";
+          modal_1.style.opacity = "0";
+        };
+
+        // Close modal if clicked outside
+        window.addEventListener("click", function (event) {
+          if (event.target === modal_1) {
+            modal_1.style.transform = "translateY(-50px)";
+            modal_1.style.zIndex = "-100";
+            modal_1.style.opacity = "0";
+          }
+        });
+      });
+    </script>
+    <script>
+          var userBtn = document.querySelectorAll(".user-btn");
+          var modal_2 = document.getElementById("modal_2");
+          var closeUser = modal_2.getElementsByClassName("close_2")[0];
+          var cancelUser = modal_2.getElementsByClassName("cancel_btn")[0];
+
+          userBtn.forEach(function(btn) {
+
+              btn.onclick = function () {
+              load_sheet_access_data(btn.dataset.sid);
+              modal_2.style.transform = 'translateY(0px)';
+              modal_2.style.zIndex = '103100';
+              modal_2.style.opacity = '1';
+          }
+
+          closeUser.onclick = function () {
+              modal_2.style.transform = 'translateY(-50px)';
+              modal_2.style.zIndex = '-100';
+              modal_2.style.opacity = '0';
+          }
+
+          cancelUser.onclick = function () {
+              modal_2.style.transform = 'translateY(-50px)';
+              modal_2.style.zIndex = '-100';
+              modal_2.style.opacity = '0';
+          }
+
+          window.addEventListener("click", function (event) {
+              if (event.target === modal_2) {
+                  modal_2.style.transform = 'translateY(-50px)';
+                  modal_2.style.zIndex = '-100';
+                  modal_2.style.opacity = '0';
+              }
+          });
+      });
+
+          var access_table_body = document.getElementById('manageAccessTableBody');
+
+          function load_sheet_access_data(sheet_id) {
+
+              // Send AJAX request to the backend
+              $.ajax({
+                  url: "{% url 'finance_and_corporate_team:load_budget_sheet_access' %}",
+                  type: 'GET',
+                  data: {
+                      'sheet_id': sheet_id,
+                  },
+                  success: function(response) {
+                      // Handle success response from the backend
+                      response_data = response.data;
+                      access_table_body.innerHTML = `<input type="hidden" name="sheet_id" value=${response_data[0].sheet_id}>`;
+
+                      for (let i = 1; i < response_data.length; i++) {
+                          access_table_body.innerHTML += `
+                          <tr>
+                              <td>${i}</td>
+                              <td>${response_data[i].member.name}</td>
+                              <td>${response_data[i].member.position}</td>
+                              <td>
+                                  <input type="hidden" name="ieee_id" value=${response_data[i].member.ieee_id}>
+                                  <select name="access_type" class="form-select" style="padding: 6px 12px; border-radius: 6px; border: none; text-decoration: none;">
+                                      <option value="" ${response_data[i].access_type === null? "selected" : ""}>Select</option>
+                                      <option value="ViewOnly" ${response_data[i].access_type === 'ViewOnly'? "selected" : ""}>ViewOnly</option>
+                                      <option value="Edit" ${response_data[i].access_type === 'Edit'? "selected" : ""}>Edit</option>
+                                      <option value="Restricted" ${response_data[i].access_type === 'Restricted'? "selected" : ""}>Restricted</option>
+                                  </select>
+                              </td>
+                          </tr>
+                          `;
+                      }
+
+                      {% comment %} 
+                      showMessage(response.message); 
+                      {% endcomment %}
+                  },
+                  error: function(xhr, status, error) {
+                      // Handle error response from the backend
+                      console.error('AJAX request error:', error);
+                  }
+              });
+          }
+    </script>
+
+    <script>
+    {% for message in messages %}
+
+    Swal.fire({
+        icon:"{{message.tags}}",
+        title:"{{message}}",
+        
+    })
+    {% endfor %}
+  </script>
+  </body>
+</html>

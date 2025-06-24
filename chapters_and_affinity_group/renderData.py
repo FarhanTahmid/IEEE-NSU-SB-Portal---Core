@@ -1,4 +1,6 @@
 from django.contrib import messages
+
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
 from .models import SC_AG_Members,SC_AG_FeedBack
 from users.models import Members,Panel_Members
 from port.models import Panels,Chapters_Society_and_Affinity_Groups,Teams,Roles_and_Position
@@ -111,7 +113,7 @@ class Sc_Ag:
             get_panel_members=Panel_Members.objects.filter(tenure=Panels.objects.get(pk=panel_id))
             for member in get_panel_members:
                 if member.member:
-                    SC_AG_Members.objects.filter(member=Members.objects.get(ieee_id=member.member.ieee_id)).update(position=None,team=None)
+                    SC_AG_Members.objects.filter(sc_ag=Panels.objects.get(pk=panel_id).panel_of,member=Members.objects.get(ieee_id=member.member.ieee_id)).update(position=None,team=None)
 
             return True
         except Exception as e:
@@ -168,9 +170,9 @@ class Sc_Ag:
                     if member.member:
                         if member.team is None:
                             # update team as none
-                            SC_AG_Members.objects.filter(member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=None,position=Roles_and_Position.objects.get(id=member.position.id))                
+                            SC_AG_Members.objects.filter(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=None,position=Roles_and_Position.objects.get(id=member.position.id))                
                         else:
-                            SC_AG_Members.objects.filter(member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=Teams.objects.get(primary=member.team.primary),position=Roles_and_Position.objects.get(id=member.position.id))
+                            SC_AG_Members.objects.filter(sc_ag=Chapters_Society_and_Affinity_Groups.objects.get(primary=sc_ag_primary),member=Members.objects.get(ieee_id=member.member.ieee_id)).update(team=Teams.objects.get(primary=member.team.primary),position=Roles_and_Position.objects.get(id=member.position.id))
                 #now update the panel
                 panel_to_update.current=True
                 panel_to_update.year=panel_tenure
@@ -626,12 +628,103 @@ class Sc_Ag:
             return False
 
 
+    def create_budget(request, primary, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+        
+        try:
+            total_cost = 0
+            for cost in cst_total:
+                if cost:
+                    total_cost += float(cost)
 
+            total_revenue = 0
+            for revenue in rev_total:
+                if revenue:
+                    total_revenue += float(revenue)
+
+            cost_data =  {}
+            for i in range(len(cst_item)):
+                cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+            revenue_data = {}
+            for i in range(len(rev_item)):
+                revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+            if event_id:
+                event = Events.objects.get(id=event_id)
+                budget_sheet = BudgetSheet.objects.create(name=f'Budget of {event.event_name}',
+                                        sheet_of=event.event_organiser,
+                                        event=event,
+                                        costBreakdownData=cost_data,
+                                        revenueBreakdownData=revenue_data,
+                                        total_cost=total_cost,
+                                        total_revenue=total_revenue)           
+            else:
+                budget_sheet = BudgetSheet.objects.create(name=f'Budget Of XYZ',
+                                                        sheet_of=Chapters_Society_and_Affinity_Groups.objects.get(primary=primary),
+                                                        costBreakdownData=cost_data,
+                                                        revenueBreakdownData=revenue_data,
+                                                        total_cost=total_cost,
+                                                        total_revenue=total_revenue)
+
+            try:   
+                username = request.user.username
+                member = Members.objects.get(ieee_id=username)
+                panel_member = Panel_Members.objects.filter(tenure__current=True, tenure__panel_of__primary=primary, member=member)
+                if panel_member.exists():
+                    if not panel_member[0].position.is_eb_member:
+                        BudgetSheetAccess.objects.create(sheet=budget_sheet, member=member, access_type='Edit')
+            except:
+                pass
+                
+            return budget_sheet
+        
+        except:
+            return False
+        
+    def edit_budget(sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+
+        try:
+            total_cost = 0
+            for cost in cst_total:
+                if cost:
+                    total_cost += float(cost)
+
+            total_revenue = 0
+            for revenue in rev_total:
+                if revenue:
+                    total_revenue += float(revenue)
+
+            cost_data =  {}
+            for i in range(len(cst_item)):
+                cost_data.update({i : [cst_item[i], cst_quantity[i], cst_upc_bdt[i], cst_total[i]]})
+
+            revenue_data = {}
+            for i in range(len(rev_item)):
+                revenue_data.update({i : [rev_item[i], rev_quantity[i], rev_upc_bdt[i], rev_total[i]]})
+
+            budget_sheet = BudgetSheet.objects.get(id=sheet_id)
+            budget_sheet.costBreakdownData = cost_data
+            budget_sheet.revenueBreakdownData = revenue_data
+            budget_sheet.total_cost = total_cost
+            budget_sheet.total_revenue = total_revenue
+
+            if saved_rate:
+                budget_sheet.usd_rate = saved_rate
+            else:
+                budget_sheet.usd_rate = None
+
+            if show_usd_rates == 'on':
+                budget_sheet.show_usd_rates = True
+            else:
+                budget_sheet.show_usd_rates = False
+
+            budget_sheet.save()
+            return True
+        
+        except:
+            return False
         
         
-    
-    
-
 
     
     

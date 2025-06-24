@@ -1,0 +1,1246 @@
+{% load static %} 
+{% block budget_form_content %}
+  <style>
+    :root {
+      --primary-color: #00629b;
+      --secondary-color: #107a57;
+      --background-color: #f3f4f6;
+      --text-color: #1f2937;
+      --border-color: #e5e7eb;
+      --ieee-blue: #0f77b3;
+      --ieee-light-blue: #0083ca;
+      --ieee-teal: #00843d;
+      --ieee-light-gray: #e4e4e4;
+      --ieee-medium-gray: #d9d9d9;
+      --ieee-dark-gray: #666666;
+      --ieee-black: #000000;
+      --white: #f0f0f0;
+      --red: #ef4444;
+      --green: #059669;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: white;
+      color: var(--text-color);
+      line-height: 1.6;
+      /* padding: 2rem; */
+    }
+
+    .container_1 {
+      max-width: 900px;
+      margin: 26px auto;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 9px 3px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+    }
+
+    .budget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .budget-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin: 12px 0;
+    }
+
+    .add-row-btn {
+      border: none;
+      padding: 2px -5px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      /* display: flex; */
+      /* align-items: center; */
+      gap: 0.5rem;
+      background-color: #fefefe;
+      color: var(--primary-color);
+      /* border: 1px solid var(--primary-color);*/
+    }
+
+    .add-row-btn:hover {
+      color: #2a9cde;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    th {
+      background-color: var(--primary-color);
+      color: #fefefe;
+      /* font-weight: 600; */
+      /* text-transform: uppercase; */
+      font-size: 0.875rem;
+      padding: 1rem;
+      text-align: left;
+    }
+
+    td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      background-color: white;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.875rem;
+      transition: border-color 0.3s ease-in-out;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: center;
+      padding: 19px 4px;
+    }
+
+    .action-btn {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .remove-btn {
+      color: var(--red);
+      font-size: larger;
+    }
+
+    .remove-btn:hover {
+      color: #ec1616;
+    }
+
+    .total-row {
+      font-weight: 600;
+      background-color: #f9fafb;
+    }
+
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      background-color: #f9fafb;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .save-btn {
+      background-color: white;
+      color: var(--green);
+      border: 1px solid var(--green);
+      padding: 0.5rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      margin-left: 4px;
+    }
+
+    .save-btn:hover {
+      background-color: var(--green);
+      color: white;
+    }
+    .convert-usd-bdt {
+      padding: 7px 20px;
+      /* border: 1px solid var(--green); */
+      border-radius: 0 0 4px 0px;
+      color: var(--green);
+      background-color: #54cca68f;
+      transition: all 0.3s ease-in-out;
+    }
+    .convert-usd-bdt:hover {
+      color: white;
+    }
+    .conversion_rate {
+      width: 86px;
+      height: 31px;
+    }
+    .download_modal {
+      opacity: 0;
+      position: fixed;
+      z-index: -1;
+      padding-top: 50px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 120%;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease-in-out;
+      transform: translateY(-20px);
+      overflow: auto;
+    }
+    .close_1 {
+      color: #000;
+      font-size: 28px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .close_1:hover,
+    .close_1:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    @media screen and (max-width: 1024px) {
+      .modal-1-content {
+        left: 0px;
+        margin: auto;
+      }
+    }
+    @media screen and (max-width: 650px) {
+      .modal-1-content {
+        width: auto;
+      }
+    }
+    @media screen and (max-width: 900px) {
+      .budget_container {
+        margin: 5%;
+      }
+    }
+    .cancel_download {
+      padding: 2px 26px;
+      color: var(--red);
+      background: white;
+      border-radius: 4px;
+      border: 1px solid var(--red);
+      transition: all ease-in-out 0.3s;
+    }
+    .cancel_download:hover {
+      color: white;
+      background: var(--red);
+      border-color: transparent;
+    }
+    .modal-1-content input {
+      width: auto;
+    }
+    .fa-download,
+    .fa-users {
+      cursor: pointer;
+      font-size: larger;
+    }
+    .fa-download:hover,
+    .fa-users:hover {
+      color: var(--primary-color);
+    }
+    .modal-1-content::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .modal-1-content::-webkit-scrollbar-thumb {
+      background-color: #e7eeef;
+      transition: all 0.4s ease-in-out;
+      border-radius: 4px;
+    }
+    .modal-1-content::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(169, 170, 170);
+    }
+    .modal-1-content {
+      background-color: #fefefe;
+      margin: auto 45%;
+      padding: 20px;
+      border: 1px solid rgb(136, 136, 136);
+      width: 250px;
+      border-radius: 6px;
+    }
+    .modal-2-content::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .modal-2-content::-webkit-scrollbar-thumb {
+      background-color: #e7eeef;
+      transition: all 0.4s ease-in-out;
+      border-radius: 4px;
+    }
+    .modal-2-content::-webkit-scrollbar-thumb:hover {
+      background-color: rgb(169, 170, 170);
+    }
+    .modal-2-content {
+      background-color: #fefefe;
+      margin: auto 35%;
+      padding: 20px;
+      border: 1px solid rgb(136, 136, 136);
+      width: 40%;
+      border-radius: 6px;
+    }
+    .download_modal {
+      opacity: 0;
+      position: fixed;
+      z-index: -1;
+      padding-top: 50px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 120%;
+      background-color: rgb(0, 0, 0);
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease-in-out;
+      transform: translateY(-20px);
+      overflow: auto;
+    }
+    .close_1,
+    .close_2 {
+      color: #000;
+      font-size: 28px;
+      display: flex;
+      justify-content: flex-end;
+      position: relative;
+      bottom: 3px;
+    }
+
+    .close_1:hover,
+    .close_2:hover,
+    .close_1:focus,
+    .close_2:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    @media screen and (max-width: 1024px) {
+      .modal-1-content {
+        left: 0px;
+        margin: auto;
+      }
+      .modal-2-content {
+        left: 0px;
+        margin: auto;
+      }
+    }
+    @media screen and (max-width: 650px) {
+      .modal-1-content {
+        width: auto;
+      }
+      .modal-2-content {
+        width: auto;
+      }
+    }
+    .cancel_download {
+      padding: 2px 26px;
+      color: var(--red);
+      background: white;
+      border-radius: 4px;
+      border: 1px solid var(--red);
+      transition: all ease-in-out 0.3s;
+    }
+    .cancel_download:hover {
+      color: white;
+      background: var(--red);
+      border-color: transparent;
+    }
+    .cancel_btn {
+      padding: 4px 26px;
+      color: var(--red);
+      background: white;
+      border-radius: 4px;
+      border: 1px solid var(--red);
+      transition: all ease-in-out 0.3s;
+    }
+    .cancel_btn:hover {
+      color: white;
+      background: var(--red);
+      border-color: transparent;
+    }
+    .confirm_download {
+      padding: 2px 26px;
+      border-radius: 4px;
+      border: 1px solid var(--green);
+      transition: all ease-in-out 0.3s;
+      background: white;
+      color: var(--green);
+    }
+    .confirm_download:hover {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .submit {
+      padding: 2px 26px;
+      border-radius: 4px;
+      border: 1px solid var(--green);
+      transition: all ease-in-out 0.3s;
+      background: white;
+      color: var(--green);
+    }
+    .submit:hover {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .modal-1-content input,
+    .modal-2-content input {
+      width: auto;
+    }
+    .download-btn {
+      border: none;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: #fefefe;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .download-btn:hover {
+      color: white;
+      background-color: var(--primary-color);
+    }
+
+    .user-btn {
+      border: none;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: #fefefe;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .user-btn:hover {
+      color: white;
+      background-color: var(--primary-color);
+    }
+    td input {
+      text-align: center;
+      text-decoration: none;
+      border: none;
+    }
+  </style>
+<div class="container_1">
+  <!--budget name-->
+  {% if budget_sheet.event %}
+  <h2 style="text-align: center; margin-top: 30px; margin-bottom: 24px">
+    Budget of
+    <span style="color: var(--primary-color); font-weight: bold"
+      >{{budget_sheet.event.event_name}}</span
+    >
+    event
+  </h2>
+  {% elif event %}
+  <h2 style="text-align: center; margin-top: 30px; margin-bottom: 24px">
+    Budget of
+    <span style="color: var(--primary-color); font-weight: bold"
+      >{{event.event_name}}</span
+    >
+    event
+  </h2>
+  {% else %}
+  <h2 style="text-align: center; margin-top: 30px; margin-bottom: 24px">
+    {{budget_sheet.name}}
+  </h2>
+  {% endif %}
+
+  <div class="budget_container">
+    <form method="POST">
+      <div style="display: flex;justify-content: right; align-items: flex-end; flex-direction: column; margin-bottom: 16px;">
+        {% if access_type == 'Edit' and budget_sheet %}
+        <p style="margin: 0; font-weight: bold; text-align: center; border-radius: 4px 4px 0 0;padding: 5px 35px;background-color: #ffd10073;">Current USD rate: {% if usd_rate %}{{usd_rate}}{% else %}No Data{% endif %}</p>
+        <div>
+        <input
+          type="decimal"
+          name="saved_rate"
+          class="conversion_rate"
+          placeholder="USD Rate"
+          style="border-radius: 0px 0 0 4px; position: relative; left: 4px;"
+          value={% if budget_sheet.usd_rate %}{{budget_sheet.usd_rate}}{% else %}""{% endif %}
+        />
+        <a href="#" class="convert-usd-bdt">{% if budget_sheet.show_usd_rates %}Convert to BDT{% else %}Convert to USD{% endif %}</a>
+        <input type="hidden" id="show_usd_rates" value="{% if budget_sheet.show_usd_rates %}on{% else %}off{% endif %}" name="show_usd_rates">
+      </div>
+      {% endif %}
+        </div>
+      {% csrf_token %}
+      <div style="display: flex; justify-content: space-between">
+        <div class="budget-header">
+          <h2 style="border-bottom: 2px solid var(--primary-color)">
+            Cost Breakdown
+          </h2>
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            align-items: center;
+          "
+        >
+        {% if eb_common_access and budget_sheet %}
+          <i class="fa fa-users user-btn" aria-hidden="true"></i>
+        {% endif %}
+        {% if budget_sheet %}
+          <i
+            class="fa fa-download download-btn"
+            aria-hidden="true"
+            data-sid="{{budget_sheet.pk}}"
+          ></i>
+        {% endif %}
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>{% if budget_sheet.show_usd_rates %}Unit Per Cost (USD){% else %}Unit Per Cost (BDT){% endif %}</th>
+            <th>Total</th>
+            {% if access_type == 'Edit' %}
+            <th>Actions</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody id="cost-body">
+          {% if budget_sheet.costBreakdownData %} {% for row, data in budget_sheet.costBreakdownData.items %}
+          <tr>
+            <td>
+              <input
+                type="text"
+                class="item-input"
+                name="cst_item[]"
+                placeholder="Item"
+                value="{{data.0}}" {% if access_type != 'Edit' %} disabled {% endif %}
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="quantity-input"
+                name="cst_quantity[]"
+                oninput="calculateCostTotal(this)"
+                placeholder="20"
+                value="{{data.1}}" {% if access_type != 'Edit' %} disabled {% endif %}
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="unit-cost-input"
+                name="cst_upc_bdt[]"
+                oninput="calculateCostTotal(this)"
+                placeholder="500"
+                value="{{data.2}}" {% if access_type != 'Edit' %}disabled{% endif %}
+              />
+            </td>
+            <td class="total-cell">{{data.3}}</td>
+            <input
+              type="hidden"
+              class="totalinput"
+              name="cst_total[]"
+              value="{{data.3}}" {% if access_type != 'Edit' %}disabled{% endif %}
+            />
+            {% if access_type == 'Edit' %}
+            <td class="action-buttons">
+              <div>
+                <i
+                  class="fa fa-trash action-btn remove-btn"
+                  onclick="removeRow(this)"
+                  aria-hidden="true"
+                ></i>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %} 
+          {% else %}
+          <tr>
+            <td>
+              <input
+                type="text"
+                class="item-input"
+                name="cst_item[]"
+                placeholder="Item"
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="quantity-input"
+                name="cst_quantity[]"
+                oninput="calculateCostTotal(this)"
+                placeholder="20"
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="unit-cost-input"
+                name="cst_upc_bdt[]"
+                oninput="calculateCostTotal(this)"
+                placeholder="500"
+              />
+            </td>
+            <td class="total-cell">0</td>
+            <input type="hidden" class="totalinput" name="cst_total[]" />
+            <td class="action-buttons">
+              <div>
+                <i
+                  class="fa fa-trash action-btn remove-btn"
+                  onclick="removeRow(this)"
+                  aria-hidden="true"
+                ></i>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td>Total Cost</td>
+            <td></td>
+            <td></td>
+            <td id="total-cost">{{budget_sheet.total_cost|floatformat:2}}</td>
+            {% if access_type == 'Edit' %}
+            <td>
+              <button type="button" class="add-row-btn" onclick="addCostRow()">
+                + Add Row
+              </button>
+            </td>
+            {% endif %}
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="budget-header" style="margin-top: 4rem">
+        <h2 style="border-bottom: 2px solid var(--primary-color)">
+          Revenue Breakdown
+        </h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Revenue Type</th>
+            <th>Quantity</th>
+            <th>{% if budget_sheet.show_usd_rates %}Revenue/Unit (USD){% else %}Revenue/Unit (BDT){% endif %}</th>
+            <th>Total</th>
+            {% if access_type == 'Edit' %}
+            <th>Actions</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody id="revenue-body">
+          {% if budget_sheet.revenueBreakdownData %} {% for row, data in budget_sheet.revenueBreakdownData.items %}
+          <tr>
+            <td>
+              <input
+                type="text"
+                class="revenue-type-input"
+                name="rev_item[]"
+                placeholder="Revenue"
+                value="{{data.0}}" {% if access_type != 'Edit' %}disabled{% endif %}
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="revenue-quantity-input"
+                name="rev_quantity[]"
+                oninput="calculateRevenueTotal(this)"
+                placeholder="50"
+                value="{{data.1}}" {% if access_type != 'Edit' %}disabled{% endif %}
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="revenue-unit-input"
+                name="rev_upc_bdt[]"
+                oninput="calculateRevenueTotal(this)"
+                placeholder="500"
+                value="{{data.2}}" {% if access_type != 'Edit' %}disabled{% endif %}
+              />
+            </td>
+            <td class="revenue-total-cell">{{data.3}}</td>
+            <input
+              type="hidden"
+              class="revenue-totalinput"
+              name="rev_total[]"
+              value="{{data.3}}" {% if access_type != 'Edit' %}disabled{% endif %}
+            />
+            {% if access_type == 'Edit' %}
+            <td class="action-buttons">
+              <div>
+                <i
+                  class="fa fa-trash action-btn remove-btn"
+                  onclick="removeRow(this)"
+                  aria-hidden="true"
+                ></i>
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+          {% else %}
+          <tr>
+            <td>
+              <input
+                type="text"
+                class="revenue-type-input"
+                name="rev_item[]"
+                placeholder="Registered Participants"
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="revenue-quantity-input"
+                name="rev_quantity[]"
+                oninput="calculateRevenueTotal(this)"
+                placeholder="50"
+              />
+            </td>
+            <td>
+              <input
+                type="decimal"
+                class="revenue-unit-input"
+                name="rev_upc_bdt[]"
+                oninput="calculateRevenueTotal(this)"
+                placeholder="500"
+              />
+            </td>
+            <td class="revenue-total-cell">0</td>
+            <input type="hidden" class="revenue-totalinput" name="rev_total[]" />
+            <td class="action-buttons">
+              <div>
+                <i
+                  class="fa fa-trash action-btn remove-btn"
+                  onclick="removeRow(this)"
+                  aria-hidden="true"
+                ></i>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td>Total Revenue</td>
+            <td></td>
+            <td></td>
+            <td id="total-revenue">
+              {{budget_sheet.total_revenue|floatformat:2}}
+            </td>
+            {% if access_type == 'Edit' %}
+            <td>
+              <button
+                type="button"
+                class="add-row-btn"
+                onclick="addRevenueRow()"
+              >
+                + Add Row
+              </button>
+            </td>
+            {% endif %}
+          </tr>
+        </tfoot>
+      </table>
+
+      <div style="background-color: white;position: sticky;
+      bottom: 0px;
+      z-index: 1000;">
+      <div class="summary" style="margin-top: 4rem">
+        <div>
+          <strong>Fund use:</strong>
+          BDT
+          <span id="deficit-surplus"
+            >{% if deficit %}{{deficit|floatformat:2}}{% else %}0{% endif %}</span
+          >
+        </div>
+        <div>
+          <strong>Fund Collection:</strong>
+          BDT
+          <span id="net-income"
+            >{% if surplus %}{{surplus|floatformat:2}}{% else %}0{% endif %}</span
+          >
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: center">
+        <!-- <a href="#" class="download-btn">Download</a> -->
+        {% if access_type == 'Edit' %}
+        <button type="submit" name="save_budget" class="save-btn">
+          Save Budget
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+    </form>
+    <div id="modal_1" class="download_modal">
+      <!-- Modal content -->
+      <div class="modal-1-content">
+        <form
+          method="GET"
+          action="{% url 'finance_and_corporate_team:download_budget_sheet' %}"
+          target="_blank"
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 30px;
+              align-items: center;
+            "
+          >
+            <h5>Download</h5>
+            <span class="close_1">&times;</span>
+          </div>
+          <div style="font-size: larger;">
+            <input type="radio" name="download_type" value="pdf" id="pdf">
+            <label for="pdf">PDF</label>
+            <br>
+            <input type="radio" name="download_type" value="excel" id="excel">
+            <label for="excel">Excel</label>
+        </div>
+          <input
+            type="hidden"
+            id="sheet_id"
+            name="sheet_id"
+            value="{{budget_sheet.pk}}"
+          />
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              flex-wrap: wrap;
+              gap: 5px;
+              align-items: center;
+              margin-top: 20px;
+            "
+          >
+            <a href="#" class="cancel_download">Cancel</a>
+            <button
+              type="submit"
+              class="confirm_download"
+              name="confirm_download"
+            >
+              Confirm
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- User Modal -->
+    <div id="modal_2" class="download_modal">
+      <div class="modal-2-content">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            align-items: center;
+          "
+        >
+          <h5>Manage Access</h5>
+          <span class="close_2">&times;</span>
+        </div>
+        <form method="POST">
+          {% csrf_token %}
+          <div class="table-responsive" style="border-radius: 4px 4px 0 0">
+            <table class="table table-striped table-class">
+              <thead>
+                <tr>
+                  <th>SL</th>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th>Action</th>
+                  <!-- Updated header title -->
+                </tr>
+              </thead>
+              <tbody id="budgetTableBody">
+                <!-- Table data will be dynamically loaded -->
+                 {% for team_member in fct_team_member_accesses %}
+                 <tr>
+                   <td>{{forloop.counter}}</td>
+                   <td>{{team_member.member.name}}</td>
+                   <td>{{team_member.member.position}}</td>
+                   <td>
+                     <input type="hidden" name="ieee_id" value={{team_member.member.ieee_id}}>
+                     <select
+                       name="access_type"
+                       class="form-select"
+                       style="
+                         padding: 6px 12px;
+                         border-radius: 6px;
+                         border: none;
+                         text-decoration: none;
+                       "
+                     >
+                       <option value="" {% if team_member.access_type == None %}selected{% endif %}>Select</option>
+                       <option value="ViewOnly" {% if team_member.access_type == 'ViewOnly' %}selected{% endif %}>ViewOnly</option>
+                       <option value="Edit" {% if team_member.access_type == 'Edit' %}selected{% endif %}>Edit</option>
+                       <option value="Restricted" {% if team_member.access_type == 'Restricted' %}selected{% endif %}>Restricted</option>
+                     </select>
+                   </td>
+                 </tr>
+                 {% endfor %}
+              </tbody>
+            </table>
+
+            <div style="display: flex; justify-content: right; gap: 6px">
+              <a href="#" class="cancel_btn">Cancel</a>
+              <button name="save_access" type="submit" class="submit">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- app end-->
+  </div>
+</div>
+<script>
+  function calculateCostTotal(input) {
+    const row = input.closest("tr");
+    const quantity = row.querySelector(".quantity-input").value || 0;
+    const unitCost = row.querySelector(".unit-cost-input").value || 0;
+    const totalCell = row.querySelector(".total-cell");
+    const totalinput = row.querySelector(".totalinput");
+    const total = quantity * unitCost;
+    totalCell.textContent = total.toFixed(2);
+    totalinput.value = total.toFixed(2);
+    updateTotalCost();
+    updateDeficitSurplus();
+  }
+
+  function calculateRevenueTotal(input) {
+    const row = input.closest("tr");
+    const quantity = row.querySelector(".revenue-quantity-input").value || 0;
+    const unitCost = row.querySelector(".revenue-unit-input").value || 0;
+    const totalCell = row.querySelector(".revenue-total-cell");
+    const totalinput = row.querySelector(".revenue-totalinput");
+    const total = quantity * unitCost;
+    totalCell.textContent = total.toFixed(2);
+    totalinput.value = total.toFixed(2);
+    updateTotalRevenue();
+    updateDeficitSurplus();
+  }
+
+  function updateTotalCost() {
+    const rows = document.querySelectorAll("#cost-body tr");
+    const totalCostCell = document.getElementById("total-cost");
+    const totalCost = Array.from(rows).reduce((sum, row) => {
+      const total =
+        parseFloat(row.querySelector(".total-cell").textContent) || 0;
+      return sum + total;
+    }, 0);
+    totalCostCell.textContent = totalCost.toFixed(2);
+  }
+
+  function updateTotalRevenue() {
+    const rows = document.querySelectorAll("#revenue-body tr");
+    const totalRevenueCell = document.getElementById("total-revenue");
+    const totalRevenue = Array.from(rows).reduce((sum, row) => {
+      const total =
+        parseFloat(row.querySelector(".revenue-total-cell").textContent) || 0;
+      return sum + total;
+    }, 0);
+    totalRevenueCell.textContent = totalRevenue.toFixed(2);
+  }
+
+  function updateDeficitSurplus() {
+    const totalCost = parseFloat(
+      document.getElementById("total-cost").textContent
+    );
+    const totalRevenue = parseFloat(
+      document.getElementById("total-revenue").textContent
+    );
+    const deficitSurplus = document.getElementById("deficit-surplus");
+    const netIncome = document.getElementById("net-income");
+
+    const difference = totalRevenue - totalCost;
+    deficitSurplus.textContent =
+      difference < 0 ? `${difference.toFixed(2)}` : "0";
+    netIncome.textContent = difference > 0 ? `+${difference.toFixed(2)}` : "0";
+  }
+
+  function addCostRow() {
+    const tbody = document.getElementById("cost-body");
+    const newRow = tbody.rows[0].cloneNode(true);
+    newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
+    newRow.querySelector(".total-cell").textContent = "0";
+    tbody.appendChild(newRow);
+  }
+
+  function addRevenueRow() {
+    const tbody = document.getElementById("revenue-body");
+    const newRow = tbody.rows[0].cloneNode(true);
+    newRow.querySelectorAll("input").forEach((input) => (input.value = ""));
+    newRow.querySelector(".revenue-total-cell").textContent = "0";
+    tbody.appendChild(newRow);
+  }
+
+  function removeRow(button) {
+    const row = button.closest("tr");
+    const tbody = row.closest("tbody");
+    if (tbody.rows.length > 1) {
+      row.remove();
+      updateTotalCost();
+      updateTotalRevenue();
+      updateDeficitSurplus();
+    }
+  }
+
+  document.getElementById("save-button").addEventListener("click", () => {
+    alert("Budget saved!");
+  });
+</script>
+<script>
+  document
+    .querySelector(".convert-usd-bdt")
+    .addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const rateInput = document.querySelector(".conversion_rate");
+      let rate = parseFloat(rateInput.value);
+
+      if (!rate || rate <= 0) {
+        alert("Please enter a valid USD rate.");
+        return;
+      }
+
+      const costTable = document.querySelectorAll("table")[0];
+      const revenueTable = document.querySelectorAll("table")[1];
+      const costHeader = costTable.querySelector("thead tr").children[2];
+      const revenueHeader = revenueTable.querySelector("thead tr").children[2];
+
+      let isUSD = costHeader.textContent.includes("USD");
+
+      if (isUSD) {
+        // Convert back to BDT
+        costHeader.textContent = "Unit Per Cost (BDT)";
+        revenueHeader.textContent = "Revenue/Unit (BDT)";
+
+        document.querySelectorAll(".unit-cost-input").forEach((input) => {
+          let value = parseFloat(input.value);
+          if (!isNaN(value)) {
+            input.value = (value * rate).toFixed(0);
+          }
+        });
+
+        document.querySelectorAll(".revenue-unit-input").forEach((input) => {
+          let value = parseFloat(input.value);
+          if (!isNaN(value)) {
+            input.value = (value * rate).toFixed(0);
+          }
+        });
+
+        // Change deficit and surplus text back to BDT
+        document.getElementById("deficit-surplus").previousSibling.textContent =
+          " BDT ";
+        document.getElementById("net-income").previousSibling.textContent =
+          " BDT ";
+
+        this.textContent = "Convert to USD";
+        document.getElementById('show_usd_rates').value = 'off';
+      } else {
+        // Convert to USD
+        costHeader.textContent = "Unit Per Cost (USD)";
+        revenueHeader.textContent = "Revenue/Unit (USD)";
+
+        document.querySelectorAll(".unit-cost-input").forEach((input) => {
+          let value = parseFloat(input.value);
+          if (!isNaN(value)) {
+            input.value = (value / rate).toFixed(2);
+          }
+        });
+
+        document.querySelectorAll(".revenue-unit-input").forEach((input) => {
+          let value = parseFloat(input.value);
+          if (!isNaN(value)) {
+            input.value = (value / rate).toFixed(2);
+          }
+        });
+
+        // Change deficit and surplus text to USD
+        document.getElementById("deficit-surplus").previousSibling.textContent =
+          " USD ";
+        document.getElementById("net-income").previousSibling.textContent =
+          " USD ";
+
+        this.textContent = "Convert to BDT";
+        document.getElementById('show_usd_rates').value = 'on';
+      }
+
+      // Recalculate totals after conversion
+      document
+        .querySelectorAll(".quantity-input")
+        .forEach((input) => calculateCostTotal(input));
+      document
+        .querySelectorAll(".revenue-quantity-input")
+        .forEach((input) => calculateRevenueTotal(input));
+
+      updateTotalCost();
+      updateTotalRevenue();
+      updateDeficitSurplus();
+    });
+</script>
+<script>
+  // Get the modal
+  var modal_1 = document.getElementById("modal_1");
+
+  // Get the button that opens the modal
+  var btn_1 = document.querySelector(".download-btn");
+
+  // Get the <span> element that closes the modal
+  var span_1 = document.getElementsByClassName("close_1")[0];
+
+  var cancel = document.getElementsByClassName("cancel_download")[0];
+
+  // When the user clicks the button, open the modal
+  btn_1.onclick = function () {
+    modal_1.style.transform = "translateY(0px)";
+    modal_1.style.zIndex = "103100";
+    modal_1.style.opacity = "1";
+  };
+
+  // When the user clicks on <span> (x), close the modal
+  span_1.onclick = function () {
+    modal_1.style.transform = "translateY(-50px)";
+    modal_1.style.zIndex = "-100";
+    modal_1.style.opacity = "0";
+  };
+
+  // When the user clicks on <span> (x), close the modal
+  cancel.onclick = function () {
+    //   modal.style.display = "none";
+    modal_1.style.transform = "translateY(-50px)";
+    modal_1.style.zIndex = "-100";
+    modal_1.style.opacity = "0";
+  };
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function (event) {
+    if (event.target == modal_1) {
+      modal_1.style.transform = "translateY(-50px)";
+      modal_1.style.zIndex = "-100";
+      modal_1.style.opacity = "0";
+    }
+  };
+</script>
+<script>
+  var userBtn = document.querySelectorAll(".user-btn");
+  var modal_2 = document.getElementById("modal_2");
+  var closeUser = modal_2.getElementsByClassName("close_2")[0];
+  var cancelUser = modal_2.getElementsByClassName("cancel_btn")[0];
+
+  userBtn.forEach(function (btn) {
+    btn.onclick = function () {
+      modal_2.style.transform = "translateY(0px)";
+      modal_2.style.zIndex = "103100";
+      modal_2.style.opacity = "1";
+    };
+
+    closeUser.onclick = function () {
+      modal_2.style.transform = "translateY(-50px)";
+      modal_2.style.zIndex = "-100";
+      modal_2.style.opacity = "0";
+    };
+
+    cancelUser.onclick = function () {
+      modal_2.style.transform = "translateY(-50px)";
+      modal_2.style.zIndex = "-100";
+      modal_2.style.opacity = "0";
+    };
+
+    window.addEventListener("click", function (event) {
+      if (event.target === modal_2) {
+        modal_2.style.transform = "translateY(-50px)";
+        modal_2.style.zIndex = "-100";
+        modal_2.style.opacity = "0";
+      }
+    });
+  });
+</script>
+<script>
+  // Get all modal buttons
+  var btns = document.querySelectorAll(".download-btn");
+  var download_sheet_id = document.getElementById("sheet_id");
+
+  // Loop through each button
+  btns.forEach(function (btn) {
+    var modal_1 = document.getElementById("modal_1");
+    var span_1 = modal_1.getElementsByClassName("close_1")[0];
+    var cancel = modal_1.getElementsByClassName("cancel_download")[0];
+
+    // When the user clicks the button, open the modal
+    btn.onclick = function () {
+      modal_1.style.transform = "translateY(0px)";
+      modal_1.style.zIndex = "103100";
+      modal_1.style.opacity = "1";
+      download_sheet_id.value = btn.dataset.sid;
+    };
+
+    // Close modal on span click
+    span_1.onclick = function () {
+      modal_1.style.transform = "translateY(-50px)";
+      modal_1.style.zIndex = "-100";
+      modal_1.style.opacity = "0";
+    };
+
+    // Close modal on cancel click
+    cancel.onclick = function () {
+      modal_1.style.transform = "translateY(-50px)";
+      modal_1.style.zIndex = "-100";
+      modal_1.style.opacity = "0";
+    };
+
+    // Close modal if clicked outside
+    window.addEventListener("click", function (event) {
+      if (event.target === modal_1) {
+        modal_1.style.transform = "translateY(-50px)";
+        modal_1.style.zIndex = "-100";
+        modal_1.style.opacity = "0";
+      }
+    });
+  });
+</script>
+
+<script>
+  {% for message in messages %}
+
+  Swal.fire({
+      icon:"{{message.tags}}",
+      title:"{{message}}",
+      
+  })
+  {% endfor %}
+</script>
+{% endblock budget_form_content %}

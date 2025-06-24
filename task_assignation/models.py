@@ -8,6 +8,7 @@ from users.models import Members
 class Task_Category(models.Model):
     name = models.TextField(null=False,blank=False)
     points = models.FloatField(null=False,blank=False)
+    enabled = models.BooleanField(null=False,blank=False,default=True)
 
     class Meta:
         verbose_name="Task Category"

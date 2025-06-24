@@ -16,12 +16,16 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import requests
 from central_events.models import Events, Google_Calendar_Attachments, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
 from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
 from events_and_management_team.renderData import Events_And_Management_Team
 from googleapiclient.http import BatchHttpRequest
+from finance_and_corporate_team.manage_access import FCT_Render_Access
+from finance_and_corporate_team.models import BudgetSheet, BudgetSheetAccess
+from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from graphics_team.models import Graphics_Banner_Image, Graphics_Link
 from django_celery_beat.models import PeriodicTask
 from graphics_team.renderData import GraphicsTeam
@@ -70,7 +74,6 @@ from recruitment.models import recruitment_session
 from membership_development_team.models import Renewal_Sessions
 from system_administration.render_access import Access_Render
 from django.views import View
-from users.renderData import member_login_permission
 from task_assignation.models import *
 import re
 from email.utils import getaddresses, parseaddr, parsedate_to_datetime
@@ -2009,6 +2012,46 @@ def faq_preview(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
+@login_required
+@member_login_permission  
+def contact(request):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        has_access = Branch_View_Access.get_manage_web_access(request)
+
+        if has_access:
+
+            if request.method == 'POST':
+                if 'save_info' in request.POST:
+                    address = request.POST.get('address')
+                    nsu_ieee_email = request.POST.get('nsu_ieee_email')
+                    chair_email = request.POST.get('chair_email')
+                    membership_queries_number = request.POST.get('membership_queries_number')
+                    corporate_engagement_number = request.POST.get('corporate_engagement_number')
+
+                    if Branch.update_contact_info(address, nsu_ieee_email, chair_email, membership_queries_number, corporate_engagement_number):
+                        messages.success(request, 'Contact info updated successfully!')
+                    else:
+                        messages.error(request, 'Something went wrong!')
+
+            contact_info, created = Contact_Info.objects.get_or_create(id=1)
+
+            context={
+                    'user_data':user_data,
+                    'all_sc_ag':sc_ag,
+                    'contact_info':contact_info
+                }
+            return render(request,'Manage Website/About/Contact/contact.html',context)
+        else:
+            return render(request, 'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
 @login_required
 @member_login_permission
@@ -3507,6 +3550,130 @@ def event_preview(request, event_id):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
+    
+@login_required
+@member_login_permission
+def event_edit_budget_form_tab(request, event_id):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary filee
+    
+        eb_common_access = Branch_View_Access.common_access(request.user.username)
+        has_access = FCT_Render_Access.access_for_budget(request, event_id=event_id)
+        event = Events.objects.get(id=event_id)
+
+        # Not good fix!!!
+        if Access_Render.system_administrator_superuser_access(username=request.user.username) or Access_Render.system_administrator_staffuser_access(username=request.user.username):
+            has_access = 'Edit'
+        else:
+            if event.event_organiser.primary != 1:
+                has_access = 'Restricted'
+
+        if has_access != 'Restricted':
+            if request.method == "POST":
+                if 'save_budget' in request.POST:
+                    cst_item = request.POST.getlist('cst_item[]')
+                    cst_quantity = request.POST.getlist('cst_quantity[]')
+                    cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                    cst_total = request.POST.getlist('cst_total[]')
+
+                    rev_item = request.POST.getlist('rev_item[]')
+                    rev_quantity = request.POST.getlist('rev_quantity[]')
+                    rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                    rev_total = request.POST.getlist('rev_total[]')
+
+                    saved_rate = request.POST.get('saved_rate')
+                    show_usd_rates = request.POST.get('show_usd_rates')
+                    
+                    if BudgetSheet.objects.filter(event=event_id).count() == 0:
+                        if FinanceAndCorporateTeam.create_budget(request, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                            messages.success(request, 'Budget created successfully!')
+                        else:
+                            messages.warning(request, 'Could not create budget!')
+                    else:
+                        budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                        if FinanceAndCorporateTeam.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+                            messages.success(request, 'Budget edited successfully!')
+                        else:
+                            messages.warning(request, 'Could not update budget!')
+                    
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
+                
+                elif 'save_access' in request.POST:
+                    ieee_ids = request.POST.getlist('ieee_id')
+                    access_types = request.POST.getlist('access_type')
+                    budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                    if FinanceAndCorporateTeam.update_budget_sheet_access(budget_sheet_id, ieee_ids, access_types):
+                        messages.success(request, 'Budget sheet access updated!')
+                    else:
+                        messages.warning(request, 'Could not update budget sheet access!')
+                    return redirect('central_branch:event_edit_budget_form_tab', event_id)
+                
+            fct_team_member_accesses = []
+            if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                budget_sheet = BudgetSheet.objects.get(event=event_id)
+                if eb_common_access:
+                    fct_team_members = Branch.load_team_members(team_primary=11)
+
+                    for member in fct_team_members:
+                        access = BudgetSheetAccess.objects.filter(sheet_id=budget_sheet.id, member=member)
+                        member_access_type = access[0].access_type if access.exists() else None
+
+                        fct_team_member_accesses.append({
+                            'member': {
+                                'ieee_id':member.ieee_id,
+                                'name': member.name,
+                                'position': member.position.role
+                            },
+                            'access_type': member_access_type
+                        })
+            else:
+                budget_sheet = None  
+
+            
+            deficit = 0.0
+            surplus = 0.0
+
+            usd_rate = None
+            if budget_sheet:
+
+                if budget_sheet.total_cost > budget_sheet.total_revenue:
+                    deficit = budget_sheet.total_revenue - budget_sheet.total_cost
+                elif budget_sheet.total_cost < budget_sheet.total_revenue:
+                    surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+
+                currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+                if(currency_data_response.status_code==200):
+                    # if response is okay then load data
+                    usd_rate = round(json.loads(currency_data_response.text)['usd']['bdt'],2)
+                else:
+                    usd_rate = None             
+            
+            context = {
+                'is_branch' : True,
+                'event_id' : event_id,
+                'all_sc_ag':sc_ag,
+                'user_data':user_data,
+                'budget_sheet':budget_sheet,
+                'access_type':has_access,
+                'eb_common_access':eb_common_access,
+                'fct_team_member_accesses':fct_team_member_accesses,
+                'deficit':deficit,
+                'surplus':surplus,
+                'event':event,
+                'usd_rate':usd_rate
+            }
+
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
+
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
 @login_required
 @member_login_permission
@@ -4616,7 +4783,7 @@ def create_task(request,team_primary = None):
         #app name for proper redirecting
         app_name = "central_branch"
         permission_for_co_ordinator_and_incharges_to_create_task = None
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
             
@@ -4626,7 +4793,6 @@ def create_task(request,team_primary = None):
         #Done:
         create_individual_task_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
         create_team_task_access = Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
-
 
         if create_individual_task_access or create_team_task_access:
             
@@ -4668,9 +4834,9 @@ def create_task(request,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_home_team',team_primary)
             
-            task_categories = Task_Category.objects.all().order_by('name')
+            task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
             
-            #loads central bracnh if none or if is 1
+            #loads central branch if none or if is 1
             if team_primary == None or team_primary == "1":
 
                 #This is for central bracnh where Team or individual task can be created
@@ -4759,12 +4925,13 @@ def task_home(request,team_primary = None):
 
         app_name = "central_branch"
         permission_for_co_ordinator_and_incharges_to_create_task = None
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             permission_for_co_ordinator_and_incharges_to_create_task = "Team"
         #getting all task categories
-        all_task_categories = Task_Category.objects.all().order_by('name')
+        all_task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
         all_branch_panels = Branch.load_all_panels()
+        branch_panel = None
 
         if request.method == "POST":
 
@@ -4805,7 +4972,18 @@ def task_home(request,team_primary = None):
         #########
         has_task_create_access = Branch_View_Access.get_create_individual_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task) or Branch_View_Access.get_create_team_task_access(request, team_primary,permission_for_co_ordinator_and_incharges_to_create_task)
         #########
-        all_tasks = Task_Assignation.load_task_for_home_page(team_primary)
+        try:
+            if request.GET.get('panel') and request.GET.get('panel') != '':
+                panel = request.GET.get('panel')
+                branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+            else:
+                branch_panel = Branch.load_current_panel()
+        except:
+            branch_panel = None
+
+        all_tasks = Task_Assignation.load_task_for_home_page(team_primary, branch_panel)
+               
+
         if team_primary == None or team_primary == "1":
 
             
@@ -4817,7 +4995,7 @@ def task_home(request,team_primary = None):
             'all_task_categories':all_task_categories,
             'all_branch_panels':all_branch_panels,
             'has_task_create_access':has_task_create_access,
-
+            'branch_panel':branch_panel,
             'app_name':app_name,
             }
 
@@ -4825,7 +5003,6 @@ def task_home(request,team_primary = None):
         
         else:
             team = Teams.objects.get(primary=team_primary)
-            all_tasks = Task.objects.filter(team=team).order_by('-pk','is_task_completed')
             desired_team = Task_Assignation.get_team_app_name(team_primary)
             
             #getting nav_bar_name
@@ -4836,7 +5013,9 @@ def task_home(request,team_primary = None):
             'all_sc_ag':sc_ag,
             'user_data':user_data,
             'all_task_categories':all_task_categories,
+            'all_branch_panels':all_branch_panels,
             'has_task_create_access':has_task_create_access,
+            'branch_panel':branch_panel,
 
             #loading navbars as per page
             'web_dev_team':nav_bar["web_dev_team"],
@@ -4877,7 +5056,7 @@ def upload_task(request, task_id,team_primary = None):
 
         #for proper navbar and redirection
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #getting nav_bar_name
             nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
@@ -5146,7 +5325,7 @@ def add_task(request, task_id,team_primary = None,by_coordinators = 0):
 
         #for proper navbar and redirection
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #getting nav_bar_name
             nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
@@ -5267,7 +5446,7 @@ def forward_to_incharges(request,task_id,team_primary = None):
 
         #for proper navbar and redirection
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #getting nav_bar_name
             nav_bar = Task_Assignation.get_nav_bar_name(team_primary=team_primary)
@@ -5402,7 +5581,7 @@ def task_edit(request,task_id,team_primary = None):
         print("checking")
         #app name for proper redirecting
         app_name = "central_branch"
-        if team_primary and team_primary!="1":
+        if team_primary != None and team_primary!="1":
             app_name = Task_Assignation.get_team_app_name(team_primary=team_primary)
             #this function will check whether current user is coordinator or not
             team_p = Teams.objects.get(primary = int(team_primary))
@@ -5500,7 +5679,7 @@ def task_edit(request,task_id,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_home_team',team_primary)
 
-            elif '2' in request.POST or '3' in request.POST or '4' in request.POST or '5' in request.POST or '6' in request.POST or '7' in request.POST or '8' in request.POST or '9' in request.POST or '10' in request.POST or '11' in request.POST or 'forward_to_team_incharges' in request.POST:
+            elif '0' in request.POST or '2' in request.POST or '3' in request.POST or '4' in request.POST or '5' in request.POST or '6' in request.POST or '7' in request.POST or '8' in request.POST or '9' in request.POST or '10' in request.POST or '11' in request.POST or 'forward_to_team_incharges' in request.POST:
 
                 team_clicked = request.POST.get('teamclicked')
 
@@ -5514,7 +5693,7 @@ def task_edit(request,task_id,team_primary = None):
                 else:
                     return redirect(f'{app_name}:task_edit_team',task_id,team_primary)
                 
-        task_categories = Task_Category.objects.all()
+        task_categories = Task_Category.objects.filter(enabled=True).order_by('name')
         #getting all task logs for this task
         task_logs = Task_Log.objects.get(task_number = task)
 
@@ -5636,8 +5815,11 @@ class GetTaskCategoryPointsAjax(View):
     def get(self,request):
         task_category_name = request.GET.get('selectedTaskCategory')
         try:
-            points = Task_Category.objects.get(name=task_category_name).points
-            return JsonResponse({'points':points})
+            category = Task_Category.objects.get(name=task_category_name)
+            if category.enabled:
+                return JsonResponse({'points':category.points})
+            else:
+                return JsonResponse({'points':0})
         except:
             return JsonResponse('Something went wrong!',safe=False)
 
@@ -5743,15 +5925,31 @@ def task_leaderboard(request):
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
         has_common_access = Branch_View_Access.common_access(username=request.user.username)
+        branch_panel = None
 
-        all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
-        all_teams = Teams.objects.filter(team_of__primary=1).order_by('-completed_task_points')
+        if request.GET.get('panel') and request.GET.get('panel') != '':
+            panel = request.GET.get('panel')
+            branch_panel = Panels.objects.get(panel_of__primary=1, year=panel)
+            if not branch_panel.current:
+                all_members = Member_Task_Points_History.objects.filter(panel_of=branch_panel).exclude(points=0).order_by('-points')
+                all_teams = Team_Task_Points_History.objects.filter(team__team_of__primary=1, panel_of=branch_panel).order_by('-points')
+            else:
+                all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
+                all_teams = Teams.objects.filter(team_of__primary=1, is_active=True).order_by('-completed_task_points')
+        else:
+            branch_panel = Branch.load_current_panel()
+            all_members = Members.objects.all().exclude(completed_task_points=0).order_by('-completed_task_points')
+            all_teams = Teams.objects.filter(team_of__primary=1, is_active=True).order_by('-completed_task_points')
+
+        all_panels_of_branch = Branch.load_all_panels()
 
         context = {
             'all_sc_ag':sc_ag,
             'user_data':user_data,
             'all_members': all_members,
             'all_teams': all_teams,
+            'all_panels_of_branch': all_panels_of_branch,
+            'branch_panel': branch_panel,
             'has_common_access': has_common_access
         }
 
@@ -5890,7 +6088,12 @@ def mail(request, primary=None):
                     messagess = response.get('messages', [])
 
                     if messagess:
-                        last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                        if section == 'sent':
+                            # Only get the first message for this section
+                            last_message = messagess[0]
+                        else:
+                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+
                         headers = last_message['payload'].get('headers', [])
                         snippet = last_message.get('snippet', '')
                         labels = last_message.get('labelIds', [])
@@ -6041,7 +6244,12 @@ def mail(request, primary=None):
                         messagess = response.get('messages', [])
 
                         if messagess:
-                            last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                            if section == 'sent':
+                                # Only get the first message for this section
+                                last_message = messagess[0]
+                            else:
+                                last_message = messagess[len(messagess)-1]  # Get the last message in the thread
+                                
                             headers = last_message['payload'].get('headers', [])
                             snippet = last_message.get('snippet', '')
                             labels = last_message.get('labelIds', [])

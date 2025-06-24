@@ -97,6 +97,8 @@ class Access_Render:
                     return True
                 else:
                     return False
+            else:
+                return False
         except Members.DoesNotExist:
             return False
         except:
@@ -110,6 +112,8 @@ class Access_Render:
                     return True
                 else:
                     return False
+            else:
+                return False
         except Members.DoesNotExist:
             return False
         except:
@@ -137,6 +141,8 @@ class Access_Render:
                     return True
                 else:
                     return False
+            else:
+                return False
         except Members.DoesNotExist:
             return False
         except:

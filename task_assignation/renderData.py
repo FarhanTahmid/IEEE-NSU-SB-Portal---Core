@@ -237,7 +237,7 @@ class Task_Assignation:
             new_task.members.add(*members)
             new_task.save()
 
-            if team_primary and team_primary != 1:
+            if team_primary is not None and team_primary != 1:
                 team = Teams.objects.get(primary=team_primary)
                 new_task.team.add(team)
                 new_task.save()
@@ -1532,6 +1532,9 @@ class Task_Assignation:
 
         '''This function will deduct point according the late duration.. Marks will be decucted every day 5% of current score'''
 
+        if task.task_panel_of != Branch.load_current_panel():
+            return False
+        
         #getting all members of specific task
         all_members_of_task = Member_Task_Point.objects.filter(task=task)
         #getting the deadline
@@ -1847,9 +1850,9 @@ This is an automated message. Do not reply
             return 'events_and_management_team'
         elif team_primary == 4:
             return 'logistics_and_operations_team'
-        # elif team_primary == 5:
-        #     return 'promotions_team'
-        elif team_primary == 6:
+        elif team_primary == 5:
+            return 'promotions_team'
+        elif team_primary == 6 or team_primary == 0:
             return 'public_relation_team'
         elif team_primary == 7:
             return 'membership_development_team'
@@ -1872,9 +1875,9 @@ This is an automated message. Do not reply
             event_team = True
         elif team_primary == 4:
             logistic_team = True
-        # elif team_primary == 5:
-        #     promotion_team = True
-        elif team_primary == 6:
+        elif team_primary == 5:
+            promotion_team = True
+        elif team_primary == 6 or team_primary == 0:
             public_relation_team = True
         elif team_primary == 7:
             mdt_team = True
@@ -2842,7 +2845,7 @@ This is an automated message. Do not reply
 
                 if len(task_team) == 1 and task.task_type == "Individuals":
                     if task_team[0] == team:
-                        if member.position.is_officer and member not in task.members.all():
+                        if member.position.is_officer and member.team == team and member not in task.members.all():
                             return True
                         else:
                             return False
@@ -2851,23 +2854,19 @@ This is an automated message. Do not reply
                 else:
                     return False
 
-    def load_task_for_home_page(team_primary):
+    def load_task_for_home_page(team_primary, branch_panel):
 
         '''This function will load all the task for central branch and respective
         task for teams home page'''
 
-        current_panel = Branch.load_current_panel()
-
-        if team_primary == None or team_primary == "1":
-            
-            return Task.objects.filter(task_panel_of=current_panel).order_by('-pk','is_task_completed')
+        if branch_panel:
+            if team_primary == None or team_primary == "1":
+                return Task.objects.filter(task_panel_of=branch_panel).order_by('-pk','is_task_completed')
+            else:
+                team = Teams.objects.get(primary=team_primary)
+                return Task.objects.filter(team=team, task_panel_of=branch_panel).order_by('-pk','is_task_completed')
         else:
-
-            team = Teams.objects.get(primary = int(team_primary))
-            tasks = list(Task.objects.filter(task_type = "Team",team = team, task_panel_of=current_panel).order_by('-pk','is_task_completed'))
-            tasks += (Task.objects.filter(task_type = "Individuals",team=team, task_panel_of=current_panel).order_by('-pk','is_task_completed'))
-
-        return tasks
+            return None
                 
     def is_task_started_by_a_coodinator_for_a_team(task,team):
 

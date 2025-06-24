@@ -1,7 +1,12 @@
+import json
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+import requests
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
+from finance_and_corporate_team.manage_access import FCT_Render_Access
+from finance_and_corporate_team.models import BudgetSheet
+from finance_and_corporate_team.renderData import FinanceAndCorporateTeam
 from graphics_team.models import Graphics_Banner_Image, Graphics_Link
 from graphics_team.renderData import GraphicsTeam
 from insb_port import settings
@@ -1908,6 +1913,97 @@ def event_edit_content_form_tab(request,primary,event_id):
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return cv.custom_500(request)
+    
+@login_required
+@member_login_permission
+def event_edit_budget_form_tab(request, primary, event_id):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        
+        has_access = SC_Ag_Render_Access.access_for_sc_ag_budget(request, event_id, primary)
+
+        if has_access != 'Restricted':
+            if request.method == "POST":
+                cst_item = request.POST.getlist('cst_item[]')
+                cst_quantity = request.POST.getlist('cst_quantity[]')
+                cst_upc_bdt = request.POST.getlist('cst_upc_bdt[]')
+                cst_total = request.POST.getlist('cst_total[]')
+
+                rev_item = request.POST.getlist('rev_item[]')
+                rev_quantity = request.POST.getlist('rev_quantity[]')
+                rev_upc_bdt = request.POST.getlist('rev_upc_bdt[]')
+                rev_total = request.POST.getlist('rev_total[]')
+
+                saved_rate = request.POST.get('saved_rate')
+                show_usd_rates = request.POST.get('show_usd_rates')
+                
+                if BudgetSheet.objects.filter(event=event_id).count() == 0:
+                    if Sc_Ag.create_budget(request, primary, event_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total):
+                        messages.success(request, 'Budget created successfully!')
+                    else:
+                        messages.warning(request, 'Could not create budget!')
+                else:
+                    budget_sheet_id = BudgetSheet.objects.get(event=event_id).pk
+                    if Sc_Ag.edit_budget(budget_sheet_id, cst_item, cst_quantity, cst_upc_bdt, cst_total, rev_item, rev_quantity, rev_upc_bdt, rev_total, saved_rate, show_usd_rates):
+                        messages.success(request, 'Budget updated successfully!')
+                    else:
+                        messages.warning(request, 'Could not update budget!')
+                
+                return redirect('chapters_and_affinity_group:event_edit_budget_form_tab', primary, event_id)
+                
+            if BudgetSheet.objects.filter(event=event_id).count() > 0:
+                budget_sheet = BudgetSheet.objects.get(event=event_id)
+            else:
+                budget_sheet = None
+            
+            deficit = 0.0
+            surplus = 0.0
+
+            usd_rate = None
+            if budget_sheet:
+
+                if budget_sheet.total_cost > budget_sheet.total_revenue:
+                    deficit = budget_sheet.total_revenue - budget_sheet.total_cost
+                elif budget_sheet.total_cost < budget_sheet.total_revenue:
+                    surplus = budget_sheet.total_revenue - budget_sheet.total_cost
+                
+                currency_data_response = requests.get('https://latest.currency-api.pages.dev/v1/currencies/usd.min.json')
+                if(currency_data_response.status_code==200):
+                    # if response is okay then load data
+                    usd_rate = json.loads(currency_data_response.text)['usd']['bdt']
+                else:
+                    usd_rate = None
+
+            event = Events.objects.get(id=event_id)
+
+            context = {
+                'is_branch' : False,
+                'primary' : primary,
+                'event_id' : event_id,
+                'all_sc_ag':sc_ag,
+                'sc_ag_info':get_sc_ag_info,
+                'user_data':user_data,
+                'budget_sheet':budget_sheet,
+                'access_type': has_access if has_access == 'ViewOnly' else 'Edit',
+                'deficit':deficit,
+                'surplus':surplus,
+                'event':event,
+                'usd_rate':usd_rate
+            }
+
+            return render(request,"Events/event_edit_budget_form_tab.html", context)
+        else:
+            return render(request,"access_denied2.html", {'all_sc_ag':sc_ag ,'user_data':user_data,})
+
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return cv.custom_500(request)
+
     
 @login_required
 @member_login_permission

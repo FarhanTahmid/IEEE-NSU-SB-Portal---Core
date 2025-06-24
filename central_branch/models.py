@@ -9,30 +9,6 @@ from events_and_management_team.models import Venue_List,Permission_criteria
 
 # Create your models here.
 
-###### THESE MODELS ARE SPECIFICALLY USED FOR EVENT HANDLING PURPOSE ####
-
-###### THIS BLOCK OF COODE IS FOR DECLARING DIRECTORIES TO STORE FILES#####
-event_proposal_files=FileSystemStorage(location='Event Proposals')
-############################################################################
-
-
-####### THIS BLOCK OF CODES REPRESENTS THE TABLES FOR SPECIFIC CREATED EVENTS #########
-
-
-#Event type table
-# class Event_type(models.Model):
-#     event_type=models.CharField(null=False,blank=False,max_length=60)
-
-#     class Meta:
-#         verbose_name="Event Type"
-#     def __str__(self) -> str:
-#         return self.event_type
-#     def get_absolute_url(self):
-#         return reverse("event_type", kwargs={"pk": self.id})
-
-
-
-
 
 # class meeting_minutes_team_info(models.Model):
 #     mm_team_id=models.ForeignKey(team_meeting_minutes, on_delete=models.CASCADE)

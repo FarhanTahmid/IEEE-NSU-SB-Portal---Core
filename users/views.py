@@ -5,12 +5,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from central_events.google_calendar_handler import CalendarHandler
 from insb_port import settings
+from port.models import Chapters_Society_and_Affinity_Groups
 from system_administration.models import SystemErrors, adminUsers
 from task_assignation.models import Member_Task_Point
 from users import registerUser
 from django.db import connection
 from django.db.utils import IntegrityError
 from recruitment.models import recruited_members
+from wallet.models import Wallet
+from wallet.renderData import WalletManager
 from . models import Members,ResetPasswordTokenTable,UserSignupTokenTable
 import csv,datetime
 from django.utils.timezone import now
@@ -120,58 +123,63 @@ def signup(request,ieee_id,token):
     try:
 
         # check if this is a valid link used
-        get_user_signup_link=UserSignupTokenTable.objects.filter(user=Members.objects.get(ieee_id=ieee_id),token=token)
-        # if the signuplink object exists
-        if(get_user_signup_link.exists()):
-            # if the token is equal to url token
-            if(get_user_signup_link[0].token==token):
-                
-                if request.method=="POST":
-                    password=request.POST['password']
-                    confirm_password=request.POST['confirm_password']
+        user = Members.objects.filter(ieee_id=ieee_id)
+        if user.exists():
+            get_user_signup_link=UserSignupTokenTable.objects.filter(user=user[0],token=token)
+            # if the signuplink object exists
+            if(get_user_signup_link.exists()):
+                # if the token is equal to url token
+                if(get_user_signup_link[0].token==token):
                     
-                    #checking if password equals to confirm password
-                    #the password length must be greater than 6.
-                    
-                    if(password==confirm_password):
-                        if(len(password)>6):
-                            
-                            # Now find the Registered Member against the IEEE id. Matching the IEEE ID in MEMBERS table and finding their associated email with their IEEE account
-                            try:
-                                getMember=Members.objects.get(ieee_id=ieee_id)
+                    if request.method=="POST":
+                        password=request.POST['password']
+                        confirm_password=request.POST['confirm_password']
+                        
+                        #checking if password equals to confirm password
+                        #the password length must be greater than 6.
+                        
+                        if(password==confirm_password):
+                            if(len(password)>6):
                                 
-                                #checking if the member is already signed up
-                                if User.objects.filter(username=ieee_id).exists():
-                                    messages.info(request,"You are already signed up! Try Logging in instead.")
-                                else:
+                                # Now find the Registered Member against the IEEE id. Matching the IEEE ID in MEMBERS table and finding their associated email with their IEEE account
+                                try:
+                                    getMember=Members.objects.get(ieee_id=ieee_id)
                                     
-                                    #creating account for the user
-                                    try:
-                                        user = User.objects.create_user(username=ieee_id, email=getMember.email_personal,password=password)
-                                        user.save()
-                                        # delete the user signup link object
-                                        get_user_signup_link.delete()
-                                        auth.login(request,user) #logging in user after signing up automatically
-                                        return redirect('users:dashboard')
-                                    except:
-                                        messages.info(request,"Something went wrong! Try again")
-                                    
-                            except Members.DoesNotExist:
-                                #If the ieee id is not found:
-                                messages.info(request,"Looks like you are not registered in our Central database yet!")
-                                messages.info(request,"If you are a member of IEEE NSU SB, please contact our Membership Development Team!")                    
-                            
-                            except ValueError:
-                                messages.info(request,"Please enter your IEEE ID as Numerical Values!")
+                                    #checking if the member is already signed up
+                                    if User.objects.filter(username=ieee_id).exists():
+                                        messages.info(request,"You are already signed up! Try Logging in instead.")
+                                    else:
+                                        
+                                        #creating account for the user
+                                        try:
+                                            user = User.objects.create_user(username=ieee_id, email=getMember.email_personal,password=password)
+                                            user.save()
+                                            # delete the user signup link object
+                                            get_user_signup_link.delete()
+                                            auth.login(request,user) #logging in user after signing up automatically
+                                            return redirect('users:dashboard')
+                                        except:
+                                            messages.info(request,"Something went wrong! Try again")
+                                        
+                                except Members.DoesNotExist:
+                                    #If the ieee id is not found:
+                                    messages.info(request,"Looks like you are not registered in our Central database yet!")
+                                    messages.info(request,"If you are a member of IEEE NSU SB, please contact our Membership Development Team!")                    
+                                
+                                except ValueError:
+                                    messages.info(request,"Please enter your IEEE ID as Numerical Values!")
+                            else:
+                                messages.info(request,"Your password must be greater than 6 characters!")
                         else:
-                            messages.info(request,"Your password must be greater than 6 characters!")
-                    else:
-                        messages.info(request,"Two passwords Did not match!")
-                    
-                return render(request,'users/signup.html')
-            else:
-                return redirect('users:invalid_url')
+                            messages.info(request,"Two passwords Did not match!")
+                        
+                    return render(request,'users/signup.html')
+                else:
+                    return redirect('users:invalid_url')
 
+            else:
+                messages.info(request,"Signup token expired/incorrect!")
+                return render(request,'users/signup.html')
         else:
             return redirect('users:invalid_url')
         
@@ -208,6 +216,7 @@ def dashboard(request):
         hit_count_over_5_years = renderData.getHitCountOver5Years()
         #getting monthly members with highest task completion points
         monthly_top_members = renderData.getMonthlyTopMembers()
+
                 
         # Get the SC & AGS
         sc_ag=PortData.get_all_sc_ag(request=request)
@@ -217,6 +226,19 @@ def dashboard(request):
         user_data=current_user.getUserData() #getting user data as dictionary file
         performers = get_top_5_performers(request)
         top_teams = get_top_5_teams(request)
+
+
+        if is_eb_or_admin:
+            wallet_balance = Wallet.objects.get(sc_ag=Chapters_Society_and_Affinity_Groups.objects.filter(primary=1).values('id')[0]['id']).balance
+            wallet_entry_stats_whole_tenure = WalletManager.get_wallet_entry_stats_whole_tenure(primary=1)
+            wallet_entry_stats_whole_tenure_by_month = WalletManager.get_wallet_entry_stats_whole_tenure_by_month(primary=1)
+            wallet_entry_stats_for_current_month = WalletManager.get_wallet_entry_stats_for_current_month(primary=1)
+        else:
+            wallet_balance = None
+            wallet_entry_stats_whole_tenure = None
+            wallet_entry_stats_whole_tenure_by_month = None
+            wallet_entry_stats_for_current_month = None
+
         if(user_data==False):
 
             if request.method == "POST":
@@ -251,6 +273,11 @@ def dashboard(request):
             'media_url':settings.MEDIA_URL,
             'performers':performers,
             'top_teams':top_teams,
+            'wallet_entry_stats_whole_tenure': wallet_entry_stats_whole_tenure,
+            'wallet_entry_stats_whole_tenure_by_month': wallet_entry_stats_whole_tenure_by_month,
+            'wallet_entry_stats_for_current_month':wallet_entry_stats_for_current_month,
+            'wallet_balance': wallet_balance,
+            'now': datetime.now(),
         }
 
         

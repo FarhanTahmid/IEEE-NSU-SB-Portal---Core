@@ -116,6 +116,14 @@
   .app-header ~ .app-body {
     padding-top: 0rem;
 }
+.form-check{
+  font-size: larger;
+  position: relative;
+  left: 20px;
+}
+.form-check label{
+  padding: 0;
+}
   </style>
 </head>
 <body>
@@ -283,10 +291,7 @@
                                     <div class="form-group">
                                         <div class="row m-b">
                                             <div class="col-sm-6">
-                                                <label>NSU ID</label>
-                                                <input
-                                                    class="form-control"
-                                                    type="number" placeholder="NSU ID" required name="nsu_id" value="{{data.nsu_id}}"/>
+                                                <h5 class="box-header col-md-12">NSU ID: {{data.nsu_id}}</h5>
                                             </div>
                                             <div class="col-sm-6">
                                                 <label>IEEE ID</label>
@@ -383,10 +388,36 @@
                     <label for="exampleInputPassword1">Address</label>
                     <input class="form-control" type="text" placeholder="Enter Address" name="home_address" value="{{address}}"/>
                   </div>
-                  <div class="form-group">
-                    <label for="exampleInputPassword1">Gender</label>
-                    <input class="form-control" type="text" placeholder="Gender" name="gender" value="{{data.gender}}"/>
-                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Gender<span style="color:red;"> *</span></label>
+                    <div class="col-sm-10">
+                      <label class="radio-inline">
+                        <input
+                            type="radio"
+                            name="gender"
+                            id="male"
+                            value="Male"
+                            {% if data.gender == 'Male' %}checked{% endif %}
+                        > Male
+                      </label>
+                      <label class="radio-inline">
+                        <input 
+                            type="radio"
+                            name="gender"
+                            id="female"
+                            value="Female"
+                            {% if data.gender == 'Female' %}checked{% endif %}> Female
+                      </label>
+                      <label class="radio-inline">
+                        <input
+                            type="radio"
+                            name="gender"
+                            id="other"
+                            value="Other"
+                            {% if data.gender == 'Other' %}checked{% endif %}> Other
+                      </label>
+                    </div>
+                </div>
                   <div class="form-group w-50">
                     <label for="blood_group">Blood Group</label>
                     <select class="form-control" name="blood_group" value="{{ data.blood_group }}">
@@ -403,15 +434,14 @@
                   </div>
                   <div class="form-group">
                     <label>Skillsets:</label>
-                    <select multiple class="form-control" name="skill_sets">
-                        <option value="null" {% if not data.skills.exists %}selected{% endif %}>--------------------</option>
-                        {% for skill in all_skills %}
-                            <option value="{{ skill.id }}" {% if skill in data.skills.all %}selected{% endif %}> 
-                                {{ skill.skill_type }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                  </div>
+                    {% for skill in all_skills %}
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="skill_sets" value="{{ skill.id }}" {% if skill in data.skills.all %}checked{% endif %}>
+                            <label class="form-check-label">{{ skill.skill_type }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                
                   <div class="box-header" style="text-align:center;">
                     <h1>Academic Details</h1>
                   </div>

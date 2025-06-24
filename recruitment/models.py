@@ -8,10 +8,19 @@ from port.models import SkillSetTypes
 class recruitment_session(models.Model):
     session=models.CharField(null=False,blank=False,max_length=100)
     session_time=models.DateField(null=True,blank=True)
-    
+    session_end_date_time=models.DateTimeField(null=True, blank=True)
+    recruitment_event_link=models.CharField(null=True, blank=True,max_length=100)
+    is_active=models.BooleanField(null=False, blank=False, default=False)
     
     class Meta:
         verbose_name="Recruitment Session"
+
+    def save(self, *args, **kwargs):
+        # If this instance is being activated
+        if self.is_active:
+            # Deactivate all other instances
+            recruitment_session.objects.filter(is_active=True).exclude(id=self.id).update(is_active=False)
+        super().save(*args, **kwargs)
     def __str__(self) -> str:
         return self.session
     def get_absolute_url(self):

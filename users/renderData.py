@@ -541,15 +541,20 @@ def get_top_5_performers(request):
 
     '''This function will return top 5 performers of all time'''
 
-    performers = Members.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5]
-    print(performers)
+    performers = list(Members.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5])
+    while len(performers) < 5:
+        performers.append(None)
+
     return performers
 
 def get_top_5_teams(request):
 
     '''This function will return the top 3 teams'''
     
-    teams = Teams.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5]
+    teams = list(Teams.objects.all().exclude(completed_task_points=0.0).order_by('-completed_task_points')[:5])
+    while len(teams) < 5:
+        teams.append(None)
+        
     return teams
 
 class PanelMembersData:

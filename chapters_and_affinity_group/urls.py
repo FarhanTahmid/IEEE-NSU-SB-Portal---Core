@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from central_branch import views as centralViews
 from . import views
 
@@ -40,6 +40,8 @@ urlpatterns = [
     path('<str:primary>/event_details/<int:event_id>/edit/graphics/links',views.event_edit_graphics_form_links_sub_tab,name='event_edit_graphics_form_links_sub_tab'),
     #Event content tab page
     path('<str:primary>/event_details/<int:event_id>/edit/content',views.event_edit_content_form_tab,name='event_edit_content_form_tab'),
+    #Event budget page
+    path('<str:primary>/event_details/<int:event_id>/edit/budget',views.event_edit_budget_form_tab,name='event_edit_budget_form_tab'),
     #Event preview
     path('<str:primary>/event_details/<int:event_id>/preview/',views.event_preview,name='event_preview'),
     #Event Feedback
@@ -76,4 +78,6 @@ urlpatterns = [
     path('<str:primary>/mail/request_update_schedule/',centralViews.UpdateScheduledEmailOptionsAjax.as_view(),name='request_update_email_schedule'),
     path('<str:primary>/navigate/', centralViews.PaginationAjax.as_view(),name='navigate'),
     path('<str:primary>/mail/view/attachments/<str:message_id>/<str:attachment_id>/', centralViews.get_attachment, name='get_attachment'),
+    # Wallet Urls
+    path('<str:primary>/wallet/', include('wallet.urls'), name='wallet'),
 ]

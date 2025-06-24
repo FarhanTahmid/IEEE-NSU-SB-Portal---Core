@@ -14,7 +14,7 @@ body {
   outline: 0 !important; }
 
 a {
-  color: inherit;
+  color: white;
   text-decoration: none;
   cursor: pointer;
   outline: 0; }
@@ -3941,7 +3941,7 @@ a.text-blue:hover {
 
 .text-muted {
   color: inherit !important;
-  opacity: 0.6; }
+  opacity: 1; }
 
 .text-color {
   color: rgba(0, 0, 0, 0.87); }

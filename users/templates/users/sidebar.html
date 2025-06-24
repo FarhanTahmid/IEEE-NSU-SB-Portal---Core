@@ -117,6 +117,22 @@
 .app-aside {
   z-index: 1020;
 }
+.nav-icon{
+  position: relative;
+  z-index: 2;
+}
+.nav-icon-society{
+  float: left;
+  line-height: inherit;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  top: 0;
+  min-width: 1.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  left: 8px;
+}
 </style>
     <!-- fluid app aside -->
   <div class="left navside dark dk" data-layout="column">
@@ -154,6 +170,16 @@
                   </span>
                   <span class="nav-text">{% if user_data.position.is_eb_member %}My Assigned Task{% else %}My Tasks{% endif %}</span>
                 </a>
+                {% if user_data.position.is_eb_member or user_data.is_admin_user %}
+                <a href="{% url 'central_branch:wallet:wallet_homepage' %}" >
+                  <span class="nav-icon">
+                    <img src={% static 'images/wallet.png' %} width="20px" height="20px">
+                      <i class="fa-fa-user">
+                      </i>
+                  </span>
+                  <span class="nav-text">Wallet</span>
+                </a>
+                {% endif %}
 
               </li>
           
@@ -164,7 +190,7 @@
               <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                     <span class="nav-icon">
@@ -235,7 +261,7 @@
               <li>
                 <a>
                   <span class="nav-caret">
-                    <i class="fa fa-caret-down"></i>
+                    <i class="fa fa-angle-down"></i>
                   </span>
                   
                   <span class="nav-icon">
@@ -277,7 +303,7 @@
               <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                     <span class="nav-icon">
@@ -310,7 +336,7 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                   <span class="nav-icon">
@@ -342,7 +368,7 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                   <span class="nav-icon">
@@ -350,7 +376,7 @@
                       <i class="fa-fa-user">
                       </i>
                   </span>
-                  {% comment %}
+                  
                     <span class="nav-text">Promotions</span>
                   </a>
                   <ul class="nav-sub nav-mega nav-mega-3">
@@ -375,15 +401,15 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                   <span class="nav-icon">
                       <img src={% static 'images/pr.png' %} width="20px" height="20px">
                       <i class="fa-fa-user">
                       </i>
-                  </span>{% endcomment %}
-                    <span class="nav-text">Public Relations and Promotions</span>
+                  </span>
+                    <span class="nav-text">Public Relations</span>
                   </a>
                   <ul class="nav-sub nav-mega nav-mega-3">
                     <li>
@@ -392,7 +418,7 @@
                       </a>
                     </li>
                     <li>
-                      <a href="{% url 'public_relation_team:task_home_team' 6 %}">
+                      <a href="{% url 'public_relation_team:task_home_team' 0 %}">
                         <span class="nav-text">Tasks</span>
                       </a>
                     </li>
@@ -407,7 +433,7 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                   <span class="nav-icon">
@@ -460,7 +486,7 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                   <span class="nav-icon">
@@ -492,11 +518,11 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                     <span class="nav-icon">
-                      <img src={% static 'images/media.gif' %} width="20px" height="20px">
+                      <img src={% static 'images/media.png' %} width="20px" height="20px">
                       <i class="fa-fa-user">
                       </i>
                   </span>
@@ -530,7 +556,7 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                     <span class="nav-icon">
@@ -573,7 +599,7 @@
                 <li>
                   <a>
                     <span class="nav-caret">
-                      <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-angle-down"></i>
                     </span>
                     
                     <span class="nav-icon">
@@ -590,8 +616,18 @@
                       </a>
                     </li>
                     <li>
+                      <a href="{% url 'finance_and_corporate_team:event_page' %}" >
+                        <span class="nav-text">Events</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'finance_and_corporate_team:task_home_team' 11 %}">
                         <span class="nav-text">Tasks</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'finance_and_corporate_team:budgetHomePage' %}">
+                        <span class="nav-text">Budget</span>
                       </a>
                     </li>
                     <li>
@@ -609,14 +645,14 @@
                   <li>
                     <a>
                       <span class="nav-caret">
-                        <i class="fa fa-caret-down"></i>
+                        <i class="fa fa-angle-down"></i>
                       </span>
                       <span class="nav-text">Society, Chapters & Affinity Groups</span>
                     </a>
                     <ul class="nav-sub nav-mega nav-mega-3">
                       {% for i in all_sc_ag %}
                       <li style="margin-left:5px;">
-                        <span class="nav-icon" >
+                        <span class="nav-icon-society" >
                           <img src="/media_files/{{i.logo}}" width="40px" height="40px">
                           <i class="fa-fa-user"></i>
                         </span>

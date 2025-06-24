@@ -567,8 +567,8 @@ def getRenewalStats(request):
         if('sc_ag' in data_type):
             # checking if data type has 'sc_ag' in it. so we know that it is seeking for the stat of SC & AG Renewal.
             
-            # The URL is designed such a way that the last number in the 'data_type' value will be the session_id. So we can extract session data from it.
-            session_id=data_type[-1] 
+            # The URL is designed such a way that the second part in the 'data_type' value will be the session_id. So we can extract session data from it.
+            session_id=data_type[6:] 
             try:
                 pes_renewal_count=Renewal_requests.objects.filter(session_id=session_id,pes_renewal_check=True).count()
                 ras_renewal_count=Renewal_requests.objects.filter(session_id=session_id,ras_renewal_check=True).count()

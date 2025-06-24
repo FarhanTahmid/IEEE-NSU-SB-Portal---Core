@@ -148,6 +148,18 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="num_rows" style="">
+                            <div class="form-group">
+                                <!--		Show Numbers Of Rows 		-->
+                                <form id="panelForm1">
+                                    <select class="form-control search_box" name="panel" id="maxRows1" onchange="panelSelect();">
+                                        {% for panel in all_panels_of_branch %}
+                                        <option {% if panel.year == branch_panel.year %}selected{% endif %} value="{{panel.year}}">{{panel.year}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
                         <div class="tb_search">
                             <input type="text" id="individual_search_input_all" onkeyup="FilterkeyWord_individual_table()"
                                 placeholder="Search.." class="form-control search_box" />
@@ -175,6 +187,7 @@
                             </thead>
                             <tbody id="nostripe">
                                 {% for member in all_members %}
+                                {% if branch_panel.current %}
                                 <tr>
                                     <td>{{forloop.counter}}</td>
                                     <td>
@@ -189,6 +202,22 @@
                                     <td>{{member.position}}</td>
                                     <td class="task-points">{{member.completed_task_points}}</td>
                                 </tr>
+                                {% else %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>
+                                        {% if has_common_access %}
+                                        <a style="color: #00629b" href="{% url 'central_branch:individual_task_history' member.member.ieee_id %}">{{member.member.name}}</a>
+                                        {% else %}
+                                        {{member.member.name}}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{member.member.ieee_id}}</td>
+                                    <td>{{member.member.team}}</td>
+                                    <td>{{member.member.position}}</td>
+                                    <td class="task-points">{{member.points}}</td>
+                                </tr>
+                                {% endif %}
                                 {% endfor %}                                
                             </tbody>
                         </table>
@@ -209,6 +238,12 @@
         {% include "common_js.html" %}
         {% endblock common_js %}
     <script>
+        var form = document.getElementById('panelForm1');
+
+        function panelSelect() {
+            form.submit();
+        }
+
         getPagination11("#table-id");
         $("#maxRows1").trigger("change");
         function getPagination11(table) {

@@ -22,7 +22,9 @@ a {
 a:hover,
 a:focus {
   color: inherit;
-  text-decoration: none; }
+  text-decoration: none; 
+  border-radius: 6px;
+}
 
 button {
   color: inherit; }
@@ -868,7 +870,9 @@ a.list-group-item {
     padding-bottom: 0; }
 
 .navbar-brand {
-  font-weight: bold; }
+  /* font-weight: bold; */
+  padding-top: 0;
+}
   .navbar-brand:hover {
     text-decoration: none; }
   .navbar-brand img,
@@ -1895,17 +1899,19 @@ body {
         padding-left: 5.5rem; }
       .navside .nav li a {
         display: block;
-        padding: 0 1rem;
+        padding: 0 6px;
         line-height: 2.25rem;
-        position: relative; }
+        position: relative;
+        margin:2px .5rem;
+        transition: all .2s ease-in-out; }
         .navside .nav li a::after {
           display: block;
           content: "";
           clear: both; }
         .navside .nav li a:hover, .navside .nav li a:focus {
-          background-color: rgba(0, 0, 0, 0.065); }
+          background-color: #042e5e; }
       .navside .nav li.active {
-        background-color: rgba(0, 0, 0, 0.065); }
+        background-color: #002855; }
         .navside .nav li.active > a {
           background-color: transparent; }
           .navside .nav li.active > a .nav-caret i {
@@ -1936,7 +1942,7 @@ body {
   .nav-text small {
     display: block; }
   .navside .nav-text {
-    opacity: 0.75; }
+    opacity: 1; }
   .navside a:hover > .nav-text,
   .navside a:focus > .nav-text,
   .navside .active > a > .nav-text {
@@ -2910,7 +2916,7 @@ div.input-group > .select2-container > .selection {
 
 .dark {
   color: rgba(255, 255, 255, 0.87);
-  background-color: #050D3A; }
+  background-color: #002855; }
   .dark .lt {
     background-color: #334456; }
   .dark .dk {
@@ -3940,7 +3946,7 @@ a.text-blue:hover {
 
 .text-muted {
   color: inherit !important;
-  opacity: 0.6; }
+  opacity: 1; }
 
 .text-color {
   color: rgba(0, 0, 0, 0.87); }
@@ -5677,3 +5683,10 @@ textarea.md-input {
 .fade-in-down.ng-leave {
   -webkit-animation: fadeOutDown 0.5s;
   animation: fadeOutDown 0.5s; }
+
+.navside a{
+  color: white;
+}
+.navside .navbar{
+  padding: 0 1rem;
+}

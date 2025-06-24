@@ -1,0 +1,766 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <title>Wallet</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %} 
+    {% include "common_css.html" %} 
+    {% endblock common_css %}
+    <style>
+        .search_filter{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search_bar{
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            height: 26px;
+            padding: 16px;
+            border: 1px solid #D9D9D9;
+        }
+        .wallet_balance{
+            border-radius: 6px;
+            color: rgb(76, 171, 119);
+            background-color: rgb(168, 255, 207);
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter{
+            border-radius: 6px;
+            /* border: 1px solid rgb(76 76 171); */
+            color: rgb(76 76 171);
+            background-color: rgb(206, 206, 254);
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter:hover{
+            background-color: rgb(155, 155, 255);
+        }
+        .net_total{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .net_total_box{
+            padding: 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+        .flex_space_between{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .category{
+            color: #31AE70;
+            background-color: #98EAC2;
+            border: 1px solid #31AE70;
+            padding: 0px 6px;
+            border-radius: 3px;
+        }
+        {% for category in categories %}
+        .category[data-cat='{{category.name}}']{
+            background-color: {{category.background_colour}}; 
+            color: {{category.text_colour}}; 
+            border-color: {{category.text_colour}};
+        }
+        {% endfor %}
+        
+        /* Filter Menu Styles */
+        .filter_menu {
+            /* position: absolute; */
+            top: 100%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            max-height: 0;
+            overflow: auto;
+            transition: max-height .3s ease-in-out;
+            z-index: 100;
+            margin-top: 10px;
+            transition: all .3s ease-in-out;
+            opacity: 0%;
+            flex-direction: column;
+        }
+
+        .clear_button {
+            background-color: #6c7ae0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 20px;
+            cursor: pointer;
+            /* float: right; */
+            margin: 0;
+            position: relative;
+            right: 0;
+            bottom: 5px;
+        }
+        
+        .clear_button:hover {
+            background-color: #5663c7;
+        }
+        
+        
+        .cash_in_btn{
+            background-color: #31AE70;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #31AE70;
+        }
+
+        .cash_in_btn:hover{
+            color: #31AE70;
+            background-color: white;
+        }
+
+        .cash_out_btn{
+            background-color: #EB5132;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #EB5132;
+        }
+
+        .cash_out_btn:hover{
+            color: #EB5132;
+            background-color: white;
+        }
+
+        .cash_in_cash_out_div{
+            display: grid;
+            gap: 6px;
+            grid-template-columns: 1fr 1fr;
+            justify-items: stretch;
+            align-items: center;
+            text-align: center;
+            padding: 16px 0;
+            position: sticky;
+            bottom: 0;
+            background-color: white;
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            /* padding: 12px 20px; */
+            /* border: 1px solid #e0e0e0; */
+            border-radius: 8px;
+            background: white;
+            max-width: 100%;
+            /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
+            position: relative;
+            margin-top: 12px;
+        }
+          
+        .filter-bar select {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            width: 167px;
+        }
+
+        .filter_menu.show {
+            max-height: 500px; /* adjust as needed */
+            opacity: 100%;
+            padding: 20px;
+            margin: 6px 0;
+        }
+        .category_container{
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+      .tooltip-container.right {
+        float: right;
+        margin-right: 0;
+      }
+
+      .image-button:hover + .tooltip-text {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(10px);
+      }
+
+      .image-button img {
+        width: 40px; /* Adjust as needed */
+        height: auto; /* Maintain aspect ratio */
+        border-radius: 50%; /* Add rounded corners if desired */
+        box-shadow: 2px 2px 5px 0px #80808054;
+      }
+
+      .tooltip-text {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        background-color: #333;
+        color: #fff;
+        padding: 5px;
+        border-radius: 5px;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+      }
+      .entry_date{
+        font-weight: bold;
+        color: #4D4D4D;
+        margin-top: 42px;
+        position: relative;
+        left: 4px;
+      }
+      .total_entries{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        text-align: center; 
+        margin-top: 12px; 
+        margin-bottom: -40px;
+      }
+      .app-body{
+                margin: 0 15%;
+      }
+    .complete_text{
+        margin-right: 8px;
+        font-weight: 600;
+        color: #000000a2;
+    }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 30px;
+        height: 17px;
+        }
+
+        .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        input:checked + .slider {
+        background-color: #75D481;
+        }
+
+        input:focus + .slider {
+        box-shadow: 0 0 1px #75D481;
+        }
+
+        input:checked + .slider:before {
+        -webkit-transform: translateX(13px);
+        -ms-transform: translateX(13px);
+        transform: translateX(13px);
+        }
+
+        .slider.round {
+        border-radius: 34px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        }
+
+        .delete_complete_toggle{
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+        }
+        @media screen and (max-width: 500px) {
+            .image-button img {
+                width: 32px;
+            }
+            .filter-bar{
+                flex-direction: column;
+            }
+            .net_total{
+                grid-template-columns: 1fr;
+            }
+            .entry .flex_space_between{
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search_filter{
+                align-items: flex-start;
+                flex-direction: column-reverse;
+            }
+            .total_entries {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .total_entries hr {
+                display: none;
+            }
+            .search_bar{
+                width: 100%;
+            }
+            .filter-bar select{
+                width: 100%;
+            }
+            .app-body{
+                margin: 5%;
+            }
+        }
+    </style>
+</head>
+<body style="background-color: white;">
+        <!-- ############ LAYOUT START-->
+        <div class="app" id="app" style="background-color: white;">
+            <!-- aside -->
+            <div id="aside" class="app-aside modal nav-dropdown">
+              {% block sidebar %} 
+              {% include 'users/sidebar.html' %} 
+              {% endblock %}
+            </div>
+            <!-- aside end -->
+      
+            <!-- navbar content -->
+            <div id="content" class="app-content box-shadow-z0" role="main">
+                {% if primary == 1 %}
+                    {% block navbar %}
+                        {% include 'navbar.html' %}
+                    {% endblock navbar %}
+                {% else %}
+                    {% block sc_ag_navbar %}
+                        {% include 'sc_ag_navbar.html' %}
+                    {% endblock sc_ag_navbar %}
+                {% endif %}
+            </div>
+            <!--navbar content end-->
+      
+            <!-- ############ PAGE START-->
+            <div
+              ui-view
+              class="app-body"
+              style="justify-content: center;"
+              id="view"
+            >
+            <h3 style="text-align: center; color: #002855; margin-top: 45px;">{{event_name}}</h3>
+            <div class="flex_space_between" style="margin-bottom: 16px;">
+                <div class="tooltip-container">
+                    <a href="{% if primary == 1 %}{% url 'central_branch:wallet:wallet_homepage' %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}" class="image-button">
+                        <img src="/static/back-arrow.png" alt="Go back to session">
+                    </a>
+                    <span class="tooltip-text">Go back</span>
+                </div>
+                    <div class="delete_complete_toggle">
+                        <div style="display: flex; margin: 0 10px;">
+                            {% if total_entries != 0 %}
+                            {% if wallet_event_status.status == 'COMPLETED' %}
+                            <p class="complete_text" style="color: #75D481;">Completed!</p>
+                            {% else %}
+                            <p class="complete_text" style="color: #000000a2;">Book complete?</p>
+                            {% endif %}
+                            <label class="switch">
+                                <input type="checkbox" name="wallet_event_update_status" {% if wallet_event_status.status == 'COMPLETED' %}checked{% endif %}>
+                                <span class="slider round"></span>
+                            </label>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+            </div>
+            <div class="search_filter">
+                <input class="search_bar net_total_box" type="text" name="" id="" placeholder="Search...">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <p class="wallet_balance">Wallet Balance: {{wallet_balance}}</p>
+                    <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
+                </div>
+            </div>
+
+            <!-- Filter Menu -->
+            <div class="filter_menu">
+            <strong>Filter by</strong>
+            <div class="filter-bar">
+                <select id="filter-entry">
+                  <option value="Entry">Entry</option>
+                  <option value="all">All</option>
+                  <option value="CASH_IN">Cash In</option>
+                  <option value="CASH_OUT">Cash Out</option>
+                </select>
+
+                <!-- <select id="filter-date">
+                  <option>Month</option>
+                  <option value="this-month">This Month</option>
+                  <option value="last-month">Last Month</option>
+                  <option value="this-week">This Week</option>
+                  <option value="yesterday">Yesterday</option>
+                </select> -->
+
+                <select id="filter-category">
+                  <option>Category</option>
+                  {% for category in categories %}
+                  <option value="{{category.name}}">{{category.name}}</option>
+                  {% endfor %}
+                </select>
+              
+                <select id="filter-name">
+                  <option value="name">Name</option>
+                  {% for name in names %}
+                  <option value="{{name}}">{{name}}</option>
+                  {% endfor %}
+                </select>
+                
+                <select id="filter-payment">
+                    <option>Payment</option>
+                    <option value="CASH">Cash</option>
+                    <option value="CARD">Card</option>
+                    <option value="BKASH">Bkash</option>
+                    <option value="NAGAD">Nagad</option>
+                </select>
+              
+                
+                <button id="clearFilters" class="clear_button" style="margin-top: 10px;">Clear Filters</button>
+              </div>
+            </div>
+
+            <div class="net_total">
+                <div class="net_total_box" style="font-weight: bold;">
+                    <div class="flex_space_between">
+                        <p>Cash In</p>
+                        <p style="color: #1B971F;">{{cash_in_total}}</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Cash Out</p>
+                        <p style="color: #EB5132;">{{cash_out_total}}</p>
+                    </div>
+                    <hr style="width: 100%;">
+                    <div class="flex_space_between">
+                        <p>Net Balance</p>
+                        {% if net_balance > 0 %}
+                        <p style="color: #1B971F;">{{net_balance}}</p>
+                        {% else %}
+                        <p style="color: #EB5132;">{{net_balance}}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="net_total_box"  style="font-weight: bold;">
+                    <div class="flex_space_between">
+                        <p>Budget (Revenue)</p>
+                        <p style="color: #1B971F;">{% if budget_data %}{{budget_data.total_revenue|floatformat:2}}{% else %}No Data{% endif %}</p>
+                    </div>
+                    <div class="flex_space_between">
+                        <p>Budget (Cost)</p>
+                        <p style="color: #EB5132;">{% if budget_data %}{{budget_data.total_cost|floatformat:2}}{% else %}No Data{% endif %}</p>
+                    </div>
+                    <hr style="width: 100%;">
+                    <div class="flex_space_between">
+                        <p>Surplus/Deficit</p>
+                        {% if budget_surplus_deficit > 0 %}
+                        <p style="color: #1B971F;">{{budget_surplus_deficit}}</p>
+                        {% elif budget_surplus_deficit < 0 %}
+                        <p style="color: #EB5132;">{{budget_surplus_deficit}}</p>
+                        {% else %}
+                        <p style="color: #EB5132;">No Data</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="total_entries">
+                <hr style="width: 100%;">
+                <p style="color: #4D4D4D;">Showing {{total_entries}} entries</p>
+                <hr style="width: 100%;">
+            </div>
+            
+            {% for entry_date, entries in wallet_entries.items %}
+            <div class="entriesContainer">
+                <p class="entry_date">{{entry_date}}</p>
+                {% for entry in entries %}
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_edit' entry.0.pk %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_edit' primary entry.0.pk %}{% endif %}" class="net_total_box entry" data-name="{% if entry.0.name %}{{entry.0.name}}{% else %}None{% endif %}" data-category="{% for category in entry.0.categories.all %}{{category.name}} {% endfor %}" data-payment="{{entry.0.payment_mode}}" data-entrytype="{{entry.0.entry_type}}" data-date="05-05-2025">
+                    <div class="flex_space_between">
+                        <h5 style="font-weight: bold;">{% if entry.0.name %}{{entry.0.name}}{% endif %}</h5>
+                        <h5 style="color: {% if entry.0.entry_type == 'CASH_IN' %}#1B971F{% elif entry.0.entry_type == 'CASH_OUT' %}#EB5132{% endif %}; font-weight: bold;">{{entry.0.amount}}</h5>
+                    </div>
+                    <div class="flex_space_between">
+                        <div class="category_container">
+                            {% for category in entry.0.categories.all %}
+                            <p class="category" data-cat='{{category.name}}'>{{category.name}}</p>
+                            {% endfor %}
+                        </div>
+                        <p style="color: #4D4D4D;">Payment : {{entry.0.payment_mode}}</p>
+                    </div>
+                    <div class="flex_space_between">                  
+                        <p><i>📎</i>{% if entry.1 %}{{entry.1}} attachments{% else %}No attachments{% endif %}</p>                 
+                    </div>
+                    <p>{{entry.0.remarks}}</p>
+                    <div>
+                        <p style="font-weight: bold;">Entry done at <span style="color: #475DAC;">{{entry.0.entry_date_time|date:"g:i A"}}</span></p>
+                    </div>
+                </a>                
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <div class="cash_in_cash_out_div">
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_in_event' event_id %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_in_event' primary event_id %}{% endif %}" class="cash_in_btn">CASH IN</a>
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_out_event' event_id %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_out_event' primary event_id %}{% endif %}" class="cash_out_btn">CASH OUT</a>
+            </div>
+        </div>
+</body>
+    {% block common_js %} 
+    {% include "common_js.html" %} 
+    {% endblock common_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const entries = document.querySelectorAll('.entry');
+            const entryType = document.getElementById('filter-entry');
+            // const dateSelect = document.getElementById('filter-date');
+            const categorySelect = document.getElementById('filter-category');
+            const nameInput = document.getElementById('filter-name');
+            const paymentSelect = document.getElementById('filter-payment');
+            const clearButton = document.getElementById('clearFilters');
+
+            function filterEntries() {
+                const entree = entryType.value;
+                const category = categorySelect.value;
+                const name = nameInput.value.trim().toLowerCase();
+                const payment = paymentSelect.value;
+
+                const containers = document.querySelectorAll('.entriesContainer');
+
+                containers.forEach(container => {
+                    const entries = container.querySelectorAll('.entry');
+                    let anyVisible = false;
+
+                    entries.forEach(entry => {
+                        const entryType = entry.dataset.entrytype?.toLowerCase();
+                        const entryCategory = entry.dataset.category?.toLowerCase();
+                        const entryName = entry.dataset.name?.toLowerCase();
+                        const entryPayment = entry.dataset.payment?.toLowerCase();
+
+                        let show = true;
+
+                        if (name !== 'name' && name && !entryName.includes(name)) show = false;
+                        if ((entree !== "Entry" && entree !== "all") && entryType !== entree.toLowerCase()) show = false;
+                        if (category !== "Category" && !entryCategory.split(" ").includes(category.toLowerCase())) show = false;
+                        if (payment !== "Payment" && entryPayment !== payment.toLowerCase()) show = false;
+
+                        entry.style.display = show ? 'block' : 'none';
+                        if (show) anyVisible = true;
+                    });
+
+                    container.style.display = anyVisible ? 'block' : 'none';
+                });
+                updateTotalEntriesVisibility();
+
+            }
+
+            // Trigger filtering on change/input
+            nameInput.addEventListener('input', filterEntries);
+            categorySelect.addEventListener('change', filterEntries);
+            paymentSelect.addEventListener('change', filterEntries);
+            // dateSelect.addEventListener('change', filterEntries);
+            entryType.addEventListener('change', filterEntries);
+
+            // Clear filters
+            clearButton.addEventListener('click', function () {
+                nameInput.value = 'name';
+                categorySelect.selectedIndex = 0;
+                paymentSelect.selectedIndex = 0;
+                // dateSelect.selectedIndex = 0;
+                entryType.selectedIndex = 0;
+                entries.forEach(entry => entry.style.display = 'block');
+            });
+        });
+
+        const filterBtn = document.getElementById('filterButton');
+        const filterMenu = document.querySelector('.filter_menu');
+
+        filterBtn.addEventListener('click', () => {
+            const isVisible = filterMenu.classList.contains('show');
+            
+            if (isVisible) {
+            filterMenu.classList.remove('show');
+            } else {
+            filterMenu.classList.add('show');
+            }
+        });
+
+    </script>
+    <script>
+    document.querySelector('.search_bar').addEventListener('input', function () {
+        const searchValue = this.value.toLowerCase().trim();
+        const containers = document.querySelectorAll('.entriesContainer');
+
+        containers.forEach(container => {
+            const entries = container.querySelectorAll('.entry');
+            let anyVisible = false;
+
+            entries.forEach(entry => {
+                const name = entry.dataset.name?.toLowerCase();
+                const category = entry.dataset.category?.toLowerCase();
+                const payment = entry.dataset.payment?.toLowerCase();
+                const entryType = entry.dataset.entrytype?.toLowerCase();
+                const innerText = entry.innerText.toLowerCase();
+
+                const match = name.includes(searchValue) ||
+                            category.includes(searchValue) ||
+                            payment.includes(searchValue) ||
+                            entryType === searchValue ||
+                            innerText.includes(searchValue);
+
+                entry.style.display = match ? 'block' : 'none';
+                if (match) anyVisible = true;
+            });
+
+            container.style.display = anyVisible ? 'block' : 'none';
+            updateTotalEntriesVisibility();
+
+        });
+    });
+    function updateTotalEntriesVisibility() {
+    const totalBox = document.querySelector('.total_entries');
+    const allEntries = document.querySelectorAll('.entry');
+    const visibleEntries = document.querySelectorAll('.entry:not([style*="display: none"])');
+
+    if (allEntries.length === visibleEntries.length) {
+        totalBox.style.display = 'grid';
+    } else {
+        totalBox.style.display = 'none';
+    }
+}
+
+        </script>
+        <script>
+        //change text if the toggle is active
+
+        let completeText = document.querySelector('.complete_text');
+        let toggle = document.querySelector('.delete_complete_toggle input[name="wallet_event_update_status"]');
+
+        toggle.onclick = function(){
+            let active = toggle.checked;
+
+            $.ajax({
+                url: "{% url 'central_branch:wallet:wallet_event_update_status' %}",
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' 
+                },
+                data: JSON.stringify({
+                    event_id: {{ event_id }},
+                    completed: active
+                }),
+                success: function (response) {
+                    if(response.message == 'success') {
+                        if(active){
+                            Swal.fire({
+                                icon:"success",
+                                title:"Event status is marked as Completed!",
+                                
+                            })
+                            completeText.innerHTML = 'Completed!';
+                            completeText.style.color = '#75D481';
+                        }
+                        else{
+                            Swal.fire({
+                                icon:"success",
+                                title:"Event status is marked as Ongoing!",
+                                
+                            })
+                            completeText.innerHTML = 'Book complete?';
+                            completeText.style.color = '#000000a2';
+                        }
+                    }
+                    else {
+                        Swal.fire({
+                            icon:"error",
+                            title:"Could not updated event status!",
+                            
+                        })
+                        if(active){
+                            toggle.checked = false;
+                            completeText.innerHTML = 'Book complete?';
+                            completeText.style.color = '#000000a2';
+                        }
+                        else{
+                            toggle.checked = true;
+                            completeText.innerHTML = 'Completed!';
+                            completeText.style.color = '#75D481';
+                        }
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Failed to update wallet event status:', error);
+
+                    if(active){
+                        toggle.checked = false;
+                    }
+                    else{
+                        toggle.checked = true;
+                    }
+                }
+            });
+        };
+    </script>
+    <script>
+        {% for message in messages %}
+    
+        Swal.fire({
+            icon:"{{message.tags}}",
+            title:"{{message}}",
+            
+        })
+        {% endfor %}
+    </script>
+    
+</html>

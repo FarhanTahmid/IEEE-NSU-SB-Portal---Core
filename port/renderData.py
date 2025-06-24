@@ -54,7 +54,7 @@ class HandleVolunteerAwards:
         
         except Exception as e:
             PortData.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc() + '\n' + ' url:' + request.build_absolute_uri())
             messages.info(request,'Something went wrong while loading award information!')
             return False
     
@@ -68,7 +68,7 @@ class HandleVolunteerAwards:
         
         except Exception as e:
             PortData.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
-            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+            ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc() + '\n' + ' url:' + request.build_absolute_uri())
             messages.info(request,'Something went wrong while loading award winners!')
             return False
     
@@ -436,7 +436,7 @@ class PortData:
             #if a position exists then add it in the dict
             if position_data.count() > 0:
                 sc_ag_previous_positions.update({sc_ag.primary:position_data})
-
+                
         return sc_ag_previous_positions
     
     def get_all_panels(request,sc_ag_primary):

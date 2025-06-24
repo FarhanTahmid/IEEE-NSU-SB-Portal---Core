@@ -5,7 +5,7 @@ from django.urls import reverse
 from central_events.google_calendar_handler import CalendarHandler
 from chapters_and_affinity_group.get_sc_ag_info import SC_AG_Info
 from insb_port import settings
-from main_website.models import About_IEEE, HomePageTopBanner, IEEE_Bangladesh_Section, IEEE_NSU_Student_Branch, IEEE_Region_10, Page_Link,FAQ_Question_Category,FAQ_Questions,HomePage_Thoughts,IEEE_Bangladesh_Section_Gallery
+from main_website.models import About_IEEE, Contact_Info, HomePageTopBanner, IEEE_Bangladesh_Section, IEEE_NSU_Student_Branch, IEEE_Region_10, Page_Link,FAQ_Question_Category,FAQ_Questions,HomePage_Thoughts,IEEE_Bangladesh_Section_Gallery
 from notification.models import NotificationTypes
 from notification.notifications import NotificationHandler
 from port.models import Teams,Roles_and_Position,Chapters_Society_and_Affinity_Groups,Panels
@@ -1919,6 +1919,20 @@ class Branch:
         except Exception as e:
             Branch.logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
             ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+            return False
+        
+    def update_contact_info(address, nsu_ieee_email, chair_email, membership_queries_number, corporate_engagement_number):
+        try:
+            contact_info = Contact_Info.objects.get(id=1)
+
+            contact_info.address = address
+            contact_info.nsu_ieee_email = nsu_ieee_email
+            contact_info.chair_email = chair_email
+            contact_info.membership_queries_number = membership_queries_number
+            contact_info.corporate_engagement_number = corporate_engagement_number
+            contact_info.save()
+            return True
+        except:
             return False
         
     def save_homepage_thoughts(author,thought):

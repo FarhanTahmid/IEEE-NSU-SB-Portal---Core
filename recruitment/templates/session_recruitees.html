@@ -73,6 +73,213 @@
   .app-header ~ .app-body {
     padding-top: 0rem;
 }
+ .recruitment_date{
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    color: rgb(76, 171, 92);
+    background-color: rgb(213, 251, 219);
+    padding: 6px 16px;
+    transition: all .3s ease-in-out;
+    cursor: pointer;
+    margin: 0;
+  }
+  .recruitment_date:hover{
+      background-color: rgb(149, 255, 165);
+      color: rgb(76, 171, 92);
+  }
+  .save_button{
+    text-decoration: none;
+    text-align: right;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    color: rgb(76, 171, 92);
+    background-color: rgb(213, 251, 219);
+    padding: 6px 16px;
+    transition: all .3s ease-in-out;
+    cursor: pointer;
+    margin: 0;
+    margin-top: 16px;
+  }
+  .save_button:hover{
+      background-color: rgb(149, 255, 165);
+      color: rgb(76, 171, 92);
+  }
+  .search_bar{
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    height: 26px;
+    padding: 16px;
+    border: 1px solid #D9D9D9;
+  }
+  .shadow_box{
+    /* padding: 16px 20px; */
+    border: 1px solid #D9D9D9;
+    border-radius: 6px;
+    margin: 6px 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: block;
+  }
+  .create_btn{
+    text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      color: rgb(76 76 171);
+      background-color: rgb(206, 206, 254);
+      padding: 6px 16px;
+      transition: all .3s ease-in-out;
+      cursor: pointer;
+      margin: 0;
+  }
+  .create_btn:hover{
+      background-color: rgb(155, 155, 255);
+  }
+  .button_groups{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+  }
+  .recuitment_modal{
+    opacity: 0;
+    position: fixed;
+    z-index: -1;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 120%;
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.5);
+    transition: all .3s ease-in-out;
+    transform: translateY(-20px);
+    overflow: auto;
+  }
+
+  .close_1{
+    color: #000;
+    font-size: 28px;
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    bottom: 4px;
+  }
+
+  .close_1:hover,
+  .close_1:focus{
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .modal-1-content::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .modal-1-content::-webkit-scrollbar-thumb {
+    background-color: #e7eeef;
+    transition: all 0.4s ease-in-out;
+    border-radius: 4px;
+  }
+  .modal-1-content::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(169, 170, 170);
+  }
+  .modal-1-content {
+    background-color: #fefefe;
+    margin: auto 40%;
+    padding: 20px;
+    border: 1px solid rgb(136, 136, 136);
+    width: 450px;
+    border-radius: 6px;
+  }
+  @media screen and (max-width: 1024px) {
+    .modal-1-content {
+      left: 0px;
+      margin: auto;
+    }
+  }
+  @media screen and (max-width: 650px) {
+    .modal-1-content {
+      width: auto;
+    }
+  }
+  .on_text{
+        margin-right: 8px;
+        font-weight: 600;
+        color: #000000a2;
+    }
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 30px;
+        height: 17px;
+        }
+
+        .switch input { 
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 13px;
+        width: 13px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        }
+
+        input:checked + .slider {
+        background-color: #75D481;
+        }
+
+        input:focus + .slider {
+        box-shadow: 0 0 1px #75D481;
+        }
+
+        input:checked + .slider:before {
+        -webkit-transform: translateX(13px);
+        -ms-transform: translateX(13px);
+        transform: translateX(13px);
+        }
+
+        .slider.round {
+        border-radius: 34px;
+        }
+
+        .slider.round:before {
+        border-radius: 50%;
+        }
+
+        .toggle{
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+        }
+        #recruitment-link{
+          text-decoration: none;
+          border: 1px solid transparent;
+          border-bottom: 1px solid #ddd;
+          /* border-radius: 8px; */
+          padding: 8px 16px;
+        }
   </style>
 </head>
 <body>
@@ -199,8 +406,41 @@
         <div class="btn-container">
           <a href="{% url "recruitment:recruit_member" pk %}" class="btn btn-outline b-primary text-primary">Recruit New Member</a>
           <a href="{% url "recruitment:export_excel" pk %}" class="btn btn-outline b-success text-success">Generate Excel Sheet for this Session</a>
+          <a href="#" onclick="openModal()" class="recruitment_date">Set Recruitment Date</a>
         </div>
     </div>
+    <form method="POST">
+      {% csrf_token %}
+      <div id="modal_1" class="recuitment_modal">
+        <!-- Modal content -->
+        <div class="modal-1-content">
+            <div style="text-align: right;">
+                <span class="close_1">&times;</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; padding: 8px;" class="">
+              <label for="recruitment_date" style="font-style: 16px; margin: 0;font-weight: bold;">Set Recruitment Deadline:</label>
+              <input type="datetime-local" style="border: none;" name="recruitment_end_datetime" {% if session.session.session_end_date_time %}value="{{session.session.session_end_date_time|date:'Y-m-d\\TH:i'}}"{% endif %}>
+              <div>
+                <label for="recruitment-link" style="font-style: 16px; margin: 0;font-weight: bold;">Recruitment Event Link:</label>
+                <input type="text" name="recruitment_event_link" id="recruitment-link" placeholder="Event Link" {% if session.session.recruitment_event_link %}value="{{session.session.recruitment_event_link}}"{% endif %}>
+              </div>
+              <div class="toggle">
+                        <div style="display: flex; margin: 0 10px;">
+                            <p class="on_text" style="color: #000000a2;">Is Active?</p>
+                            <!-- <p class="on_text" style="color: #000000a2;">OFF</p> -->
+                            <label class="switch">
+                                <input type="checkbox" name="is_active" {% if session.session.is_active %}checked{% endif %}>
+                                <span class="slider round"></span>
+                            </label>      
+                        </div>
+                      </div>
+            </div>
+            <div style="display: flex; justify-self: flex-end;">
+              <button type="submit" class="save_button" name="save_details">Save</button>
+            </div>
+          </div>
+      </div>
+      </form>
     <!--Messages-->
     <div style="justify-content:center; text-align:center;">
       {% if messages %}
@@ -606,6 +846,39 @@ function FilterkeyWord_all_table() {
     }
 }
   </script>
+    <script>
+    // Get the modal
+    var modal_1 = document.getElementById("modal_1");
+    
+    // Get the button that opens the modal
+    var btn_1 = document.querySelector(".recruitment_date");
+    
+    // Get the <span> element that closes the modal
+    var span_1 = document.getElementsByClassName("close_1")[0];
+    
+    // When the user clicks the button, open the modal 
+    btn_1.onclick = function() {
+    modal_1.style.transform = 'translateY(0px)';
+    modal_1.style.zIndex = '103100';
+    modal_1.style.opacity = '1';
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span_1.onclick = function() {
+    modal_1.style.transform = 'translateY(-50px)';
+    modal_1.style.zIndex = '-100';
+    modal_1.style.opacity = '0';
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == modal_1) {
+        modal_1.style.transform = 'translateY(-50px)';
+        modal_1.style.zIndex = '-100';
+        modal_1.style.opacity = '0';
+    }
+    }
+    </script>
 <!-- endbuild -->
 <!-- endbuild -->
 </body>

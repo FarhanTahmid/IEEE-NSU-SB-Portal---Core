@@ -271,32 +271,63 @@
                             const name=awardWinner.name;
                             const team=awardWinner.team;
                             const position = awardWinner.position;
-                            const contributions = awardWinner.contributions;
+                            const contributions = awardWinner['contributions'];
 
-                            return `
-                            <div class="content">
-                                <div class="con">
-                                    <div class="circle">
-                                        <img src="/media_files/${imgSrc}" onerror="this.onerror=null;this.src='{% static '/images/default_profile_picture.png'%}';" alt="picture_of_volunteer_of_the_month">
-                                    </div>
-                                    <div class="details">
-                                        <div class="list-with-icon-caption">
-                                            <p style="text-align: left;">Name: <span style="color: #002855;">${name}</span></p>
-                                            <p style="text-align: left;">Team: <span style="color: #002855;">${team}</span></p>
-                                            <p style="text-align: left;">Position: <span style="color: #002855;">${position}</span></p>
+                            if(contributions != undefined) {
+
+                                return `
+                                <div class="content">
+                                    <div class="con">
+                                        <div class="circle">
+                                            <img src="/media_files/${imgSrc}" onerror="this.onerror=null;this.src='{% static '/images/default_profile_picture.png'%}';" alt="picture_of_volunteer_of_the_month">
                                         </div>
-                                        <div class="list-with-icon-content">
-                                            <div class="list-with-icon-title gdlr-skin-title" style="font-weight: 500;">
-                                                Contributions
-                                            </div>
+                                        <div class="details">
                                             <div class="list-with-icon-caption">
-                                                <p style="text-align: justify;">${contributions}</p>
+                                                <p style="text-align: left;">Name: <span style="color: #002855;">${name}</span></p>
+                                                <p style="text-align: left;">Team: <span style="color: #002855;">${team}</span></p>
+                                                <p style="text-align: left;">Position: <span style="color: #002855;">${position}</span></p>
+                                            </div>
+                                            <div class="list-with-icon-content">
+                                                <div class="list-with-icon-title gdlr-skin-title" style="font-weight: 500;">
+                                                    Contributions
+                                                </div>
+                                                <div class="list-with-icon-caption">
+                                                    <p style="text-align: justify;">${contributions}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            `;
+                                `;
+                            }
+                            else {
+                                const points = awardWinner['points'];
+                                return `
+                                <div class="content">
+                                    <div class="con">
+                                        <div class="circle">
+                                            <img src="/media_files/${imgSrc}" onerror="this.onerror=null;this.src='{% static '/images/default_profile_picture.png'%}';" alt="picture_of_top_performer">
+                                        </div>
+                                        <div class="details">
+                                            <div class="list-with-icon-caption">
+                                                <p style="text-align: left;">Name: <span style="color: #002855;">${name}</span></p>
+                                                <p style="text-align: left;">Team: <span style="color: #002855;">${team}</span></p>
+                                                <p style="text-align: left;">Position: <span style="color: #002855;">${position}</span></p>
+                                            </div>
+                                            <div class="list-with-icon-content">
+                                                {% comment %} <div class="list-with-icon-title gdlr-skin-title" style="font-weight: 500;">
+                                                    Points
+                                                </div> {% endcomment %}
+                                                <div class="list-with-icon-caption">
+                                                    <p style="text-align: left;">Points: <span style="color: #002855;">${points}</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            }
+
                         });
                         
                         // Update the award winner container content

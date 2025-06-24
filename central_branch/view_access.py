@@ -70,12 +70,12 @@ class Branch_View_Access:
             username=request.user.username
             if(Branch_View_Access.common_access(username=username)):
                 return True           
-            elif(team_primary and task_type == "Team"):
+            elif(team_primary != None and task_type == "Team"):
                 if (team_primary == "1"):
                     return True
                 else:
                     member = Members.objects.get(ieee_id = username)
-                    team = Teams.objects.get(primary=member.team.primary)
+                    team = Teams.objects.get(primary=team_primary)
                     get_current_panel=Branch.load_current_panel()
                     #Get current panel members of branch
                     get_current_panel_member= Panel_Members.objects.filter(member=member, tenure=get_current_panel.pk, team=team).first()
@@ -85,7 +85,7 @@ class Branch_View_Access:
                             return True
                         elif not get_current_panel_member.position.is_co_ordinator and get_current_panel_member.position.is_officer:
                             return True
-            elif(team_primary and task_type == "Individuals" and len(task.team.all()) == 1):
+            elif(team_primary != None and task_type == "Individuals" and len(task.team.all()) == 1):
                 if (team_primary == "1"):
                     return True
                 else:
@@ -116,12 +116,12 @@ class Branch_View_Access:
             username=request.user.username
             if(Branch_View_Access.common_access(username=username)):
                 return True
-            elif(team_primary and task_type == "Team"):               
+            elif(team_primary != None and task_type == "Team"):               
                 if (team_primary == "1"):
                     return True
                 else:
                     member = Members.objects.get(ieee_id = username)
-                    team = Teams.objects.get(primary=member.team.primary)
+                    team = Teams.objects.get(primary=team_primary)
                     get_current_panel=Branch.load_current_panel()
                     #Get current panel members of branch
                     get_current_panel_member= Panel_Members.objects.filter(member=member, tenure=get_current_panel.pk, team=team).first()
@@ -132,7 +132,7 @@ class Branch_View_Access:
                         elif not get_current_panel_member.position.is_co_ordinator and get_current_panel_member.position.is_officer:
                             return True
             #reset head
-            elif(team_primary and task_type == "Individuals" and len(task.team.all()) == 1):               
+            elif(team_primary != None and task_type == "Individuals" and len(task.team.all()) == 1):               
                 if (team_primary == "1"):
                     return True
                 else:

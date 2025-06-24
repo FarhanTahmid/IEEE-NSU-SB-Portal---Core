@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from main_website.forms import About_IEEE_Bangladesh_Section_Form, About_IEEE_Form, About_IEEE_NSU_Student_Branch_Form, About_IEEE_Region_10_Form
-from .models import Research_Papers,Blog_Category,Blog,IEEE_Bangladesh_Section,IEEE_Bangladesh_Section_Gallery,HomePage_Thoughts,About_IEEE,IEEE_NSU_Student_Branch,IEEE_Region_10,Page_Link,FAQ_Question_Category,FAQ_Questions
+from .models import *
 # Register your models here.
 
 #Research Blogs Category
@@ -86,3 +86,7 @@ class FAQ_Question_Category(admin.ModelAdmin):
 class FAQ_Questions(admin.ModelAdmin):
 
     list_display = ['title','question','answer']
+
+@admin.register(Contact_Info)
+class IEEE_Region_10(admin.ModelAdmin):
+    list_display = ['id']

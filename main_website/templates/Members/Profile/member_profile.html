@@ -333,7 +333,9 @@
                                                 <div class="des-r3">
                                                     <div class="title">{{sc_ag.sc_ag.short_form}}</div>
                                                     <div class="position">Current Position: {{sc_ag.position}}</div>
+                                                    {% if sc_ag.team %}
                                                     <div class="team">Current Team: {{sc_ag.team}}</div>
+                                                    {% endif %}
                                                     <br>
                                                 </div>
                                             </div>

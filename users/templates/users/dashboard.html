@@ -21,18 +21,256 @@
   
   <!-- style -->
   
-  <link rel="stylesheet" href="{% static '/assets/animate.css/animate.min.css'%}" type="text/css" />
-  <link rel="stylesheet" href="{% static '/assets/glyphicons/glyphicons.css'%}" type="text/css" />
-  <link rel="stylesheet" href="{% static '/assets/font-awesome/css/font-awesome.min.css'%}" type="text/css" />
-  <link rel="stylesheet" href="{% static '/assets/material-design-icons/material-design-icons.css'%}" type="text/css" />
+    <!--common CSS-->
+    {% block common_css %}
+     {% include "common_css.html" %}
+    {% endblock common_css %}
 
-  <link rel="stylesheet" href="{% static '/assets/bootstrap/dist/css/bootstrap.min.css'%}" type="text/css" />
-  <!-- build:css ../assets/styles/app.min.css -->
-  <link rel="stylesheet" href="{% static '/assets/styles/app.css'%}" type="text/css" />
-  <!-- endbuild -->
-  <link rel="stylesheet" href="{% static '/assets/styles/font.css'%}" type="text/css" />
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <style>
+   /* redesigned barcharts */
+    .container_dash {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+			
+        }
+        
+        .card_dash {
+            background: white;
+           
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+			border: 1px solid #ddd;
+			border-radius: 0.25rem;
+			box-shadow: 2px 2px 2px #ddd;
+        }
+        
+        .dropdown_dash-container_dash {
+            margin-bottom: 25px;
+        }
+        
+        .dropdown_dash {
+            padding: 6px 16px;
+			border: 2px solid #e9ecef;
+			border-radius: 6px;
+			font-size: 10px;
+			background: white;
+			cursor: pointer;
+			/* width: 100%; */
+			max-width: 400px;
+			transition: border-color 0.3s ease;
+        }
+        
+        .dropdown_dash:focus {
+            outline: none;
+            border-color: #3980c0;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #000;
+            margin-bottom: 20px;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+        
+        .chart-container_dash {
+			position: relative;
+			width: 100%;
+			height: 400px;
+			
+			min-height: 300px;
+		}
+				
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .stat-card_dash {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .stat-value {
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: bold;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+        
+        .stat-label {
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            opacity: 0.9;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card_dash {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Mobile First Responsive Breakpoints */
+        
+        /* Extra Small devices (phones, 576px and down) */
+        @media (max-width: 576px) {            
+            .card_dash {
+                padding: 15px;
+                border-radius: 8px;
+            }
+            
+            .chart-container_dash {
+                height: 300px;
+                margin: 15px 0;
+            }
+            
+            .dropdown_dash {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            
+            .stat-card_dash {
+                padding: 15px;
+                min-height: 100px;
+            }
+            
+            .dropdown_dash-container_dash {
+                margin-bottom: 20px;
+            }
+        }
+        
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 768px) {
+            .card_dash {
+                padding: 18px;
+            }
+            
+            .chart-container_dash {
+                height: 320px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 12px;
+            }
+        }
+        
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 992px) {
+            .chart-container_dash {
+                height: 350px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 15px;
+            }
+        }
+        
+        /* Large devices (desktops, 992px and up) */
+        @media (min-width: 992px) {            
+            .card_dash {
+                padding: 24px;
+            }
+            
+            .chart-container_dash {
+                height: 400px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+        }
+        
+        /* Extra large devices (large desktops, 1200px and up) */
+        @media (min-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            .chart-container_dash {
+                height: 250px;
+            }
+            
+            .stat-card_dash {
+                min-height: 80px;
+                padding: 12px;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .card_dash {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .card_dash {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+            
+            .dropdown_dash-container_dash {
+                display: none;
+            }
+        }
+        
+        /* Focus and accessibility improvements */
+        .dropdown_dash:focus-visible {
+            box-shadow: 0 0 0 3px rgba(57, 128, 192, 0.3);
+        }
+        
+        /* Reduced motion for users who prefer it */
+        @media (prefers-reduced-motion: reduce) {
+            .card_dash {
+                animation: none;
+            }
+            
+            .dropdown_dash {
+                transition: none;
+            }
+        }
 	.card{
 		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 		overflow: hidden;
@@ -198,7 +436,7 @@
 
 	.body_top_per {
 		overflow-y: scroll;
-		height: 408px;
+		height: 418px;
 		width: 100%;
 	}
 	.headline_top_performers_together{
@@ -313,6 +551,61 @@
 	.profile a{
 		text-align: center;
 	}
+	.wallet{
+		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+		border: 1px solid rgba(120, 130, 140, 0.13);
+	}
+	.treasurer_container{
+		/* margin: 0px 0 20px 0px; */
+		/* padding: 12px 14px; */
+		/* box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px; */
+		/* display: flex; */
+		/* align-items: center; */
+		/* justify-content: center; */
+		/* flex-wrap: wrap; */
+		/* padding: 20px; */
+		/* gap: 16px; */
+		color: rgb(85, 85, 85);
+		height: 100%;
+	}
+	.outer_box{
+		padding: 12px 24px;
+		border-radius: 4px;
+		border: 1px solid rgba(120, 130, 140, 0.13);
+		/* border: 1px solid rgba(120, 130, 140, 0.13); */
+		box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 8px;
+		/* background-color: rgba(120, 130, 140, 0.13); */
+		/* display: flex; */
+		/* flex-direction: column; */
+		/* align-items: flex-start; */
+		background-color: #fff;
+		height: 100%;
+	}
+	.treasurer_container a{
+		color: #0076ae;
+		margin: 0;
+		text-align: center;
+		font-size: 24px;
+	}
+	.stat_box{
+		padding: 38px 20px;
+		border: 1px solid #D9D9D9;
+		border-radius: 6px;
+		margin: 0px;
+		box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1);
+		display: block;
+		width: 49%;
+		background-color: #fff;
+		font-weight: bold;
+	}
+	@media screen and (max-width:700px){
+		.outer_box, .stat_box{
+			width: 100%;
+		}
+	}
+	canvas {
+      display: block !important;
+    }
   </style>
 </head>
 {% block preloader %}
@@ -338,7 +631,7 @@
 	  {% endblock %}
 	  <!-- NAVIGATION BAR END -->
 	</div>
-<div ui-view class="app-body" id="view" style="background-color: #fff;">
+<div ui-view class="app-body" id="view" style="background-color: #f5f6f8;">
 
 <!-- ############ Main Content of PAGE START-->
 <!-- <div class="p-a white lt box-shadow">
@@ -350,33 +643,78 @@
 </div> -->
 <div class="padding">
 	<div class="row" >
-		<div class="" style="    display: flex;
-		justify-content: center;
-    	margin: 0px 12px 15px 12px;
-		align-items: center;
-		width: 100%;
-		background: linear-gradient(to right bottom, #002855, #013262, #023d6f, #03487c, #025389, #015e95, #016aa2, #0076ae, #0085bc, #0095c9, #00a5d6, #00b5e2);
-		border-radius: 5px; 
-		box-shadow: rgba(0, 0, 0, 0.25) 1.95px 1.95px 2.6px;">
-			<div class="card" style="border: none; background: transparent; box-shadow: rgba(0, 0, 0, 0) 1.95px 1.95px 2.6px;">
-				<div class="card-body">
-					<div class="text-center py-3">
-					   <div class="main-wid position-relative">
-							<h4 class="text-white">IEEE NSU SB - Portal Dashboard</h4>
+		{% if eb_member %}
+		<div class="col-xl-6">
+			{% endif %}
+			<div class="" style="    display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(to right bottom, #002855, #013262, #023d6f, #03487c, #025389, #015e95, #016aa2, #0076ae, #0085bc, #0095c9, #00a5d6, #00b5e2);
+			border-radius: 5px; {% if not eb_member %} margin: 11px; {% endif %}		
+			box-shadow: rgba(0, 0, 0, 0.25) 1.95px 1.95px 2.6px;">
+				<div class="card" style="border: none; background: transparent; box-shadow: rgba(0, 0, 0, 0) 1.95px 1.95px 2.6px;">
+					<div class="card-body">
+						<div class="text-center py-3">
+						<div class="main-wid position-relative">
+								<h4 class="text-white">IEEE NSU SB - Portal Dashboard</h4>
 
-							<h4 class="text-white mb-0"> Welcome Back, {{user_data.name}}</h4>
+								<h4 class="text-white mb-0"> Welcome Back, {{user_data.name}}</h4>
 
-							<p class="text-white-50 px-4 mt-4" style="color:#ffff; text-size:25px; margin-top: 0;">{{user_data.position}}, {{user_data.team}}</p> 
-							
-							<div class="mt-4 pt-2 mb-2">
-								<a href="{% url 'users:profile' %}" class="btn">View Profile <i class="mdi mdi-arrow-right ms-1"></i></a>
-							</div>
-					   </div>
+								<p class="text-white-50 px-4 mt-4" style="color:#ffff; text-size:25px; margin-top: 0;">{{user_data.position}}, {{user_data.team}}</p> 
+								
+								<div class="mt-4 pt-2 mb-2">
+									<a href="{% url 'users:profile' %}" class="btn">View Profile <i class="mdi mdi-arrow-right ms-1"></i></a>
+								</div>
+						</div>
+						</div>
 					</div>
 				</div>
 			</div>
+			{% if eb_member %}
+		</div>
+			{% endif %}
+
+		{% if eb_member %}	
+		<div class="col-xl-6">
+			<div class="treasurer_container">
+				{% comment %} <a href="{% url 'central_branch:wallet:wallet_homepage' %}">Treasurer's Wallet</a> {% endcomment %}
+				<!--Stats-->
+				<!-- <div class="stats_menu"> -->
+					<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+						<h5 class="stat_box">Wallet Balance: {{wallet_balance}}</h5>
+						<!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
+							<option value="all_time">All Time</option>
+							<option value="tenure">Current Tenure</option>
+						</select> -->
+						<h5 class="stat_box">Total Cash In: {{wallet_entry_stats_whole_tenure.total_cash_in}}</h5>
+						<h5 class="stat_box">Total Cash Out: {{wallet_entry_stats_whole_tenure.total_cash_out}}</h5>
+						<h5 class="stat_box">Total Transactions: {{wallet_entry_stats_whole_tenure.total_entries}}</h5>
+					</div>
+				<!-- </div> -->
+			</div>
+		</div>
+		{% endif %}
+	</div>
+	<!-- {% if eb_member %}
+	<div class="row" >
+		<div class="col-xl-6">
+		<div class="outer_box">
+			<div>
+				<canvas id="cashChart1" width="600"></canvas>
+			</div>
+		</div>
+		</div>
+		<div class="col-xl-6">
+		<div class="outer_box">
+			<div>
+				<canvas id="cashChart2" width="600"></canvas>
+			</div>
+		</div>
 		</div>
 	</div>
+	{% endif %} -->
 	<div class="row">
 		<div class="col-xl-6">
 			<div class="card">
@@ -874,96 +1212,32 @@
 		<div class="col-xl-12">
 			<div class="row">
 				<div class="col-xl-6">
-					<div class="card">
-						<div class="card-body">
-							<div class="avatar">
-								<span class="avatar-title bg-soft-primary rounded">
-									<i class="mdi mdi-shopping-outline text-primary font-size-24"></i>
-								</span>
-							</div>
-							<p class="text-muted mt-4 mb-0" style="padding: 0 15px;">Events over 5 Years</p>
-							<h4 class="mt-1 mb-0" <sup class="text-success fw-medium font-size-14"><i class="mdi mdi-arrow-down"></i></sup></h4>
-							<div>
-								<div class="py-3 my-1" >
-									<div id="mini-1" data-colors='["#3980c0"]' onload="initializeMiniChart1()"></div>
+				 <div class="container_dash">
+							<div class="card_dash">
+								<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+									<div id="chartTitle" class="chart-title">Events over 5 Years</div>
+									<div class="dropdown_dash-container_dash">
+										
+										<select id="chartSelector" class="dropdown_dash">
+											<option value="events">Events over 5 Years</option>
+											<option value="visitors2025">Website Visitors (2025)</option>
+											<option value="visitors5years">Website Visitors (5 Years)</option>
+											
+										</select>
+									</div>
 								</div>
-								<ul class="list-inline d-flex justify-content-between justify-content-center mb-0">
-									{% for i in years %}
-									<li class="list-inline-item" style="font-size:11px;">{{i}}</li>
-									{% endfor %}
-								</ul>
+								
+								<div class="loading" id="loading">
+									<p>Loading chart...</p>
+								</div>
+								
+								<div class="chart-container_dash">
+									<canvas id="mainChart"></canvas>
+								</div>
+								
+								
 							</div>
 						</div>
-					</div>
-					<br>
-{% comment %} 
-					<div class="card">
-						<div class="card-body">
-							<div class="avatar">
-								<span class="avatar-title bg-soft-success rounded">
-									<i class="mdi mdi-eye-outline text-success font-size-24"></i>
-								</span>
-							</div>
-							<p class="text-muted mt-4 mb-0" style="padding: 0 15px;">Website Visitor ({{month_name}})</p>
-							<h4 class="mt-1 mb-0"><sup class="text-danger fw-medium font-size-14"><i class="mdi mdi-arrow-down"></i></sup></h4>
-							<div>
-								<div class="py-3 my-1">
-									<div id="mini-2" data-colors='["#33a186"]' onload="initializeMiniChart2()"></div>
-								</div>
-								<div class="list-inline d-flex justify-content-between justify-content-center mb-0">
-									{% for i in days_of_month %}
-									<li class="list-inline-item" style=font-size:"11px;">{{i}}</li>
-									{% endfor %}
-								</div>
-							</div>
-						</div>
-					</div>
-					<br> {% endcomment %}
-
-					<div class="card">
-						<div class="card-body">
-							<div class="avatar">
-								<span class="avatar-title bg-soft-primary rounded">
-									<i class="mdi mdi-rocket-outline text-primary font-size-24"></i>
-								</span>
-							</div>
-							<p class="text-muted mt-4 mb-0" style="padding: 0 15px;">Website Visitor ({{current_year}})</p>
-							<div>
-								<div class="py-3 my-1">
-									<div id="mini-3" data-colors='["#3980c0"]' onload="initializeMiniChart3()"></div>
-								</div>
-								<ul class="list-inline d-flex justify-content-between justify-content-center mb-0">
-									{% for i in current_year_month_name %}
-									<li class="list-inline-item" style="font-size:11px;">{{i}}</li>
-									{% endfor %}
-								</ul>
-							</div>
-						</div>
-					</div>
-					<br>
-
-					<div class="card">
-						<div class="card-body">
-							<div class="avatar">
-								<span class="avatar-title bg-soft-success rounded">
-									<i class="mdi mdi-account-multiple-outline text-success font-size-24"></i>
-								</span>
-							</div>
-							<p class="text-muted mt-4 mb-0" style="padding: 0 15px;">Website Visitor (5 years)</p>
-							<h4 class="mt-1 mb-0"><sup class="text-danger fw-medium font-size-14"><i class="mdi mdi-arrow-down"></i></sup></h4>
-							<div>
-								<div class="py-3 my-1">
-									<div id="mini-4" data-colors='["#33a186"]' onload="initializeMiniChart4()"></div>
-								</div>
-								<ul class="list-inline d-flex justify-content-between justify-content-center mb-0">
-									{% for i in years %}
-									<li class="list-inline-item" style="font-size:11px;">{{i}}</li>
-									
-									{% endfor %}
-								</ul>
-							</div>
-						</div>
-					</div>
 				</div>
 
 				<div class="col-xl-6">
@@ -986,7 +1260,11 @@
 									<div class="text_top_performers">
 										<div style="display: flex; align-items: center;">
 											<h6 class="numbering">#1</h6>
+											{% if performer %}
 											<a href="{% url 'main_website:member_profile' performer.ieee_id %}"><h1>{{performer.name}}</h1></a>
+											{% else %}
+											<a><h1>Waiting...</h1></a>
+											{% endif %}
 										</div>
 										<div>
 											<p>{{performer.team.team_name}}</p>
@@ -1009,7 +1287,11 @@
 									<div class="text_top_performers">
 										<div style="display: flex; align-items: center;">
 											<h6 class="numbering"></h6>
+											{% if team %}
 											<a href="#"><h1>{{team.team_name}}</h1></a>
+											{% else %}
+											<a><h1>Waiting...</h1></a>
+											{% endif %}
 										</div>
 									</div>
 								</div>
@@ -1942,163 +2224,7 @@ document.addEventListener('DOMContentLoaded', assignTeamPerformersRanking);
 <!-- endbuild -->
 <script>
 
-	function getChartColorsArray(chartId) {
-		if (document.getElementById(chartId) !== null) {
-			var colors = document.getElementById(chartId).getAttribute("data-colors");
-			colors = JSON.parse(colors);
-			return colors.map(function (value) {
-				var newValue = value.replace(" ", "");
-				if (newValue.indexOf("--") != -1) {
-					var color = getComputedStyle(document.documentElement).getPropertyValue(
-						newValue
-					);
-					if (color) return color;
-				} else {
-					return newValue;
-				}
-			});
-		}
-	}
-	async function initializeMiniChart1() {
-		try {
-			var barchartColors = getChartColorsArray("mini-1");
-			var options = {
-				series: [{
-				  data: {{event_number_over_5_years}}
-				}],
-				chart: {
-				  type: 'line',
-				  height: 61,
-				  sparkline: {
-					enabled: true
-				  }  
-				},
-				colors: barchartColors,
-				stroke: {
-				  curve: 'smooth',
-				  width: 2.5,
-				},
-				tooltip: {
-				  fixed: {
-					enabled: false
-				  },
-				  x: {
-					show: false
-				  },
-				  y: {
-					title: {
-					  formatter: function (seriesName) {
-						return ''
-					  }
-					}
-				  },
-				  marker: {
-					show: false
-				  }
-				}
-			  };
-			
-			  var chart = new ApexCharts(document.querySelector("#mini-1"), options);
-			chart.render();
-	  } catch (error) {
-		
-	  }
-	  }
-	  initializeMiniChart1();
-
-	  async function initializeMiniChart3() {
-		try {
-			var barchartColors = getChartColorsArray("mini-3");
-			var options = {
-				series: [{
-				  data: {{hit_count_monthly_data}}
-				}],
-				chart: {
-				  type: 'line',
-				  height: 61,
-				  sparkline: {
-					enabled: true
-				  }  
-				},
-				colors: barchartColors,
-				stroke: {
-				  curve: 'smooth',
-				  width: 2.5,
-				},
-				tooltip: {
-				  fixed: {
-					enabled: false
-				  },
-				  x: {
-					show: false
-				  },
-				  y: {
-					title: {
-					  formatter: function (seriesName) {
-						return ''
-					  }
-					}
-				  },
-				  marker: {
-					show: false
-				  }
-				}
-			  };
-			
-			  var chart = new ApexCharts(document.querySelector("#mini-3"), options);
-			chart.render();
-	  } catch (error) {
-		
-	  }
-	  }
-	  initializeMiniChart3();
-
-	  async function initializeMiniChart4() {
-		try {
-			var barchartColors = getChartColorsArray("mini-4");
-			var options = {
-				series: [{
-				  data: {{hit_count_over_5_years}}
-				}],
-				chart: {
-				  type: 'line',
-				  height: 61,
-				  sparkline: {
-					enabled: true
-				  }  
-				},
-				colors: barchartColors,
-				stroke: {
-				  curve: 'smooth',
-				  width: 2.5,
-				},
-				tooltip: {
-				  fixed: {
-					enabled: false
-				  },
-				  x: {
-					show: false
-				  },
-				  y: {
-					title: {
-					  formatter: function (seriesName) {
-						return ''
-					  }
-					}
-				  },
-				  marker: {
-					show: false
-				  }
-				}
-			  };
-			
-			  var chart = new ApexCharts(document.querySelector("#mini-4"), options);
-			chart.render();
-	  } catch (error) {
-		
-	  }
-	  }
-	  initializeMiniChart4();
+	
 
 	async function initializeMiniChart2() {
 		try {
@@ -2195,7 +2321,7 @@ async function initializeChart() {
 		console.error('Error initializing chart:', error);
 	}
   }
-  initializeChart();
+	 initializeChart();
 
  async function initializeCircleChart(){
 	try {
@@ -2295,7 +2421,23 @@ async function initializeChart() {
 }
 }
 initializeCircleChart();
-
+function getChartColorsArray(chartId) {
+		if (document.getElementById(chartId) !== null) {
+			var colors = document.getElementById(chartId).getAttribute("data-colors");
+			colors = JSON.parse(colors);
+			return colors.map(function (value) {
+				var newValue = value.replace(" ", "");
+				if (newValue.indexOf("--") != -1) {
+					var color = getComputedStyle(document.documentElement).getPropertyValue(
+						newValue
+					);
+					if (color) return color;
+				} else {
+					return newValue;
+				}
+			});
+		}
+	}
 async function initializeCircleChart2(){
 	try {
 		Chart.pluginService.register({
@@ -2395,6 +2537,288 @@ async function initializeCircleChart2(){
 		initializeCircleChart2();
 
 
+		const config = {
+
+		};
+		const labels = Utils.months({count: 7});
+		const data = {
+		labels: labels,
+		datasets: [{
+			label: 'My First Dataset',
+			data: [65, 59, 80, 81, 56, 55, 40],
+			fill: true,
+			borderColor: 'rgb(255 209 0)',
+			backgroundColor: 'rgb(255 209 0 / 37%)',
+			tension: 0.1
+		}]
+		};
 </script>
+<script>
+  const ctx1 = document.getElementById('cashChart1').getContext('2d');
+  const cashChart1 = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ],
+      datasets: [
+        {
+          label: 'Cash In',
+          data: [
+            {% for data in wallet_entry_stats_whole_tenure_by_month %}
+              {{ data.cash_in|default:0 }},
+            {% endfor %}
+          ],
+          backgroundColor: '#00629B'
+        },
+        {
+          label: 'Cash Out',
+          data: [
+            {% for data in wallet_entry_stats_whole_tenure_by_month %}
+              {{ data.cash_out|default:0 }},
+            {% endfor %}
+          ],
+          backgroundColor: '#00629Bae'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Amount (BDT)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Month'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Yearly Cash In & Cash Out'
+        }
+      }
+    }
+  });
+
+  const ctx2 = document.getElementById('cashChart2').getContext('2d');
+  const cashChart2 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: [
+        {% for entry in wallet_entry_stats_for_current_month %}
+          "{{ entry.day|date:'j M' }}",
+        {% endfor %}
+      ],
+      datasets: [
+        {
+          label: 'Cash In',
+          data: [
+            {% for entry in wallet_entry_stats_for_current_month %}
+              {{ entry.cash_in|default:0 }},
+            {% endfor %}
+          ],
+          borderColor: '#00629B',
+          backgroundColor: '#00629B',
+          tension: 0.3,
+          fill: false
+        },
+        {
+          label: 'Cash Out',
+          data: [
+            {% for entry in wallet_entry_stats_for_current_month %}
+              {{ entry.cash_out|default:0 }},
+            {% endfor %}
+          ],
+          borderColor: '#00629Bae',
+          backgroundColor: '#00629Bae',
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Amount (BDT)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Date (Current Month)'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Daily Cash In & Cash Out (This Month)'
+        }
+      }
+    }
+  });
+  
+</script>
+<script>
+// Sample data - replace with your actual data
+const chartData = {
+    events: {
+        title: "Events over 5 Years",
+        labels: [{% for year in event_number_over_5_years.0 %}'{{year}}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        data: [{% for data in event_number_over_5_years.1 %}{{data}}{% if not forloop.last %},{% endif %}{% endfor %}],
+        backgroundColor: '#3980c0',
+        borderColor: '#2968a3'
+    },
+    visitors2025: {
+        title: "Website Visitors (2025)",
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        data: {{hit_count_monthly_data}},
+        backgroundColor: '#3980c0',
+        borderColor: '#2968a3'
+    },
+    visitors5years: {
+        title: "Website Visitors (5 Years)",
+        labels: ['2021', '2022', '2023', '2024', '2025'],
+        data: {{hit_count_over_5_years}},
+        backgroundColor: '#33a186',
+        borderColor: '#2a8a6e'
+    }
+    // Removed the 'combined' dataset
+};
+
+let currentChart = null;
+
+function showLoading() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('mainChart').style.opacity = '0.3';
+}
+
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('mainChart').style.opacity = '1';
+}
+
+function createChart(type) {
+    showLoading();
+    
+    setTimeout(() => {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        const data = chartData[type];
+        
+        // Destroy existing chart
+        if (currentChart) {
+            currentChart.destroy();
+        }
+        
+        // Update title
+        document.getElementById('chartTitle').textContent = data.title;
+        
+        const chartConfig = {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: data.title,
+                    data: data.data,
+                    backgroundColor: data.backgroundColor,
+                    borderColor: data.borderColor,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+					yAxes: [{
+						gridLines: {
+							color: 'rgba(0,0,0,0.1)'
+						},
+						ticks: {
+							beginAtZero: false,
+							min: 0,
+							fontSize: window.innerWidth < 576 ? 10 : 12
+						}
+					}],
+                    xAxes: [{
+                        gridLines: {
+                            display: false
+                        },
+                        ticks: {
+                            fontSize: window.innerWidth < 576 ? 10 : 12,
+                            maxRotation: window.innerWidth < 576 ? 45 : 0
+                        }
+                    }]
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        };
+        
+        currentChart = new Chart(ctx, chartConfig);
+        hideLoading();
+    }, 300);
+}
+
+// Initialize dropdown change handler
+document.getElementById('chartSelector').addEventListener('change', function() {
+    const selectedValue = this.value;
+    createChart(selectedValue);
+});
+
+// Handle window resize for responsive charts
+window.addEventListener('resize', function() {
+    if (currentChart) {
+        const selectedValue = document.getElementById('chartSelector').value;
+        // Debounce resize events
+        clearTimeout(window.resizeTimeout);
+        window.resizeTimeout = setTimeout(() => {
+            createChart(selectedValue);
+        }, 150);
+    }
+});
+
+// Initialize with first chart
+document.addEventListener('DOMContentLoaded', function() {
+    createChart('events');
+});
+</script>
+    
 </body>
 </html>

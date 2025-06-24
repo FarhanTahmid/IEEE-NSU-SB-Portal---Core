@@ -1,0 +1,1350 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <title>Treasurer's Wallet</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!--Chart-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% block common_css %}
+    {% include "common_css.html" %}
+    {% endblock common_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: white;
+        }
+        
+        
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .wallet-title {
+            text-align: center;
+            margin: 30px 0;
+            /* font-weight: bold; */
+            color: #00629b;
+        }
+        
+        .wallet-balance {
+            text-align: right;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .modal_download_btn {
+            background-color: #6495ED;
+            color: white;
+            text-align: center;
+            border: 1px solid #6495ED;
+            transition: all .3s ease-in-out;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .modal_download_btn:hover {
+            color: #6495ED;
+            background-color: white;
+        }
+        .btn-create {
+            background-color: #6495ED;
+            color: white;
+            text-align: center;
+            border: 1px solid #6495ED;
+            transition: all .3s ease-in-out;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .btn-create:hover {
+            color: #6495ED;
+            background-color: white;
+        }
+        
+        .book-title {
+            margin: 0px 0 10px;
+            font-weight: bold;
+        }
+        
+        .books-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 6px;
+        }
+        
+        .books-table th, .books-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .books-table th {
+            background-color: #f0f0f0;
+        }
+        
+        .books-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .net-balance {
+            font-weight: bold;
+        }
+
+        .profit{
+            color: #1B971F;
+        }
+
+        .loss{
+            color: rgb(224, 20, 20);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .filter-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Download Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 99900;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 16px;
+            border-radius: 5px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            /* font-weight: bold; */
+        }
+        
+        .close-modal {
+            cursor: pointer;
+            font-size: 22px;
+            color: #666;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .search_bar{
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            height: 26px;
+            padding: 16px;
+            border: 1px solid #D9D9D9;
+        }
+        .shadow_box{
+            padding: 16px 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+        .stat_box{
+            padding: 16px 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            margin: 6px 0px;
+            box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.1);
+            display: block;
+            width: 24%;
+        }
+        
+        .table_box{
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            /* padding: 12px 20px; */
+            /* border: 1px solid #e0e0e0; */
+            border-radius: 8px;
+            background: white;
+            max-width: 100%;
+            /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
+            position: relative;
+            margin-top: 12px;
+        }
+          
+        .filter-bar select {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            width: 160px;
+        }
+
+        .filter_menu.show {
+            max-height: 500px; /* adjust as needed */
+            opacity: 100%;
+            padding: 20px;
+            margin: 6px 0;
+        }
+        /* Filter Menu Styles */
+        .filter_menu {
+            /* position: absolute; */
+            top: 100%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            max-height: 0;
+            overflow: auto;
+            transition: max-height .3s ease-in-out;
+            z-index: 100;
+            margin-top: 10px;
+            transition: all .3s ease-in-out;
+            opacity: 0%;
+            flex-direction: column;
+        }
+        .stats_menu.show {
+            max-height: 500px; /* adjust as needed */
+            opacity: 100%;
+            padding: 20px;
+            margin: 6px 0;
+        }
+        /* stats Menu Styles */
+        .stats_menu {
+            /* position: absolute; */
+            top: 100%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #D9D9D9;
+            border-radius: 6px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            max-height: 0;
+            overflow: auto;
+            transition: max-height .3s ease-in-out;
+            z-index: 100;
+            margin-top: 10px;
+            transition: all .3s ease-in-out;
+            opacity: 0%;
+            flex-direction: column;
+        }
+
+        .apply_button {
+            background-color: #6c7ae0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 20px;
+            cursor: pointer;
+            margin: 0;
+            position: relative;
+            right: 0;
+            bottom: 5px;
+        }
+
+        .apply_button:hover {
+            background-color: #5663c7;
+        }
+
+        .filter{
+            border-radius: 4px;
+            /* border: 1px solid rgb(76 76 171); */
+            color: rgb(76 76 171);
+            background-color: rgb(206, 206, 254);
+            padding: 3px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .filter:hover{
+            background-color: rgb(155, 155, 255);
+        }
+        .stats_btn{
+            border-radius: 4px;
+            /* border: 1px solid #a59113; */
+            color: #a59113;
+            background-color: #fff4ad;
+            padding: 3px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .stats_btn:hover{
+            background-color: #fde965;
+            /* color: #a59113; */
+        }
+        .download_btn{
+            border-radius: 4px;
+            border: 1px solid #0cc2aa;
+            color: #0cc2aa;
+            background-color: #c5fcf5;
+            padding: 4px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .download_btn:hover{
+            background-color: #0cc2aa;
+            color: #c5fcf5;
+        }
+        .create_btn{
+            border-radius: 4px;
+            border: 1px solid transparent;
+            color: rgb(76, 171, 92);
+            background-color: rgb(213, 251, 219);
+            padding: 3px 16px;
+            transition: all .3s ease-in-out;
+            cursor: pointer;
+            margin: 0;
+        }
+        .create_btn:hover{
+            background-color: rgb(149, 255, 165);
+            /* color: rgb(213, 251, 219); */
+        }
+        .cash_in_btn{
+            background-color: #31AE70;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #31AE70;
+        }
+
+        .cash_in_btn:hover{
+            color: #31AE70;
+            background-color: white;
+        }
+
+        .cash_out_btn{
+            background-color: #EB5132;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            transition: all .3s ease-in-out;
+            border: 1px solid #EB5132;
+        }
+
+        .cash_out_btn:hover{
+            color: #EB5132;
+            background-color: white;
+        }
+
+        .cash_in_cash_out_div{
+            display: grid;
+            gap: 6px;
+            grid-template-columns: 1fr 1fr;
+            justify-items: stretch;
+            align-items: center;
+            text-align: center;
+            padding: 16px 0;
+            margin-top: 20px;
+        }
+        .buttons{
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .non_event_remarks , .event_title {
+            white-space: nowrap;         /* Prevents wrapping to the next line */
+            overflow: hidden;            /* Hides overflow text */
+            text-overflow: ellipsis;     /* Shows ... when text overflows */
+            max-width: 200px;  
+        }
+        .filter-select {
+            overflow: hidden;       /* Prevent overflow on main box */
+        }
+
+        .filter-select option {
+            height: 50px; 
+            width: 50px;     /* Not supported in all browsers */
+            overflow-y: auto;       /* Doesn't apply to <option> directly */
+        }
+        .download-btn-book {
+            border: none;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            color: #00629b;
+            /* border-radius: 50%; */
+        }
+
+        table{
+            max-height: 50px;
+            overflow: auto;
+        }
+        table th{
+                color: #000;
+        }
+        table tr:nth-child(even) {
+            background-color: white; /* Light gray or any color you prefer */
+        }
+        .table-responsive{
+            overflow-x: hidden;
+            max-height: 400px;
+        }
+        .table-responsive th{
+            position: sticky;
+            top: -2px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons button {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .tab-buttons button.active {
+            border-bottom: 2px solid #6c7ae0;
+            color: #6c7ae0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* New class names */
+        .event-dropdown {
+            position: relative;
+            width: 100%;
+        }
+
+        .event-dropdown-selected {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .event-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            z-index: 1000;
+            display: none;
+            border-radius: 4px;
+        }
+
+        .event-dropdown-options div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .event-dropdown-options div:hover {
+            /* background-color: #f0f0f0; */
+        }
+
+        .clear_btn{
+            color: #1a1a1a;
+            border-bottom: 1px solid transparent;
+            transition: all .3s ease-in-out;
+        }
+        .clear_btn:hover{
+            color: #00629b;
+            border-bottom: 1px solid #00629b;
+            border-radius: 0%;
+        }
+        canvas {
+            background: #fff;
+            /* border: 1px solid #ccc; */
+            padding: 10px;
+            height: 350px;
+            width: 500px;
+        }
+        .remove-btn {
+            text-decoration: none;
+            border: none;
+            color: #ef4444;
+            font-size: 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            cursor: pointer;
+            background: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .remove-btn:hover {
+            color: #ec1616;
+        }
+        @media screen and (max-width: 700px) {
+            .table-responsive{
+                overflow-x: scroll;
+                width: 500px;
+            }
+            .stat_box{
+                width: 49%;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .table-responsive{
+                width: 400px;
+            }
+            canvas{
+                width: 400px;
+            }
+        }
+        @media screen and (max-width: 450px) {
+            .table-responsive{
+                width: 350px;
+            }
+            .actions{
+                justify-content: space-around;
+            }
+            .stat_box{
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app" style="background-color: white;">
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+        </div>
+        <!-- aside end -->
+
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+            	{% if primary == 1 %}
+                    {% block navbar %}
+                        {% include 'navbar.html' %}
+                    {% endblock navbar %}
+                {% else %}
+                    {% block sc_ag_navbar %}
+                        {% include 'sc_ag_navbar.html' %}
+                    {% endblock sc_ag_navbar %}
+                {% endif %}
+        </div>
+        <!--navbar content end-->
+
+        <!-- ############ PAGE START -->
+
+
+    <div class="container">
+        <h2 class="wallet-title">Treasurer's Wallet</h2>
+                
+        <div class="actions">
+            <div>
+                <input type="text" id="searchBar" class="search_bar shadow_box" placeholder="Search">
+            </div>
+            <div class="buttons">
+                <button class="create_btn" id="create-account-btn">Create Book/Entry</button>
+                <!-- <button class="btn download_btn" id="download-btn">Download</button> -->
+                <p class="filter" id="filterButton">Filter <i class="fa fa-filter" aria-hidden="true"></i></p>
+                <p class="stats_btn" id="statsButton">Stats </p>
+            </div>
+        </div>
+        
+        <!-- Filter Menu -->
+        <div class="filter_menu {% if filter_queries %}show{% endif %}">
+            <div style="display: flex; justify-content: space-between;">
+                <strong>Filter by</strong>
+                <a href="{% if primary == 1 %}{% url 'central_branch:wallet:wallet_homepage' %}{% else %}{% url 'chapters_and_affinity_group:wallet:wallet_homepage' primary %}{% endif %}" class="clear_btn">Clear filter</a>
+            </div>
+
+            <form id="filterForm">
+            <div class="filter-bar">
+                {% comment %} <select id="filter-category" name="category">
+                    <option>Category</option>
+                    <option value="travel">Travel</option>
+                    <option value="food">Food</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="utilities">Utilities</option>
+                </select> {% endcomment %}
+
+                <select id="filter-month" name="month">
+                    <option>Month</option>
+                    <option value="1" {% if filter_queries.month == '1' %}selected{% endif %}>January</option>
+                    <option value="2" {% if filter_queries.month == '2' %}selected{% endif %}>February</option>
+                    <option value="3" {% if filter_queries.month == '3' %}selected{% endif %}>March</option>
+                    <option value="4" {% if filter_queries.month == '4' %}selected{% endif %}>April</option>
+                    <option value="5" {% if filter_queries.month == '5' %}selected{% endif %}>May</option>
+                    <option value="6" {% if filter_queries.month == '6' %}selected{% endif %}>June</option>
+                    <option value="7" {% if filter_queries.month == '7' %}selected{% endif %}>July</option>
+                    <option value="8" {% if filter_queries.month == '8' %}selected{% endif %}>August</option>
+                    <option value="9" {% if filter_queries.month == '9' %}selected{% endif %}>September</option>
+                    <option value="10" {% if filter_queries.month == '10' %}selected{% endif %}>October</option>
+                    <option value="11" {% if filter_queries.month == '11' %}selected{% endif %}>November</option>
+                    <option value="12" {% if filter_queries.month == '12' %}selected{% endif %}>December</option>
+                </select>
+
+                <select id="filter-tenure" name="tenure">
+                    <option>Tenure</option>
+                    {% for tenure in tenures %}
+                    <option value="{{tenure.year}}" {% if filter_queries.tenure == tenure.year %}selected{% endif %}>{{tenure.year}}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="filter-last-updated" name="last_updated">
+                    <option value="latestupdated">Last Updated</option>
+                    <option value="latest" {% if filter_queries.last_updated == 'latest' %}selected{% endif %}>Latest</option>
+                    <option value="oldest" {% if filter_queries.last_updated == 'oldest' %}selected{% endif %}>Oldest</option>
+                </select>
+
+                <select id="filter-balance" name="net_balance">
+                    <option value="netbalance">Net Balance</option>
+                    <option value="htol" {% if filter_queries.net_balance == 'htol' %}selected{% endif %}>High to Low</option>
+                    <option value="ltoh" {% if filter_queries.net_balance == 'ltoh' %}selected{% endif %}>Low to High</option>
+                </select>
+
+                {% if view == 'event_view' %}
+                <select id="filter-status" name="status">
+                    <option>Status</option>
+                    <option value="ongoing" {% if filter_queries.status == 'ONGOING' %}selected{% endif %}>Ongoing</option>
+                    <option value="completed" {% if filter_queries.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+                </select>
+                {% endif %}
+
+                <button type="submit" id="applyFilters" class="apply_button" style="margin-top: 10px;">Apply Filters</button>
+            </div>
+            </form>
+        </div>
+            <p style="font-weight: bold; margin: 0;">Current Tenure</p>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <h6 class="stat_box">Wallet Balance: {{wallet_balance}}</h6>
+                <!-- <select id="stats-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;">
+                      <option value="all_time">All Time</option>
+                      <option value="tenure">Current Tenure</option>
+                </select> -->
+                <h6 class="stat_box">Total Cash In: {{wallet_entry_stats_whole_tenure.total_cash_in}}</h6>
+                <h6 class="stat_box">Total Cash Out: {{wallet_entry_stats_whole_tenure.total_cash_out}}</h6>
+                <h6 class="stat_box">Total Transactions: {{wallet_entry_stats_whole_tenure.total_entries}}</h6>
+            </div>
+        <!--Stats-->
+        <div class="stats_menu">
+            <!-- <h2>Cash In vs Cash Out (Monthly)</h2> -->
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between;">
+                <div>
+                    <canvas id="cashChart1"></canvas>
+                </div>
+                <div>
+                    <canvas id="cashChart2"></canvas>
+                </div>
+        </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <h5 class="book-title">Your Books</h5>
+            <div>
+                <form id="ViewSelectForm">
+                    <select id="filter-table" class="shadow_box" style="padding: 6px 20px; box-shadow: none;" name="view" onchange="ViewSelect();">
+                      <option value="event_view" {% if view == 'event_view' %}selected{% endif %}>Event View</option>
+                      <option value="non_event_view" {% if view == 'non_event_view' %}selected{% endif %}>Non Event View</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+        
+        {% if view == 'event_view' %}
+    <div class="table-responsive table_box">
+        <table class="books-table  table" id="event">
+            <thead style="position: relative; z-index: 101;">
+                <tr>
+                    <th>SL</th>
+                    <th>Event</th>
+                    {% comment %} <th>Category</th> {% endcomment %}
+                    <th>Created</th>
+                    <th>Last Updated</th>
+                    <th>Balance</th>
+                    <!-- <th>Download</th> -->
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wallet_entry_event in wallet_entries_event %}
+                <tr>
+                    <td>{{forloop.counter}}.</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" class="event_title" style="cursor: pointer;">{{wallet_entry_event.entry_event__event_name}}</td>
+                    {% comment %} <td>Technical</td> {% endcomment %}
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.creation_date_time}}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;">{{wallet_entry_event.last_update_date_time}}</td>
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;" class="net-balance {% if wallet_entry_event.total_amount < 0 %}loss{% else %}profit{% endif %}">{% if wallet_entry_event.total_amount < 0 %}- {{wallet_entry_event.total_amount|floatformat:2|slice:"1:" }}{% else %}+ {{wallet_entry_event.total_amount}}{% endif %}</td>
+                    <!-- <td class="fa fa-download download-btn-book" style="display: revert;"></td> -->
+                    {% if wallet_entry_event.status == 'COMPLETED' %}
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;"><svg fill="#31AE70" width="19px" height="19px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960 1807.059c-467.125 0-847.059-379.934-847.059-847.059 0-467.125 379.934-847.059 847.059-847.059 467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059M960 0C430.645 0 0 430.645 0 960s430.645 960 960 960 960-430.645 960-960S1489.355 0 960 0M854.344 1157.975 583.059 886.69l-79.85 79.85 351.135 351.133L1454.4 717.617l-79.85-79.85-520.206 520.208Z" fill-rule="evenodd"></path> </g></svg></td>
+                    {% else %}
+                    <td onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:entries_event' wallet_entry_event.entry_event %}{% else %}{% url 'chapters_and_affinity_group:wallet:entries_event' primary wallet_entry_event.entry_event %}{% endif %}'" style="cursor: pointer;"><svg fill="#FFA300" width="24px" height="24px" viewBox="-7 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>loading</title> <path d="M2.080 14.040l4-1.040c0.44-0.12 0.72-0.56 0.6-1.040-0.12-0.44-0.56-0.72-1.040-0.6l-2.080 0.56c0.68-0.88 1.56-1.6 2.64-2.080 1.64-0.72 3.44-0.76 5.12-0.12 1.64 0.64 2.96 1.92 3.68 3.52 0.2 0.44 0.68 0.6 1.12 0.44 0.44-0.2 0.6-0.68 0.44-1.12-0.88-2.040-2.52-3.6-4.6-4.44-2.080-0.8-4.36-0.76-6.4 0.12-1.36 0.6-2.48 1.52-3.36 2.68l-0.52-1.96c-0.12-0.44-0.56-0.72-1.040-0.6-0.44 0.12-0.72 0.56-0.6 1.040l1.040 4c0.12 0.56 0.4 0.8 1 0.64zM17.72 22.52l-1.040-3.96c0 0-0.16-0.8-0.96-0.6v0l-4 1.040c-0.44 0.12-0.72 0.56-0.6 1.040 0.12 0.44 0.56 0.72 1.040 0.6l2.080-0.56c-1.76 2.32-4.88 3.28-7.72 2.16-1.64-0.64-2.96-1.92-3.68-3.52-0.2-0.44-0.68-0.6-1.12-0.44-0.44 0.2-0.6 0.68-0.44 1.12 0.88 2.040 2.52 3.6 4.6 4.44 1 0.4 2 0.56 3.040 0.56 2.64 0 5.12-1.24 6.72-3.4l0.52 1.96c0.080 0.36 0.44 0.64 0.8 0.64 0.080 0 0.16 0 0.2-0.040 0.4-0.16 0.68-0.6 0.56-1.040z"></path> </g></svg></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {% else %}
+        <div class="table-responsive table_box">
+        <table class="books-table table" id="non-event">
+            <thead style="position: relative; z-index: 101;">
+                <tr>
+                    <th>SL</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                    <th>Last Updated</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <form method="POST">
+                {% csrf_token %}
+                {% for wallet_entry in wallet_entries %}
+                <tr onclick="window.location.href='{% if primary == 1 %}{% url 'central_branch:wallet:cash_edit' wallet_entry.id %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_edit' primary wallet_entry.id %}{% endif %}'" style="cursor: pointer;">
+                    <td>{{forloop.counter}}.</td>
+                    <td class="non_event_remarks">{{wallet_entry.remarks}}</td>
+                    <td>{{wallet_entry.creation_date_time}}</td>
+                    <td>{{wallet_entry.update_date_time}}</td>
+                    <td class="net-balance {% if wallet_entry.entry_type == 'CASH_OUT' %}loss{% else %}profit{% endif %}">{% if wallet_entry.entry_type == 'CASH_OUT' %}- {{wallet_entry.amount }}{% else %}+ {{wallet_entry.amount}}{% endif %}</td>
+                    <td>
+                        <button type="submit" class="remove-btn" name="delete_entry" value="{{wallet_entry.id}}">
+                            <i class="fa fa-trash action-btn" aria-hidden="true"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                </form>
+            </tbody>
+        </table>
+        </div>
+        {% endif %}
+        
+    </div>
+    
+    <!-- Download Modal -->
+    <div class="modal" id="download-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Download Options</div>
+                <span class="close-modal" id="close-download-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="filter-group" style="margin-bottom: 15px;">
+                    <label class="filter-label">Start-End Date</label>
+                    <select class="filter-select" id="date-range-select">
+                        <option value="">Select</option>
+                        <option value="2020-2021">2020-2021</option>
+                        <option value="2021-2022">2021-2022</option>
+                        <option value="2022-2023">2022-2023</option>
+                        <option value="2023-2024">2023-2024</option>
+                        <option value="2024-2025">2024-2025</option>
+                        <option value="custom">Custom Date Range</option>
+                    </select>
+                </div>
+                <div id="custom-date-container" style="display: none; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label class="filter-label">Start Date</label>
+                            <input type="date" class="filter-select" id="start-date">
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="filter-label">End Date</label>
+                            <input type="date" class="filter-select" id="end-date">
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group" style="margin-bottom: 15px;">
+                    <label class="filter-label">Tenure</label>
+                    <select class="filter-select">
+                        <option value="">Select</option>
+                        <option value="2020-2021">2020-2021</option>
+                        <option value="2021-2022">2021-2022</option>
+                        <option value="2022-2023">2022-2023</option>
+                        <option value="2023-2024">2023-2024</option>
+                        <option value="2024-2025">2024-2025</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Month</label>
+                    <select class="filter-select">
+                        <option value="">Select</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" id="cancel-download">Cancel</button>
+                <button class="modal_download_btn" id="confirm-download">Download</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Account Modal -->
+    <div class="modal" id="create-account-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create Book/Entry</div>
+                <span class="close-modal" id="close-create-modal">&times;</span>
+            </div>
+            <!-- Renamed dropdown class: event-dropdown -->
+            <div class="modal-body">
+                <!-- Tab Buttons -->
+                <div class="tab-buttons">
+                    <button type="button" class="tab-btn active" data-tab="event-tab">Event Book</button>
+                    <button type="button" class="tab-btn" data-tab="non-event-tab">Non-Event Book</button>
+                </div>
+
+                <!-- Event Book Tab -->
+                <div id="event-tab" class="tab-content active">
+                    <h6 style="font-weight: bold;">For event books</h6>
+                    <div class="event-dropdown" id="eventDropdown">
+                        <div class="event-dropdown-selected">Select Event</div>
+                        <div class="event-dropdown-options" style="display: none;">
+                            <input type="text" id="event-search" placeholder="Search event..." style="width: 100%; padding: 5px; box-sizing: border-box;border: 1px solid #dedede;;">
+                            <div id="event-options-list">
+                                {% for event in events %}
+                                <div class="event-option" data-value="{{ event.id }}">{{ event.event_name }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="event-select" name="event_select" value="none">
+                    <div style="display: flex; flex-direction: column; margin-top: 6px;">
+                        <button type="button" class="btn-create" id="confirm-create">Create</button>
+                    </div>
+                </div>
+
+                <!-- Non-Event Book Tab -->
+                <div id="non-event-tab" class="tab-content">
+                    <h6 style="font-weight: bold;">For non event books</h6>
+                    <div class="cash_in_cash_out_div">
+                        <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_in' %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_in' primary %}{% endif %}" class="cash_in_btn">CASH IN</a>
+                        <a href="{% if primary == 1 %}{% url 'central_branch:wallet:cash_out' %}{% else %}{% url 'chapters_and_affinity_group:wallet:cash_out' primary %}{% endif %}" class="cash_out_btn">CASH OUT</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Download Modal
+        // const downloadBtn = document.getElementById('download-btn');
+        // const downloadModal = document.getElementById('download-modal');
+        // const closeDownloadModal = document.getElementById('close-download-modal');
+        // const cancelDownload = document.getElementById('cancel-download');
+        // const confirmDownload = document.getElementById('confirm-download');
+        // const dateRangeSelect = document.getElementById('date-range-select');
+        // const customDateContainer = document.getElementById('custom-date-container');
+        
+        // downloadBtn.addEventListener('click', function() {
+        //     downloadModal.classList.add('active');
+        // });
+        
+        // closeDownloadModal.addEventListener('click', function() {
+        //     downloadModal.classList.remove('active');
+        // });
+        
+        // cancelDownload.addEventListener('click', function() {
+        //     downloadModal.classList.remove('active');
+        // });
+        
+        // confirmDownload.addEventListener('click', function() {
+        //     // Add download logic here
+        //     alert('Download started');
+        //     downloadModal.classList.remove('active');
+        // });
+        
+        // // Handle custom date range selection
+        // dateRangeSelect.addEventListener('change', function() {
+        //     if (this.value === 'custom') {
+        //         customDateContainer.style.display = 'block';
+        //     } else {
+        //         customDateContainer.style.display = 'none';
+        //     }
+        // });
+        
+        // Create Account Modal
+        const createAccountBtn = document.getElementById('create-account-btn');
+        const createAccountModal = document.getElementById('create-account-modal');
+        const closeCreateModal = document.getElementById('close-create-modal');
+        const cancelCreate = document.getElementById('cancel-create');
+        const confirmCreate = document.getElementById('confirm-create');
+        const event_select = document.getElementById('event-select');
+        
+        createAccountBtn.addEventListener('click', function() {
+            createAccountModal.classList.add('active');
+        });
+        
+        closeCreateModal.addEventListener('click', function() {
+            createAccountModal.classList.remove('active');
+        });
+        
+        confirmCreate.addEventListener('click', function(e) {
+            var event_id = event_select.value;
+            window.location.href = `./entries/${event_id}/`;
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const entries = document.querySelectorAll('.entry');
+            const entryType = document.getElementById('filter-entry');
+            // const dateSelect = document.getElementById('filter-date');
+            const categorySelect = document.getElementById('filter-category');
+            const nameInput = document.getElementById('filter-name');
+            const paymentSelect = document.getElementById('filter-payment');
+            const clearButton = document.getElementById('clearFilters');
+
+            function filterEntries() {
+                const entree = entryType.value;
+                const category = categorySelect.value;
+                const name = nameInput.value.trim().toLowerCase();
+                const payment = paymentSelect.value;
+
+                const containers = document.querySelectorAll('.entriesContainer');
+
+                containers.forEach(container => {
+                    const entries = container.querySelectorAll('.entry');
+                    let anyVisible = false;
+
+                    entries.forEach(entry => {
+                        const entryType = entry.dataset.entrytype?.toLowerCase();
+                        const entryCategory = entry.dataset.category?.toLowerCase();
+                        const entryName = entry.dataset.name?.toLowerCase();
+                        const entryPayment = entry.dataset.payment?.toLowerCase();
+
+                        let show = true;
+
+                        if (name !== 'name' && name && !entryName.includes(name)) show = false;
+                        if ((entree !== "Entry" && entree !== "all") && entryType !== entree.toLowerCase()) show = false;
+                        if (category !== "Category" && !entryCategory.split(" ").includes(category.toLowerCase())) show = false;
+                        if (payment !== "Payment" && entryPayment !== payment.toLowerCase()) show = false;
+
+                        entry.style.display = show ? 'block' : 'none';
+                        if (show) anyVisible = true;
+                    });
+
+                    container.style.display = anyVisible ? 'block' : 'none';
+                });
+                updateTotalEntriesVisibility();
+
+            }
+
+        //     // Trigger filtering on change/input
+        //     nameInput.addEventListener('input', filterEntries);
+        //     categorySelect.addEventListener('change', filterEntries);
+        //     paymentSelect.addEventListener('change', filterEntries);
+        //     // dateSelect.addEventListener('change', filterEntries);
+        //     entryType.addEventListener('change', filterEntries);
+
+        //     // Clear filters
+        //     clearButton.addEventListener('click', function () {
+        //         nameInput.value = 'name';
+        //         categorySelect.selectedIndex = 0;
+        //         paymentSelect.selectedIndex = 0;
+        //         // dateSelect.selectedIndex = 0;
+        //         entryType.selectedIndex = 0;
+        //         entries.forEach(entry => entry.style.display = 'block');
+        //     });
+        });
+
+        const filterBtn = document.getElementById('filterButton');
+        const filterMenu = document.querySelector('.filter_menu');
+
+        filterBtn.addEventListener('click', () => {
+            const isVisible = filterMenu.classList.contains('show');
+            
+            if (isVisible) {
+            filterMenu.classList.remove('show');
+            } else {
+            filterMenu.classList.add('show');
+            }
+        });
+
+        const statsBtn = document.getElementById('statsButton');
+        const statsMenu = document.querySelector('.stats_menu');
+
+        statsBtn.addEventListener('click', () => {
+            const isVisible = statsMenu.classList.contains('show');
+            
+            if (isVisible) {
+            statsMenu.classList.remove('show');
+            } else {
+            statsMenu.classList.add('show');
+            }
+        });
+    </script>
+
+    <script>
+        var form = document.getElementById('ViewSelectForm');
+
+        function ViewSelect() {
+            form.submit();
+        }
+    </script>
+    <script>
+        //Sweet Alert
+        {% for message in messages %}
+    
+        Swal.fire({
+            icon:"{{message.tags}}",
+            title:"{{message}}",
+            
+        })
+        {% endfor %}
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+
+        // Updated searchable dropdown
+const newDropdown = document.getElementById('eventDropdown');
+if (newDropdown) {
+    const newSelected = newDropdown.querySelector('.event-dropdown-selected');
+    const newOptionsContainer = newDropdown.querySelector('.event-dropdown-options');
+    const newOptionsList = newDropdown.querySelector('#event-options-list');
+    const searchInput = newDropdown.querySelector('#event-search');
+    const hiddenInput = document.getElementById('event-select');
+
+    // Toggle dropdown
+    newSelected.addEventListener('click', () => {
+        newOptionsContainer.style.display = 'block';
+        searchInput.focus();
+    });
+
+    // Handle option click
+    newOptionsList.querySelectorAll('.event-option').forEach(option => {
+        option.addEventListener('click', () => {
+            newSelected.textContent = option.textContent;
+            hiddenInput.value = option.dataset.value;
+            newOptionsContainer.style.display = 'none';
+            searchInput.value = '';
+            filterOptions('');
+        });
+    });
+
+        // Filter options
+        const filterOptions = (searchTerm) => {
+            const options = newOptionsList.querySelectorAll('.event-option');
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                option.style.display = text.includes(searchTerm.toLowerCase()) ? 'block' : 'none';
+            });
+        };
+
+        searchInput.addEventListener('input', (e) => {
+            filterOptions(e.target.value);
+        });
+
+        // Close dropdown if clicking outside
+        document.addEventListener('click', (e) => {
+            if (!newDropdown.contains(e.target)) {
+                newOptionsContainer.style.display = 'none';
+            }
+        });
+    }
+    });
+    </script>
+
+    <script>
+        document.getElementById('filterForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const params = new URLSearchParams(window.location.search);
+
+            // Update existing or append new form values to URL parameters
+            for (const [key, value] of formData.entries()) {
+                if (value !== '' && value !== key) {
+                    params.set(key, value);
+                }
+            }
+
+            // Remove empty selects (optional, cleaner URLs)
+            for (const select of form.querySelectorAll('select')) {
+                const val = select.value;
+                const key = select.name;
+                if (val === '' || val === key || select.selectedIndex === 0) {
+                    params.delete(key);
+                }
+            }
+
+            // Redirect with updated URL params
+            window.location.search = params.toString();
+        });
+    </script>
+
+    <script>
+    //Stats chart
+  const ctx1 = document.getElementById('cashChart1').getContext('2d');
+  const cashChart1 = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ],
+      datasets: [
+        {
+          label: 'Cash In',
+          data: [
+            {% for data in wallet_entry_stats_whole_tenure_by_month %}
+              {{ data.cash_in|default:0 }},
+            {% endfor %}
+          ],
+          backgroundColor: '#00629B'
+        },
+        {
+          label: 'Cash Out',
+          data: [
+            {% for data in wallet_entry_stats_whole_tenure_by_month %}
+              {{ data.cash_out|default:0 }},
+            {% endfor %}
+          ],
+          backgroundColor: '#00629Bae'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Amount (BDT)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Month'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Yearly Cash In & Cash Out'
+        }
+      }
+    }
+  });
+
+  const ctx2 = document.getElementById('cashChart2').getContext('2d');
+  const cashChart2 = new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: [
+        {% for entry in wallet_entry_stats_for_current_month %}
+          "{{ entry.day|date:'j M' }}",
+        {% endfor %}
+      ],
+      datasets: [
+        {
+          label: 'Cash In',
+          data: [
+            {% for entry in wallet_entry_stats_for_current_month %}
+              {{ entry.cash_in|default:0 }},
+            {% endfor %}
+          ],
+          borderColor: '#00629B',
+          backgroundColor: '#00629B',
+          tension: 0.3,
+          fill: false
+        },
+        {
+          label: 'Cash Out',
+          data: [
+            {% for entry in wallet_entry_stats_for_current_month %}
+              {{ entry.cash_out|default:0 }},
+            {% endfor %}
+          ],
+          borderColor: '#00629Bae',
+          backgroundColor: '#00629Bae',
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Amount (BDT)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Date (Current Month)'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Daily Cash In & Cash Out (This Month)'
+        }
+      }
+    }
+  });
+
+  </script>
+  <script>
+    document.getElementById("searchBar").addEventListener("input", function () {
+        const filter = this.value.toLowerCase();
+        const tables = ["event", "non-event"];
+
+        tables.forEach(tableId => {
+            const table = document.getElementById(tableId);
+            if (table) {
+                const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+                for (let row of rows) {
+                    const cells = row.getElementsByTagName("td");
+                    let match = false;
+
+                    for (let cell of cells) {
+                        if (cell.textContent.toLowerCase().includes(filter)) {
+                            match = true;
+                            break;
+                        }
+                    }
+
+                    row.style.display = match ? "" : "none";
+                }
+            }
+        });
+    });
+    </script>
+
+</body>
+{% block common_js %}
+{% include "common_js.html" %}
+{% endblock common_js %}
+</html>

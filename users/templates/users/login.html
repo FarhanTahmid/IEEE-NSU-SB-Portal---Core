@@ -19,7 +19,7 @@
             <img src="{% static 'INSB.png' %}" alt="logo">
         </div>
         <div class="Form d-grid p-3">
-              <form method="POST" action='login'>
+              <form method="POST">
                 {% csrf_token %}
                 {% if request.GET.next %}
                   <input type="hidden" name="next" value="{{ request.GET.next }}">

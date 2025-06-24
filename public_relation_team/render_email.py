@@ -56,8 +56,8 @@ class PRT_Email_System:
         if to_email_list[0] != '':
             for email in to_email_list:
                 if email=="general_members":
-                    # get general member emails
-                    general_members=Branch.load_all_members_of_branch()
+                    # get all active member emails
+                    general_members=Branch.load_all_active_members_of_branch()
                     for member in general_members:
                         if member.email_nsu and member.email_nsu != 'None':
                             to_email_final_list.append(member.email_nsu) 
@@ -136,8 +136,8 @@ class PRT_Email_System:
         if cc_email_list[0] != '':
             for email in cc_email_list:
                 if email=="general_members":
-                    # get general member emails
-                    general_members=Branch.load_all_members_of_branch()
+                    # get all active member emails
+                    general_members=Branch.load_all_active_members_of_branch()
                     for member in general_members:
                         if member.email_nsu and member.email_nsu != 'None':
                             cc_email_final_list.append(member.email_nsu)
@@ -208,8 +208,8 @@ class PRT_Email_System:
         if bcc_email_list[0] != '':
             for email in bcc_email_list:
                 if email=="general_members":
-                    # get general member emails
-                    general_members=Branch.load_all_members_of_branch()
+                    # get all active member emails
+                    general_members=Branch.load_all_active_members_of_branch()
                     for member in general_members:
                         if member.email_nsu and member.email_nsu != 'None':
                             bcc_email_final_list.append(member.email_nsu)

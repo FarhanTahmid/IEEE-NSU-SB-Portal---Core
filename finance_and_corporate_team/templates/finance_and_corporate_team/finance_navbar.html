@@ -52,9 +52,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div ui-include="'../views/blocks/dropdown.new.html'"></div>
             </li>
             <li class="nav-item dropdown">
+                <a class="nav-link" href="{% url 'finance_and_corporate_team:event_page' %}">
+                <i class="fa fa-calendar"></i>
+                <span>Events</span>
+                </a>
+                <div ui-include="'../views/blocks/dropdown.new.html'"></div>
+            </li>
+            <li class="nav-item dropdown">
                 <a class="nav-link" href="{% url 'finance_and_corporate_team:task_home_team' 11 %}">
-                <i class="fa fa-home"></i>
-                <span>Task</span>
+                <i class="fa fa-tasks"></i>
+                <span>Tasks</span>
+                </a>
+                <div ui-include="'../views/blocks/dropdown.new.html'"></div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link" href="{% url 'finance_and_corporate_team:budgetHomePage' %}">
+                <i class="fa fa-money"></i>
+                <span>Budget</span>
                 </a>
                 <div ui-include="'../views/blocks/dropdown.new.html'"></div>
             </li>

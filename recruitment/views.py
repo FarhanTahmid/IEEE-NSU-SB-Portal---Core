@@ -78,34 +78,47 @@ def recruitee(request, pk):
     '''
     try:
         sc_ag=PortData.get_all_sc_ag(request=request)
-
         #check the users view access
         user=request.user
-        has_access=(MDT_DATA.recruitment_session_view_access_control(user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username))
-        
-        getSession = renderData.Recruitment.getSession(session_id=pk)
-        getMemberCount = renderData.Recruitment.getTotalNumberOfMembers(int(pk))
-        getRecruitedMembers = renderData.Recruitment.getRecruitedMembers(
-            session_id=pk)
-
-        get_total_count_of_ieee_payment_completed=renderData.Recruitment.getTotalCountofIEEE_payment_complete(session_id=pk) 
-        get_total_count_of_ieee_payment_incomplete=renderData.Recruitment.getTotalCountofIEEE_payment_incomplete(session_id=pk) 
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
-        context = {
-            'pk':pk,
-            'memberCount': getMemberCount,
-            'session': getSession,
-            'members': getRecruitedMembers,
-            'ieee_payment_complete':get_total_count_of_ieee_payment_completed,
-            'ieee_payment_incomplete':get_total_count_of_ieee_payment_incomplete,
-            'user_data':user_data,
-            'all_sc_ag':sc_ag,
-        }
+
+        has_access=(MDT_DATA.recruitment_session_view_access_control(user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username))
         if(has_access):
+            
+            if request.method == 'POST':
+                if 'save_details' in request.POST:
+                    recruitment_end_datetime = request.POST.get('recruitment_end_datetime')
+                    recruitment_event_link = request.POST.get('recruitment_event_link')
+                    is_active = request.POST.get('is_active')
+
+                    if renderData.Recruitment.update_session_details(pk, recruitment_end_datetime, recruitment_event_link, is_active):
+                        messages.success(request, 'Session details updated successfully!')
+                    else:
+                        messages.warning(request, 'Something went wrong!')
+
+                    return redirect('recruitment:recruitee', pk)
+        
+            getSession = renderData.Recruitment.getSession(session_id=pk)
+            getMemberCount = renderData.Recruitment.getTotalNumberOfMembers(int(pk))
+            getRecruitedMembers = renderData.Recruitment.getRecruitedMembers(
+                session_id=pk)
+
+            get_total_count_of_ieee_payment_completed=renderData.Recruitment.getTotalCountofIEEE_payment_complete(session_id=pk) 
+            get_total_count_of_ieee_payment_incomplete=renderData.Recruitment.getTotalCountofIEEE_payment_incomplete(session_id=pk) 
+            context = {
+                'pk':pk,
+                'memberCount': getMemberCount,
+                'session': getSession,
+                'members': getRecruitedMembers,
+                'ieee_payment_complete':get_total_count_of_ieee_payment_completed,
+                'ieee_payment_incomplete':get_total_count_of_ieee_payment_incomplete,
+                'user_data':user_data,
+                'all_sc_ag':sc_ag,
+            }
             return render(request, 'session_recruitees.html', context=context)
         else:
-            return render(request,'access_denied.html',context)
+            return render(request,'access_denied.html', {'user_data':user_data, 'all_sc_ag':sc_ag})
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
@@ -225,6 +238,7 @@ def recruitee_details(request,session_id,nsu_id):
                             'facebook_url': request.POST['facebook_url'],
                             'facebook_username':request.POST['facebook_username'],
                             'home_address': request.POST['home_address'],
+                            'gender':request.POST['gender'],
                             'school':request.POST['school'],
                             'department':request.POST['department'],
                             'major': request.POST['major'], 'graduating_year': request.POST['graduating_year'],
@@ -263,7 +277,6 @@ def recruitee_details(request,session_id,nsu_id):
                     ##Resending recruitment mail
                     if request.POST.get('resend_email'):
                         name=request.POST['first_name']
-                        nsu_id=request.POST['nsu_id']
                         recruited_member_email=request.POST['email_personal']
                         recruitment_session_name=recruitment_session.objects.get(id=session_id)
                         
@@ -443,10 +456,11 @@ def recruit_member(request, session_id):
                             recruited_member.save()  # Saving the member to the database
 
                             #Check if any skills were selected
-                            if skill_set_list[0] != 'null':
-                                #If yes then add them
-                                recruited_member.skills.add(*skill_set_list)
-                                recruited_member.save()  # Saving the member to the database
+                            if len(skill_set_list) > 0:
+                                if skill_set_list[0] != 'null':
+                                    #If yes then add them
+                                    recruited_member.skills.add(*skill_set_list)
+                                    recruited_member.save()  # Saving the member to the database
                             
                             #send an email now to the recruited member
                             email_status=email_sending.send_email_to_recruitees_upon_recruitment(
@@ -522,7 +536,7 @@ def generateExcelSheet(request, session_id):
             font_style = xlwt.XFStyle()
 
             # getting all the values of members as rows with same session
-            rows = recruited_members.objects.filter(session_id=session_id).values_list('nsu_id',
+            rows = recruited_members.objects.filter(session_id=session_id).order_by('recruitment_time').values_list('nsu_id',
                                                                                                         'first_name', 'middle_name', 'last_name',
                                                                                                         'email_personal','email_nsu', 'blood_group',
                                                                                                         'contact_no',

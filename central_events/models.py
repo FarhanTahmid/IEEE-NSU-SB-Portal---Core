@@ -79,6 +79,7 @@ class Events(models.Model):
     
     def __str__(self) -> str:
         return str(self.pk)
+    
     def get_absolute_url(self):
         return reverse("registered_events", kwargs={"event_name": self.event_name})
     

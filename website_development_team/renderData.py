@@ -8,7 +8,7 @@ class WesbiteDevelopmentTeam:
         '''Gets the team id from the database only for Website Development Team. Not the right approach'''
         
         team=Teams.objects.get(primary=8)
-        return team
+        return team.id
     
     def load_manage_team_access():
         return WDT_Data_Access.objects.all()

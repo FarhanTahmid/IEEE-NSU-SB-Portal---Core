@@ -13,7 +13,7 @@ urlpatterns = [
     #include default auth urls
     #path('', include('django.contrib.auth.urls')),
     #loginpage
-    path('login',views.login, name='login'),
+    path('login/',views.login, name='login'),
     # signup user validation
     path('signup/validation/',views.signup_user_validation,name="signup_validation"),
     #signup page
