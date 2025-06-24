@@ -17,6 +17,10 @@ from django.utils.datastructures import MultiValueDictKeyError
 from system_administration.google_authorisation_handler import GoogleAuthorisationHandler
 
 gmail_service = None
+gmail_service_PES = None
+gmail_service_RAS = None
+gmail_service_IAS = None
+gmail_service_WIE = None
 
 class GmailHandler:
 
@@ -280,3 +284,28 @@ class GmailHandler:
 
         send_message = service.users().messages().send(userId='me', body=create_message).execute()
         msg = 'Email sent successfully!'
+
+    def get_sc_ag_gmail_service(sc_ag_primary):
+        if int(sc_ag_primary) == 2:
+            return gmail_service_PES
+        elif int(sc_ag_primary) == 3:
+            return gmail_service_RAS
+        elif int(sc_ag_primary) == 4:
+            return gmail_service_IAS
+        elif int(sc_ag_primary) == 5:
+            return gmail_service_WIE
+        
+    def update_sc_ag_gmail_service(sc_ag_primary, value):
+        if int(sc_ag_primary) == 2:
+            global gmail_service_PES
+            gmail_service_PES = value
+            print(gmail_service_PES)
+        elif int(sc_ag_primary) == 3:
+            global gmail_service_RAS
+            gmail_service_RAS = value
+        elif int(sc_ag_primary) == 4:
+            global gmail_service_IAS
+            gmail_service_IAS = value
+        elif int(sc_ag_primary) == 5:
+            global gmail_service_WIE
+            gmail_service_WIE = value

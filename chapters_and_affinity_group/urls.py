@@ -1,4 +1,5 @@
 from django.urls import path
+from central_branch import views as centralViews
 from . import views
 
 app_name="chapters_and_affinity_group"
@@ -60,5 +61,19 @@ urlpatterns = [
     #Add Events to Mega Event
     path('<str:primary>/events/mega_event_add_event/<int:mega_event_id>/',views.mega_event_add_event,name="mega_event_add_event"), 
     #excel generation
-    path('<str:primary>/events/generateExcelSheet_events_by_year_sc_ag/<int:year>/',views.generateExcelSheet_events_by_year_sc_ag,name = "generateExcelSheet_events_by_year_sc_ag")
+    path('<str:primary>/events/generateExcelSheet_events_by_year_sc_ag/<int:year>/',views.generateExcelSheet_events_by_year_sc_ag,name = "generateExcelSheet_events_by_year_sc_ag"),
+
+    #Email
+    path('<str:primary>/mail/',centralViews.mail,name="mail"),
+    path('<str:primary>/mail/view/<str:mail_id>',centralViews.view_mail,name="view_mail"),
+    path('<str:primary>/mail/send_mail_request/', centralViews.SendMailAjax.as_view(),name='send_mail_request'),
+    path('<str:primary>/mail/send_reply_mail_request/',centralViews.SendReplyMailAjax.as_view(),name='send_reply_mail_request'),
+    path('<str:primary>/mail/send_forward_mail_request/',centralViews.SendForwardMailAjax.as_view(),name='send_forward_mail_request'),
+    path('<str:primary>/mail/request_read_unread/', centralViews.ReadUnreadEmailAjax.as_view(),name='request_email_read_unread'),
+    path('<str:primary>/mail/request_delete/',centralViews.DeleteEmailAjax.as_view(),name='request_email_delete'),
+    path('<str:primary>/mail/request_star_unstar/',centralViews.StarUnstarEmailAjax.as_view(),name='request_email_star_unstar'),
+    path('<str:primary>/mail/request_scheduled/',centralViews.GetScheduledEmailInfoAjax.as_view(),name='request_scheduled_email'),
+    path('<str:primary>/mail/request_update_schedule/',centralViews.UpdateScheduledEmailOptionsAjax.as_view(),name='request_update_email_schedule'),
+    path('<str:primary>/navigate/', centralViews.PaginationAjax.as_view(),name='navigate'),
+    path('<str:primary>/mail/view/attachments/<str:message_id>/<str:attachment_id>/', centralViews.get_attachment, name='get_attachment'),
 ]

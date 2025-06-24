@@ -60,9 +60,16 @@
                     <div ui-include="'../views/blocks/dropdown.new.html'"></div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link" href="{% url 'chapters_and_affinity_group:event_control_homepage' sc_ag_info.primary %}">
-                    <i class="fa fa-user text-muted"></i>
+                    <a class="nav-link" href="{% url 'chapters_and_affinity_group:mail' sc_ag_info.primary %}">
+                    <i class="fa fa-calendar"></i>
                     <span>Events</span>
+                    </a>
+                    <div ui-include="'../views/blocks/dropdown.new.html'"></div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="{% url 'chapters_and_affinity_group:mail' sc_ag_info.primary %}">
+                    <i class="fa fa-envelope"></i>
+                    <span>Email</span>
                     </a>
                     <div ui-include="'../views/blocks/dropdown.new.html'"></div>
                 </li>

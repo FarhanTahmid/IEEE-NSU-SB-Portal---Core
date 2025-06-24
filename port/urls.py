@@ -13,5 +13,6 @@ urlpatterns = [
     path('developers',views.developed_by,name='developers'),
     
     path('authorize/', views.authorize, name='authorize'),
+    path('authorize/<int:primary>/', views.authorize, name='authorize2'),
     path('oauth2callback/', views.oauth2callback, name='oauth2callback'),
 ]

@@ -17,6 +17,7 @@ from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from central_events.models import Events, Google_Calendar_Attachments, InterBranchCollaborations, IntraBranchCollaborations, SuperEvents
+from chapters_and_affinity_group.manage_access import SC_Ag_Render_Access
 from content_writing_and_publications_team.forms import Content_Form
 from content_writing_and_publications_team.renderData import ContentWritingTeam
 from events_and_management_team.renderData import Events_And_Management_Team
@@ -5785,10 +5786,15 @@ def export_task_contents(request):
     
 @login_required
 @member_login_permission
-def mail(request):
+def mail(request, primary=None):
 
     try:
-        has_access=Branch_View_Access.get_manage_email_access(request)
+        service = None
+        if primary == None:
+            has_access=Branch_View_Access.get_manage_email_access(request)
+        else:
+            has_access=SC_Ag_Render_Access.get_sc_ag_common_access(request, primary)
+            has_access=True
         
         if has_access:
             error_message = ''
@@ -5802,55 +5808,75 @@ def mail(request):
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 section = request.GET.get('section')
                 tokens = request.session.get('pg_token')
-                print(tokens)
+
                 if tokens:
                     pg_token = tokens[-1]
                 else:
                     pg_token = ''
 
                 global gmail_service
+                if primary == None:
 
-                if not gmail_service:
-                    credentials = GoogleAuthorisationHandler.get_credentials(request)
-                    if not credentials:
-                        error_message = 'Google Authorization Required! Please contact Web Team'
-                        print("NOT OK")
-                        return None
-                    # try:
-                    gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
-                    print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+                    if not gmail_service:
+                        credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
+                        if not credentials:
+                            error_message = 'Google Authorization Required! Please contact Web Team'
+                            print("NOT OK")
+                            return None
+                        # try:
+                        gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+                        service = gmail_service
+                        print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+                    else:
+                        service = gmail_service
+                else:
+                    sc_ag_gmail_service = GmailHandler.get_sc_ag_gmail_service(primary)
+                    if not sc_ag_gmail_service:
+                        credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
+                        if not credentials:
+                            error_message = 'Google Authorization Required! Please contact Web Team'
+                            print("NOT OK")
+                            return None
+                        # try:
+                        sc_ag_gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+                        GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
+                        service = gmail_service
+                        print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+                    else:
+                        service = gmail_service
+                        GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
 
                 query = request.GET.get('query')
                 thread_data = []
 
                 if section == 'inbox':
                     if query:
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} -label:dev-mail",pageToken=pg_token).execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q=f"{query} -label:dev-mail",pageToken=pg_token).execute()
                     else:
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
                 elif section == 'sent':
                     if query:
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} in:sent -label:dev-mail",pageToken=pg_token).execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q=f"{query} in:sent -label:dev-mail",pageToken=pg_token).execute()
                     else:
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="in:sent -label:dev-mail",pageToken=pg_token).execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="in:sent -label:dev-mail",pageToken=pg_token).execute()
                 elif section =='dev_mail':
                     if Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username):
                         if query:
-                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} label:dev-mail",pageToken=pg_token).execute()
+                            threads = service.users().threads().list(userId='me', maxResults=10, q=f"{query} label:dev-mail",pageToken=pg_token).execute()
                         else:
-                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="label:dev-mail",pageToken=pg_token).execute()
+                            threads = service.users().threads().list(userId='me', maxResults=10, q="label:dev-mail",pageToken=pg_token).execute()
                     else:
                         if query:
-                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} -label:dev-mail",pageToken=pg_token).execute()
+                            threads = service.users().threads().list(userId='me', maxResults=10, q=f"{query} -label:dev-mail",pageToken=pg_token).execute()
                         else:
-                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
+                            threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
                 elif section =='starred':
                     if query:
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q=f"{query} is:starred",pageToken=pg_token).execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q=f"{query} is:starred",pageToken=pg_token).execute()
                     else:
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="is:starred",pageToken=pg_token).execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="is:starred",pageToken=pg_token).execute()
                 else:
-                    threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
+                    threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken=pg_token).execute()
                 
                 
                 if not request.session.get('pg_token'):
@@ -5906,7 +5932,7 @@ def mail(request):
                         thread_id = thread['id']
 
                         # Fetch the required details for each message
-                        batch.add(gmail_service.users().threads().get(
+                        batch.add(service.users().threads().get(
                             userId='me',
                             id=thread_id,
                             format='metadata',
@@ -5946,32 +5972,63 @@ def mail(request):
                 section = request.GET.get('section')
                 thread_data = []
 
-                credentials = GoogleAuthorisationHandler.get_credentials(request)
-                if not credentials:
-                    print("NOT OK")
-                    error_message = 'Google Authorization Required! Please contact Web Team'
-                    return render(request,'Email/compose_email.html',{'all_sc_ag':sc_ag,
+                try:
+                    service = None
+                    if primary == None:                        
+                        if not gmail_service:
+                            print('gbddvscx')
+                            credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
+                            if not credentials:
+                                error_message = 'Google Authorization Required! Please contact Web Team'
+                                print("NOT OK")
+                                return render(request,'Email/compose_email.html',{'all_sc_ag':sc_ag,
                                                                       'user_data':user_data,
                                                                       'section':section,
                                                                       'error_message':error_message})
-                try:
-                    gmail_service = build(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
-                    print(Settings.GOOGLE_MAIL_API_NAME, Settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+                        
+                            gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+                            service = gmail_service
+                            print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+                        else:
+                            service = gmail_service
+
+                    else:
+                        sc_ag_gmail_service = GmailHandler.get_sc_ag_gmail_service(primary)
+                        if not sc_ag_gmail_service:
+                            credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
+                            if not credentials:
+                                error_message = 'Google Authorization Required! Please contact Web Team'
+                                print("NOT OK")
+                                if not credentials:
+                                    return render(request,'Email/compose_email.html',{'all_sc_ag':sc_ag,
+                                                                                    'user_data':user_data,
+                                                                                    'section':section,
+                                                                                    'error_message':error_message})
+                            sc_ag_gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
+                            service = sc_ag_gmail_service
+                            # GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
+                            print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
+                        else:
+                            service = sc_ag_gmail_service
+                            # GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
+                            # print(sc_ag_gmail_service)
+
+                    print(service)
 
                     if section == 'inbox':
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
                     elif section == 'sent':
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="in:sent -label:dev-mail",pageToken='').execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="in:sent -label:dev-mail",pageToken='').execute()
                     elif section == 'dev_mail':
                         if Access_Render.system_administrator_superuser_access(request.user.username) or Access_Render.system_administrator_staffuser_access(request.user.username):
-                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="label:dev-mail",pageToken='').execute()
+                            threads = service.users().threads().list(userId='me', maxResults=10, q="label:dev-mail",pageToken='').execute()
                         else:
-                            threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
+                            threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
                     elif section =='starred':
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="is:starred -label:dev-mail",pageToken='').execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="is:starred -label:dev-mail",pageToken='').execute()
                     else:
                         section = 'inbox'
-                        threads = gmail_service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
+                        threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
 
 
                     if 'nextPageToken' in threads:
@@ -6026,7 +6083,7 @@ def mail(request):
                             thread_id = thread['id']
 
                             # Fetch the required details for each message
-                            batch.add(gmail_service.users().threads().get(
+                            batch.add(service.users().threads().get(
                                 userId='me',
                                 id=thread_id,
                                 format='metadata',

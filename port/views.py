@@ -1,6 +1,7 @@
 import os
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render,redirect
+import urllib
 from central_branch.view_access import Branch_View_Access
 from central_events.google_calendar_handler import CalendarHandler
 from system_administration.google_authorisation_handler import GoogleAuthorisationHandler
@@ -56,10 +57,10 @@ def developed_by(request):
     
         
         
-def authorize(request):
+def authorize(request, primary=None):
 
     if(Access_Render.system_administrator_staffuser_access(request) or Access_Render.system_administrator_superuser_access):
-        credentials = GoogleAuthorisationHandler.get_credentials(request)
+        credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
         if not credentials:
             flow = CalendarHandler.get_google_auth_flow(request)
             if(request.META['HTTP_HOST'] == "127.0.0.1:8000" or request.META['HTTP_HOST'] == "localhost:8000"):
@@ -71,9 +72,9 @@ def authorize(request):
                 authorization_url, state = flow.authorization_url(
                     access_type='offline',
                     include_granted_scopes='true',
-                    login_hint='ieeensusb.portal@gmail.com'
+                    # login_hint='ieeensusb.portal@gmail.com'
                 )
-            request.session['state'] = state
+            request.session['state'] = state + "++" + str(primary)
             return redirect(authorization_url)
 
         if credentials != None:
@@ -84,19 +85,29 @@ def authorize(request):
         return redirect('central_branch:event_control')
 
 def oauth2callback(request):
-    try:
+    # try:
         if(request.META['HTTP_HOST'] == "127.0.0.1:8000" or request.META['HTTP_HOST'] == "localhost:8000"):
             os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
         state = request.GET.get('state')
-        if state != request.session.pop('state', None):
+        
+        states = request.session.pop('state', None) 
+        if states:
+            print(states)
+            states = states.split('++')
+
+        if state != states[0]:
             return HttpResponseBadRequest('Invalid state parameter')
         
         flow = CalendarHandler.get_google_auth_flow(request)
         flow.fetch_token(authorization_response=request.build_absolute_uri())
         credentials = flow.credentials
-        GoogleAuthorisationHandler.save_credentials(credentials)
+        if states[1] != 'None':
+            GoogleAuthorisationHandler.save_credentials(credentials, int(states[1]))
+        else:
+            GoogleAuthorisationHandler.save_credentials(credentials)
+
         messages.success(request, "Authorized")
         return redirect('central_branch:event_control')
-    except:
-        messages.warning(request, "Access Denied!")
-        return redirect('central_branch:event_control')
+    # except:
+        # messages.warning(request, "Access Denied!")
+        # return redirect('central_branch:event_control')
