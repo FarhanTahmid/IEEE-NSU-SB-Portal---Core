@@ -14,5 +14,7 @@ urlpatterns = [
     
     path('authorize/', views.authorize, name='authorize'),
     path('authorize/<int:primary>/', views.authorize, name='authorize2'),
+    path('de-authorize/', views.deauthorise, name='de-authorize'),
+    path('de-authorize/<int:primary>/', views.deauthorise, name='de-authorize2'),
     path('oauth2callback/', views.oauth2callback, name='oauth2callback'),
 ]

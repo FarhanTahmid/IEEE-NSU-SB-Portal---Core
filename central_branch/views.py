@@ -2666,6 +2666,8 @@ def event_control_homepage(request):
         if(request.method=="POST"):
             if request.POST.get('authorise'):
                 return redirect('port:authorize')
+            elif request.POST.get('deauthorise'):
+                return redirect('port:de-authorize')
             
             #Creating new event type for Group 1 
             elif request.POST.get('add_event_type'):
@@ -6179,7 +6181,6 @@ def mail(request, primary=None):
                     service = None
                     if primary == None:                        
                         if not gmail_service:
-                            print('gbddvscx')
                             credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
                             if not credentials:
                                 error_message = 'Google Authorization Required! Please contact Web Team'

@@ -2,7 +2,7 @@
 import base64
 from email.mime.text import MIMEText
 
-from dotenv import set_key
+from dotenv import set_key, unset_key
 from google.auth.transport.requests import Request
 from insb_port import settings
 from googleapiclient.discovery import build
@@ -86,6 +86,37 @@ class GoogleAuthorisationHandler:
             if(credentials.expiry):
                 set_key('.env', f'GOOGLE_CLOUD_EXPIRY_{sc_ag}', credentials.expiry.isoformat())
                 setattr(settings, f'GOOGLE_CLOUD_EXPIRY_{sc_ag}', credentials.expiry.isoformat())
+
+    def delete_credentials(credentials, sc_ag_primary):
+        if sc_ag_primary is None:
+            # Remove default keys
+            unset_key('.env', 'GOOGLE_CLOUD_TOKEN')
+            unset_key('.env', 'GOOGLE_CLOUD_REFRESH_TOKEN')
+            unset_key('.env', 'GOOGLE_CLOUD_EXPIRY')
+
+            # Remove from runtime settings if present
+            for attr in ['GOOGLE_CLOUD_TOKEN', 'GOOGLE_CLOUD_REFRESH_TOKEN', 'GOOGLE_CLOUD_EXPIRY']:
+                if hasattr(settings, attr):
+                    setattr(settings, attr, None)
+
+        else:
+            sc_ag = GoogleAuthorisationHandler.get_sc_ag_short_form(sc_ag_primary)
+            token_key = f'GOOGLE_CLOUD_TOKEN_{sc_ag}'
+            refresh_key = f'GOOGLE_CLOUD_REFRESH_TOKEN_{sc_ag}'
+            expiry_key = f'GOOGLE_CLOUD_EXPIRY_{sc_ag}'
+
+            # Remove from .env
+            unset_key('.env', token_key)
+            unset_key('.env', refresh_key)
+            unset_key('.env', expiry_key)
+
+            # Remove from runtime settings
+            for attr in [token_key, refresh_key, expiry_key]:
+                if hasattr(settings, attr):
+                    delattr(settings, attr)
+
+    def revoke_google_token(token):
+        pass
 
     def get_sc_ag_short_form(sc_ag_primary):
         if int(sc_ag_primary) == 2:

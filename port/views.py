@@ -2,10 +2,14 @@ import os
 from django.http import HttpResponseBadRequest
 from django.shortcuts import render,redirect
 import urllib
+
+import requests
+from central_branch.google_mail_handler import GmailHandler
 from central_branch.view_access import Branch_View_Access
 from central_events.google_calendar_handler import CalendarHandler
 from system_administration.google_authorisation_handler import GoogleAuthorisationHandler
 from system_administration.models import Project_leads,Project_Developers
+from google.auth.transport.requests import Request
 from django.conf import settings
 import traceback
 import logging
@@ -111,3 +115,32 @@ def oauth2callback(request):
     # except:
         # messages.warning(request, "Access Denied!")
         # return redirect('central_branch:event_control')
+
+def deauthorise(request, primary=None):
+
+    creds = GoogleAuthorisationHandler.get_credentials(request, primary)
+
+    if creds:
+        revoke_url = 'https://oauth2.googleapis.com/revoke'
+        token = creds.token or creds.refresh_token
+
+        response = requests.post(
+            revoke_url,
+            params={'token': token},
+            headers={'content-type': 'application/x-www-form-urlencoded'}
+        )
+
+        if response.status_code == 200:
+            if not primary:
+                global gmail_service
+                gmail_service = None
+            else:
+                GmailHandler.update_sc_ag_gmail_service(primary, None)
+            pass
+        else:
+            print(f"Failed to revoke token: {response.status_code} - {response.text}")
+
+    if not primary:
+        return redirect('central_branch:event_control')
+    else:
+        return redirect('chapters_and_affinity_group:event_control_homepage', primary)
