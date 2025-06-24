@@ -5992,9 +5992,10 @@ def mail(request, primary=None):
         service = None
         if primary == None:
             has_access=Branch_View_Access.get_manage_email_access(request)
+            get_sc_ag_info=None
         else:
             has_access=SC_Ag_Render_Access.get_sc_ag_common_access(request, primary)
-            has_access=True
+            get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
         
         if has_access:
             error_message = ''
@@ -6210,11 +6211,11 @@ def mail(request, primary=None):
                                                                                     'error_message':error_message})
                             sc_ag_gmail_service = build(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, credentials=credentials)
                             service = sc_ag_gmail_service
-                            # GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
+                            GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
                             print(settings.GOOGLE_MAIL_API_NAME, settings.GOOGLE_MAIL_API_VERSION, 'service created successfully')
                         else:
                             service = sc_ag_gmail_service
-                            # GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
+                            GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
                             # print(sc_ag_gmail_service)
 
                     print(service)
@@ -6312,7 +6313,9 @@ def mail(request, primary=None):
                                                 
                 context={
                     'all_sc_ag':sc_ag,
+                    'sc_ag_info':get_sc_ag_info,
                     'user_data':user_data,
+                    'primary': primary,
                     'section':section,
                     'media_url':settings.MEDIA_URL,
                     'recruitment_sessions':recruitment_sessions,
