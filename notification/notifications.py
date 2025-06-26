@@ -1,3 +1,5 @@
+from email.mime.text import MIMEText
+from insb_port import settings
 from .models import *
 from datetime import datetime
 from system_administration.system_error_handling import ErrorHandling
@@ -5,7 +7,10 @@ import logging
 import traceback
 from task_assignation.models import Task
 from . import push_notification
+from django.core.mail import EmailMultiAlternatives
 from .models import *
+from django.core.mail import send_mail
+
 class NotificationHandler:
     
     logger=logging.getLogger(__name__)
@@ -241,6 +246,9 @@ class NotificationHandler:
                                                     general_message = notification_description,inside_link = notification_link)
         
         notification.save()
+
+        NotificationHandler.email_custom_notification(notification.title, notification.general_message, notification.inside_link, selected_member_ids)
+        
         for member_id in selected_member_ids:
             member = Members.objects.get(ieee_id = member_id)
             member_notification = MemberNotifications.objects.create(notification = notification,member = member,is_read = False)
@@ -265,3 +273,28 @@ class NotificationHandler:
             notification_dict[notification] = mem_list
         
         return notification_dict
+    
+    def email_custom_notification(title, body, general_link, recipient_ids):
+        
+        try:
+            subject=f"Notification : {title}"
+            link = f'Link: {general_link}' if general_link else ''
+            message=f'<p>Hello,</p><p>You got a notification from IEEE NSU SB Portal</p><p>{link}</p>{body}'
+            email_from=settings.EMAIL_HOST_USER
+            recipient_list=[]
+
+            for member_id in recipient_ids:
+                member = Members.objects.get(ieee_id = member_id)
+                recipient_list.append(member.email_nsu)
+
+            if recipient_list:
+                if len(recipient_list)> 0 and len(recipient_list) <=40:
+                    send_mail(subject=subject, message='', from_email=email_from, recipient_list=recipient_list, html_message=message)
+                else:
+                    while len(recipient_list)!=0:
+                        send_mail(subject=subject, message='', from_email=email_from, recipient_list=recipient_list[:40], html_message=message)
+                        recipient_list = recipient_list[40:]
+
+            return True
+        except:
+            return False
