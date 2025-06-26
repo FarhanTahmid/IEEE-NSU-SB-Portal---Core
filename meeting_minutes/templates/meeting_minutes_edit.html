@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Meeting_Minutes | IEEE NSU Student Branch</title>
+    <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+
+    <script src="https://kit.fontawesome.com/ab83dacc87.js" crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+
+    {% block common_css %}
+        {% include "common_css.html" %}
+    {% endblock common_css %}
+    
+<script>
+  let agendaCount = 1;
+
+  function addDiv() {
+    if (agendaCount >= 10) {
+      alert("Maximum of 10 agenda items allowed.");
+      return;
+    }
+
+    agendaCount++;
+
+    const container = document.getElementById("agenda-items");
+
+    const agendaDiv = document.createElement("div");
+    agendaDiv.className = "agenda_fld";
+
+    const number = document.createElement("h2");
+    number.textContent = `${agendaCount}.`;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "agenda_fld_ip";
+    input.name = "agenda[]";
+
+    agendaDiv.appendChild(number);
+    agendaDiv.appendChild(input);
+    container.appendChild(agendaDiv);
+  }
+
+  function removeDiv() {
+    if (agendaCount <= 1) {
+      alert("At least one agenda item must remain.");
+      return;
+    }
+
+    const container = document.getElementById("agenda-items");
+    container.removeChild(container.lastElementChild);
+    agendaCount--;
+  }
+</script>
+
+    <style>
+        .meeting_minutes_container{
+            margin: 50px auto;
+            padding: 50px;
+            background-color: white;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 10px;
+            max-width: 896px;
+        }
+        .div0{
+            display: flex;
+            justify-content: center;
+        }
+        .h1{
+            color: black;
+            font-size: 1.5rem;
+            padding: 0px 20px 5px 20px;
+            border: none;
+            border-bottom: 1px solid #ebebeb;
+            text-align: center;
+            width: 100%;
+        }
+        .div1{
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            margin: 20px 0px 40px 0px;
+        }
+        .return_btn i{
+            font-size: 1rem;
+            transition: 0.5s;
+            color: white;
+            background-color: black;
+            padding: 10px;
+            border-radius: 50%;
+        }
+        .return_btn i:hover{
+            color: black;
+            background-color: white;
+        }
+        .modal_btn{
+            padding: 0px 14px;
+            color: #e74c3c;
+            background-color: #fadbd8;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+        }
+        .modal_btn:hover{
+            background-color: #e74c3c;
+            color: #fadbd8;
+        }
+        .location_fld{
+            display: grid;
+            grid-template-columns: 0.65fr 10px 1fr;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+        
+        .plus_minus_btn{
+          color: #727272;
+          background-color: white;
+          border: 1px solid #dfe0e0;
+          text-decoration: none;
+          border-radius: 4px;
+          transition: 0.5s;
+        }
+        .location_fld_ip:hover{
+            background-color: #d6eaf8;
+        }
+        .plus_minus_btn:hover{
+            background-color: #e1e1e1;
+        }
+        .agenda{
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            align-items: center;
+        }
+        .agenda_fld{
+            display: flex;
+            margin: 10px 0px;
+            align-items: center;
+            color: gray;
+        }
+        .agenda_fld_ip{
+            width: 100%;
+            margin-left: 10px;
+            border: none;
+            border-bottom: 1px solid #ebebeb;
+            color: black;
+        }
+        /* .desc_fld{
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+            margin: 5px 0px;
+            min-height: 100px;
+        } */
+        .save_btn{
+            padding: 5px 50px;
+            color: #2ecc71;
+            background-color: #d5f5e3;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: 0.5s;
+            margin-top: 10px;
+            
+        }
+        .save_btn:hover{
+            background-color: #2ecc71;
+            color: #d5f5e3;
+        }   
+
+        .label-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .time_fld, .text_fld {
+            display: grid;
+            grid-template-columns: 0.65fr 10px 1fr;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+        .text_fld {
+            grid-template-columns: 0.35fr 10px 1fr;
+        }
+        .time_fld_ip, .text_fld_ip{
+            flex: 1;
+            border: none;
+            border-bottom: 1px solid #ebebeb;
+        }
+        .colon {
+            font-size: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .location_fld_ip {
+            display: inline-block;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            background-color: white;
+            color: #3498db;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.5s;
+            text-align: center;
+            padding: 2px 10px;
+            text-decoration: none;
+        }
+        input[type="radio"]:checked + .location_fld_ip {
+            background-color: #3498db;
+            color: white;
+        }
+        input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .delete_btn, .close_btn{
+            color: #3498db;
+            background-color: white;
+            border: 1px solid #3498db;
+            text-decoration: none;
+            border-radius: 5px;
+            padding: 5px 30px;
+            transition: 0.5s;      
+        }
+        .delete_btn:hover, .close_btn:hover{
+            background-color: #3498db;
+            color: white;
+        }
+        .delete_modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            padding-top: 40vh;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+        }
+
+        .modal_content {
+            background-color: white;
+            width: 30%;
+            border-radius: 10px;
+            padding: 30px 0px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            margin: auto;
+        }
+        h2{
+          margin: 0;
+          font-size: 1rem;
+          display: flex;
+          font-weight: bold;
+          color: #333;
+        }
+        @media (max-width: 1024px){
+            .body{
+                margin: 30px;
+                padding: 30px;
+            }
+            .modal_content {
+            width: 40%;
+            }
+        }
+        @media (max-width: 600px){
+            .body{
+                margin: 20px;
+                padding: 20px;
+            }
+            .space{
+                display: none;
+            }
+            .label-container {
+                grid-template-columns: 1fr;
+            }
+            .location_fld_ip{
+                margin-bottom: 5px;
+            }
+            .h1{
+            padding: 0px 10px 5px 10px;
+            }
+            .modal_content {
+            width: 70%;
+            }
+
+        }
+
+        @media (max-width: 425px){
+            .location_fld_ip{
+                margin-bottom: 5px;
+            }
+            .modal_content {
+            width: 70%;
+            }
+        }
+
+    </style>
+</head>
+{% block preloader %}
+    {% include 'preloader.html' %}
+{% endblock preloader %}
+
+
+<body style="background-color: white;">
+    <!-- ############ LAYOUT START-->
+    <div class="app" id="app">
+
+        <!-- aside -->
+        <div id="aside" class="app-aside modal nav-dropdown">
+  
+  	        {% block sidebar %}
+	            {% include 'users/sidebar.html' %}
+  	        {% endblock %}
+  
+        </div>
+        <!-- aside end -->
+  
+        <!-- navbar content -->
+        <div id="content" class="app-content box-shadow-z0" role="main">
+        {% block navbar %} {% include 'navbar.html' %} {% endblock navbar %}
+        </div>
+        <!--navbar content-->   
+
+        <div ui-view class="app-body" style="justify-content: center;" id="view">
+    <!-- ############ PAGE START-->
+    <section class="meeting_minutes_container">
+        <form method="post" id="form"> <!--form starts-->
+            {% csrf_token %}
+            <div class="div0"> <!--title-->
+                <input type="text" name="meeting_name" placeholder="Meeting Name" class="h1" required  value="{{ meeting.meeting_name|default_if_none:'' }}">
+            </div>
+
+    <div class="div1">
+      <a href="{% url 'central_branch:meeting_minutes:meeting_minutes_homepage' %}" class="return_btn"><i class="fa-solid fa-arrow-left-long"></i></a>
+      {% if meeting %}
+        <button type="button" class="modal_btn">Delete <i class="fa fa-trash action-btn" aria-hidden="true"></i></button>
+      {% endif %}
+    </div>
+
+            <div class="div2">
+                <div class="label-container">
+                    <div class="location_fld"><!--location-->
+                        <h2>Meeting Type<div style="color: #e74c3c;">*</div></h2>
+                        <div class="colon">:</div>
+
+                        <div id="location-buttons">
+                            <input type="radio" id="virtual" name="location" value="Virtual" required required {% if meeting.location == 'Virtual' %}checked{% endif %}>
+                            <label for="virtual" class="location_fld_ip">Virtual</label>
+
+            <input type="radio" id="hybrid" name="location" value="Hybrid" {% if meeting.location == 'Hybrid' %}checked{% endif %}>
+            <label for="hybrid" class="location_fld_ip">Hybrid</label>
+
+            <input type="radio" id="inperson" name="location" value="In-person" {% if meeting.location == 'In-person' %}checked{% endif %}>
+            <label for="inperson" class="location_fld_ip">In-person</label>
+          </div>
+        </div>
+
+        <div class="time_fld">
+          <h2>Meeting Date<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="date" class="time_fld_ip" name="meeting_date" required value="{{ meeting.meeting_date|date:'Y-m-d' }}">
+        </div>
+
+        <!-- Time Fields -->
+        <div class="time_fld">
+          <h2>Start time<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="time" class="time_fld_ip" name="start_time" required value="{{ meeting.start_time|time:'H:i' }}">
+        </div>
+
+        <div class="time_fld">
+          <h2>End time<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="time" class="time_fld_ip" name="end_time" required value="{{ meeting.end_time|time:'H:i' }}">
+        </div>
+
+        <!-- Venue -->
+        <div class="time_fld">
+          <h2>Venue</h2>
+          <div class="colon">:</div>
+          <input type="text" name="venue" class="time_fld_ip" value="{{ meeting.venue|default_if_none:'' }}">
+        </div>
+
+        <!-- Total Attendee -->
+        <div class="time_fld">
+          <h2>Total Attendee<div style="color: #e74c3c;">*</div></h2>
+          <div class="colon">:</div>
+          <input type="number" name="total_attendees" class="time_fld_ip" required value="{{ meeting.total_attendee|default_if_none:'' }}">
+        </div>
+
+        <!-- IEEE & Non-IEEE -->
+        <div class="time_fld">
+          <h2>IEEE Attendee</h2>
+          <div class="colon">:</div>
+          <input type="number" name="ieee_attendee" class="time_fld_ip" value="{{ meeting.ieee_attendee|default_if_none:'' }}">
+        </div>
+
+        <div class="time_fld">
+          <h2>Non-IEEE Attendee</h2>
+          <div class="colon">:</div>
+          <input type="number" name="non_ieee_attendee" class="time_fld_ip" value="{{ meeting.non_ieee_attendee|default_if_none:'' }}">
+        </div>
+      </div>
+
+      <!-- Agenda Controls -->
+      <div class="agenda" id="agenda-controls">
+        <h2>Agenda<div style="color: #e74c3c;">*</div></h2>
+        <div>
+          <button type="button" class="plus_minus_btn" onclick="addDiv()"><i class="fa-solid fa-plus"></i></button>
+          <button type="button" class="plus_minus_btn" onclick="removeDiv()"><i class="fa-solid fa-minus"></i></button>
+        </div>
+      </div>
+
+      <!-- Agenda Items -->
+      <div id="agenda-items">
+        {% if meeting.agendas %}
+          {% for item in meeting.agendas %}
+            <div class="agenda_fld">
+              <h2>{{ forloop.counter }}.</h2>
+              <input type="text" class="agenda_fld_ip" name="agenda[]" required value="{{ item }}">
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="agenda_fld">
+            <h2>1.</h2>
+            <input type="text" class="agenda_fld_ip" name="agenda[]" required>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Discussion -->
+      <div>
+        <h2 style="margin:40px 0 .5rem;">Discussion<div style="color: #e74c3c;">*</div></h2>
+        <textarea id="summernote" name="discussion">{{ meeting.discussion|default_if_none:'' }}</textarea>
+      </div>
+
+        <div class="label-container" style="margin-top: 40px;">
+            <div class="text_fld"><!--host-->   
+            <h2>Host</h2>
+            <div class="colon">:</div>
+            <input type="text"  name="host" class="text_fld_ip"  value="{{ meeting.host|default_if_none:'' }}">
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Co-host</h2>
+          <div class="colon">:</div>
+          <input type="text" name="co_host" class="text_fld_ip" value="{{ meeting.co_host|default_if_none:'' }}">
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Guest</h2>
+          <div class="colon">:</div>
+          <input type="text" name="guest" class="text_fld_ip" value="{{ meeting.guest|default_if_none:'' }}">
+        </div>
+
+        <div class="space"></div>
+
+        <div class="text_fld">
+          <h2>Written by<span style="color: #e74c3c;">*</span></h2>
+          <div class="colon">:</div>
+          <input type="text" name="written_by" class="text_fld_ip" required value="{{ meeting.written_by|default_if_none:'' }}">
+        </div>
+      </div>
+
+      <!-- Save -->
+      <div style="display: flex; justify-content: center; margin-top: 20px;">
+        <button type="submit" name="save" class="save_btn">Save</button>
+      </div>
+    </form>
+
+                    <!-- modal-->
+                    {% if meeting %}
+                    <div id="myModal" class="delete_modal">
+                      <div class="modal_content">
+                                <form method="POST">
+                                  {% csrf_token %}
+                                  <h4 style="padding-bottom: 20px; display: flex; justify-content: center; color: black; text-align: center;">Are you sure you want to delete?</h4>
+                                  <div style="display: flex; justify-content: center;">        
+                                      <!-- delete btn -->
+                                      <button type="submit" name="delete"class="delete_btn" style="margin-right: 10px;">Yes</button>
+                                      <span><button type="button" class="close_btn">No</button></span>
+                                    </div>
+                                </form>
+                          </div>
+                      </div>
+                {% endif %}
+     </section>
+
+
+     <script>
+        const modal = document.getElementById("myModal");
+        // const deleteForm = document.querySelector("#myModal form");
+        const deleteBtns = document.querySelectorAll(".modal_btn");
+        const closeBtn = document.querySelector(".close_btn");
+
+        deleteBtns.forEach(button => {
+            button.addEventListener("click", () => {
+            // const url = button.getAttribute("data-url");
+            // deleteForm.setAttribute("action", url);
+            modal.style.display = "block";
+            });
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        window.addEventListener("click", (event) => {
+            if (event.target === modal) {
+            modal.style.display = "none";
+            }
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+
+    <script>
+      $('#summernote').summernote({
+        placeholder:  'Write discussion here...',
+        tabsize: 2,
+        height: 120,
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['bold', 'underline', 'clear']],
+          ['color', ['color']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['table', ['table']],
+          ['insert', ['link', 'picture', 'video']],
+          ['view', ['fullscreen', 'codeview', 'help']]
+        ]
+      });
+
+        document.getElementById('form').addEventListener('submit',(e)=>{
+        if ($('#summernote').summernote('isEmpty')) {
+        e.preventDefault();
+        alert("Please fill in the description field.");
+        }
+    });
+    </script>
+    {% block common_js %} {% include "common_js.html" %} {% endblock common_js %}
+
+</body>
+</html>

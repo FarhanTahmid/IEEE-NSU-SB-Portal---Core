@@ -373,3 +373,20 @@ class FAQ_Questions(models.Model):
         verbose_name="FAQ Questions"
     def __str__(self) -> str:
         return self.title.title
+    
+class Contact_Info(models.Model):
+
+    address = models.CharField(null=True, blank=True, max_length=80)
+    nsu_ieee_email = models.CharField(null=True, blank=True, max_length=80)
+    chair_email = models.CharField(null=True, blank=True, max_length=80)
+    membership_queries_number = models.CharField(null=True, blank=True, max_length=80)
+    corporate_engagement_number = models.CharField(null=True, blank=True, max_length=80)
+
+    class Meta:
+        verbose_name="Contact Info"
+    def save(self, *args, **kwargs):
+        # Override the save method to ensure only one instance exists
+        self.id = 1  # Set the primary key to 1 to always update the same row
+        super(Contact_Info, self).save(*args, **kwargs)
+    def __str__(self) -> str:
+        return str(self.pk)

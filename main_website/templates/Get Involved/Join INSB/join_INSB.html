@@ -32,22 +32,6 @@
             /* margin: 30px 15px; */
         }
 
-        .join_container .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .join_container h1 {
-            color: #002855;
-            font-weight: 600;
-            position: relative;
-            margin-bottom: -20px;
-            margin-top: 30px;
-            z-index: 2;
-            border: 1px solid white;
-        }
-
         .gif {
             max-width: 500px;
             max-height: 500px;
@@ -114,6 +98,84 @@
                 bottom: -25px;
             }
         }
+        #timer{
+            font-size: 24px;
+            background: #002855;
+            color: white;
+            padding: 6px 20px;
+            border-radius: 4px;
+            width: 300px;
+        }
+        .timer_container {
+        color: #333;
+        margin: 0 auto;
+        text-align: center;
+        }
+
+        .timer_container h1 {
+        font-weight: normal;
+        letter-spacing: .125rem;
+        text-transform: uppercase;
+        }
+
+        .timer_container li {
+        display: inline-block;
+        font-size: 1.5em;
+        list-style-type: none;
+        padding: 1em;
+        text-transform: uppercase;
+        }
+
+        .timer_container li span {
+        display: block;
+        font-size: 4.5rem;
+        }
+
+        .join_container .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .join_container h1 {
+            color: #002855;
+            font-weight: 600;
+            position: relative;
+            margin-bottom: -20px;
+            margin-top: 30px;
+            z-index: 2;
+        }
+        @media all and (max-width: 768px) {
+        .timer_container h1 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        
+        .timer_container li {
+            font-size: .75rem;
+        }
+        
+        .timer_container li span {
+            font-size: .75rem;
+        }
+        }
+        .event_link{
+            cursor: pointer;
+            transition: all .2s ease-in-out;
+            border: 4px solid #00629B;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 24px;
+            color: #00629B;
+            position: relative;
+            margin-bottom: 0px;
+            margin-top: 50px;
+            z-index: 2;
+        }
+        .event_link:hover{
+            color: #FFC72C;
+            border: 4px solid #FFC72C;
+        }
     </style>
 </head>
 {% block preloader %}
@@ -135,10 +197,30 @@
         <section class="centering">
             <div class="max-width join_container">
                 <div class="container">
-                    <div class="gif"><img src="{% static 'upload/hourglass.gif' %}" alt=""></div>
-                    <div class="join_msg">
-                        <h1>Recruitment process will be announced soon</h1>
+                    {% if recruit_session %}
+                    <h1>Recruitment Ongoing!</h1>
+                    <h1>Meet us in front of recreation hall</h1>
+                    {% if recruit_session.recruitment_event_link %}
+                    <h4 class="event_link" onclick="window.location.href='{{recruit_session.recruitment_event_link}}'">
+                        <i aria-hidden="true" class="fas fa-external-link-alt"></i>
+                        Recruitment Event Link</h4>
+                    {% endif %}
+                    <div class="timer_container">
+                        <div id="countdown">
+                            <ul style="margin-left: 0;">
+                                <li><span id="days">00</span> days</li>
+                                <li><span id="hours">00</span> Hours</li>
+                                <li><span id="minutes">00</span> Minutes</li>
+                                <li><span id="seconds">00</span> Seconds</li>
+                            </ul>
+                        </div>
+                    {% else %}
+                    <div class="gif">
+                        <img src="{% static 'upload/hourglass.gif' %}" alt="">
                     </div>
+                    <h1 class="join_msg">Recruitment process will be announced soon!</h1>
+                    {% endif %}
+                </div>
                 </div>
             </div>
         </section>
@@ -152,6 +234,39 @@
     {% block common_js %}
     {% include "common_js_includes.html" %}
     {% endblock %}
+
+
+{% if recruit_session %}
+<script>
+    // Use the upcomingEventDate from template variable
+    const upcomingEventDate = new Date({% if recruit_session.session_end_date_time %}{{recruit_session.session_end_date_time|date:"U"}}{% endif %}*1000);
+
+    function updateCountdown() {
+        const now = new Date();
+        const distance = upcomingEventDate - now;
+        
+        if (distance > 0) {
+            // Time calculations
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((distance / (1000 * 60)) % 60);
+            const seconds = Math.floor((distance / 1000) % 60);
+
+            // Update countdown display
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById("minutes").innerText = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById("seconds").innerText = seconds < 10 ? '0' + seconds : seconds;
+        }
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
+{% endif %}
+
+
+
 </body>
 
 </html>

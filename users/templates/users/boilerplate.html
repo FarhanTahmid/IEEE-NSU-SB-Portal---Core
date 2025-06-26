@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'logos/logo.gif' %}" />
+    <title>Wallet</title>
+
+    <!--Sweet Alert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {% block common_css %} 
+    {% include "common_css.html" %} 
+    {% endblock common_css %}
+    <style>
+        
+    </style>
+</head>
+<body style="background-color: white;">
+
+        <!-- ############ LAYOUT START-->
+        <div class="app" id="app" style="background-color: white;">
+            <!-- aside -->
+            <div id="aside" class="app-aside modal nav-dropdown">
+              {% block sidebar %} 
+              {% include 'users/sidebar.html' %} 
+              {% endblock %}
+            </div>
+            <!-- aside end -->
+      
+
+            <!-- navbar content -->
+            <div id="content" class="app-content box-shadow-z0" role="main">
+                {% block navbar %}
+                    {% include 'navbar.html' %}
+                {% endblock navbar %}
+            </div>
+            <!--navbar content end-->
+      
+
+            <!-- ############ PAGE START-->
+            <div ui-view class="app-body" style="justify-content: center;" id="view">
+            <!--START PAGE CODE-->
+
+
+            </div>
+        </div>
+</body>
+    {% block common_js %} 
+    {% include "common_js.html" %} 
+    {% endblock common_js %}
+</html>

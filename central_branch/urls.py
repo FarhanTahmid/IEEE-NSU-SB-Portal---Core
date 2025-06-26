@@ -63,6 +63,7 @@ urlpatterns = [
     path('manage_website/about/ieee_bangladesh_section/',views.ieee_bangladesh_section,name = "ieee_bangladesh_section"),
     path('manage_website/about/ieee_nsu_student_branch/',views.ieee_nsu_student_branch,name = "ieee_nsu_student_branch"),
     path('manage_website/about/faq/',views.faq,name = "faq"),
+    path('manage_website/about/contact/',views.contact,name = "contact"),
     path('manage_website/toolkit',views.manage_toolkit,name="manage_toolkit"),
     path('manage_website/toolkit/update/<int:pk>',views.update_toolkit,name="update_toolkit"),
     path('manage_website/feedbacks',views.feedbacks,name="feedbacks"),
@@ -167,4 +168,6 @@ urlpatterns = [
 
     # Wallet Urls
     path('wallet/', include('wallet.urls'), name='wallet'),
+    #Meeting Minutes Urls
+    path('meeting_minutes/', include("meeting_minutes.urls", namespace="meeting_minutes"))
 ]

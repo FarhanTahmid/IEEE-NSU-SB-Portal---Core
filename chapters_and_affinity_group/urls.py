@@ -66,4 +66,6 @@ urlpatterns = [
 
     # Wallet Urls
     path('<str:primary>/wallet/', include('wallet.urls'), name='wallet'),
+    # Meeting Minutes Urls
+    path('<str:primary>/meeting_minutes/', include('meeting_minutes.urls'), name='meeting_minutes'),
 ]

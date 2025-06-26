@@ -4,7 +4,7 @@ from . models import recruitment_session,recruited_members,nsu_school,nsu_depart
 
 @admin.register(recruitment_session)
 class Session(admin.ModelAdmin):
-    list_display= ['id','session','session_time']
+    list_display= ['id','session','session_time', 'session_end_date_time', 'is_active']
 @admin.register(recruited_members)
 class Recruited_Members(admin.ModelAdmin):
     list_display=['nsu_id','first_name','email_personal','ieee_payment_status']
