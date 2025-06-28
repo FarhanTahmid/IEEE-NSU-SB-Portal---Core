@@ -792,6 +792,7 @@ def sc_ag_manage_access(request,primary):
                     panel_edit_access=False
                     membership_renewal_access=False
                     manage_web_access=False
+                    manage_email_access=False
                     manage_access=False
                     
                     # get values from template and change according to it
@@ -807,6 +808,8 @@ def sc_ag_manage_access(request,primary):
                         membership_renewal_access=True
                     if(request.POST.get('manage_web_access') is not None):
                         manage_web_access=True
+                    if(request.POST.get('manage_email_access') is not None):
+                        manage_email_access=True
                     if(request.POST.get('manage_access') is not None):
                         manage_access=True
                     
@@ -818,6 +821,7 @@ def sc_ag_manage_access(request,primary):
                                                         panel_edit_access=panel_edit_access,
                                                         membership_renewal_access=membership_renewal_access,
                                                         manage_web_access=manage_web_access,
+                                                        manage_email_access=manage_email_access,
                                                         manage_access=manage_access)):
                         return redirect('chapters_and_affinity_group:sc_ag_manage_access',primary)
                     else:

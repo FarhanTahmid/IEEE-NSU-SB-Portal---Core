@@ -2797,7 +2797,11 @@
         }
 
         $.ajax({
+          {% if primary == 1 %}
           url: "{% url 'central_branch:send_mail_request' %}",
+          {% else %}
+          url: "{% url 'chapters_and_affinity_group:send_mail_request' primary %}",
+          {% endif %}
           type: "POST",
           data: formData,
           processData: false,  // Important!

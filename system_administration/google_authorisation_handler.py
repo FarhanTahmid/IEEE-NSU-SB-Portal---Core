@@ -20,7 +20,7 @@ class GoogleAuthorisationHandler:
     
         creds = None
 
-        if sc_ag_primary == None:
+        if sc_ag_primary == None or sc_ag_primary == 1:
             if settings.GOOGLE_CLOUD_TOKEN:
                 creds = Credentials.from_authorized_user_info({
                     'token':settings.GOOGLE_CLOUD_TOKEN,

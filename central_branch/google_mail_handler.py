@@ -24,7 +24,7 @@ gmail_service_WIE = None
 
 class GmailHandler:
 
-    def send_mail(request, email_single_email, email_to_list, email_cc_list, email_bcc_list, email_subject, email_body, email_attachment, email_schedule_date_time):
+    def send_mail(request, primary, email_single_email, email_to_list, email_cc_list, email_bcc_list, email_subject, email_body, email_attachment, email_schedule_date_time):
         msg = 'Test'
         # print(request.POST)
         
@@ -70,7 +70,7 @@ class GmailHandler:
                     to_email_list,cc_email_list,bcc_email_list=PRT_Email_System.get_all_selected_emails_from_backend(
                         email_single_email,email_to_list,email_cc_list,email_bcc_list,request
                     )
-                    if PRT_Email_System.send_email(request, to_email_list=to_email_list,cc_email_list=cc_email_list,bcc_email_list=bcc_email_list,subject=email_subject,mail_body=email_body,is_scheduled=False,attachment=email_attachment):
+                    if PRT_Email_System.send_email(request, primary, to_email_list=to_email_list,cc_email_list=cc_email_list,bcc_email_list=bcc_email_list,subject=email_subject,mail_body=email_body,is_scheduled=False,attachment=email_attachment):
                         msg = 'Email sent successfully!'
                         # messages.success(request,"Email sent successfully!")
                     else:
@@ -81,7 +81,7 @@ class GmailHandler:
                     to_email_list,cc_email_list,bcc_email_list=PRT_Email_System.get_all_selected_emails_from_backend(
                         email_single_email,email_to_list,email_cc_list,email_bcc_list,request
                     )
-                    if PRT_Email_System.send_email(request, to_email_list=to_email_list,cc_email_list=cc_email_list,bcc_email_list=bcc_email_list,subject=email_subject,mail_body=email_body,is_scheduled=False):
+                    if PRT_Email_System.send_email(request, primary, to_email_list=to_email_list,cc_email_list=cc_email_list,bcc_email_list=bcc_email_list,subject=email_subject,mail_body=email_body,is_scheduled=False):
                         msg = 'Email sent successfully!'
                         # messages.success(request,"Email sent successfully!")
                     else:

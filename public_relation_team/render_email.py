@@ -305,7 +305,7 @@ class PRT_Email_System:
         
         return to_email_final_list,cc_email_final_list,bcc_email_final_list
     
-    def send_email(request, to_email_list,cc_email_list,bcc_email_list,subject,mail_body,is_scheduled,attachment=None):
+    def send_email(request, primary, to_email_list,cc_email_list,bcc_email_list,subject,mail_body,is_scheduled,attachment=None):
         # print(len(to_email_list))
         # print(len(bcc_email_list))
         # print(len(cc_email_list))
@@ -322,7 +322,7 @@ class PRT_Email_System:
         if len(to_email_list)>=40 and len(bcc_email_list)>=40:
             while len(to_email_list)!=0 and len(bcc_email_list)!=0:
                 # print(f"to_email_list >= {len(to_email_list)}  and bcc_email_list>={len(bcc_email_list)}")
-                if PRT_Email_System.send_email_confirmation(request, to_email_list[:40],cc_email_list,bcc_email_list[:40],subject,mail_body,is_scheduled,attachment):
+                if PRT_Email_System.send_email_confirmation(request, primary, to_email_list[:40],cc_email_list,bcc_email_list[:40],subject,mail_body,is_scheduled,attachment):
                     to_email_list = to_email_list[40:]
                     bcc_email_list = bcc_email_list[40:]
                 else:
@@ -331,7 +331,7 @@ class PRT_Email_System:
         if len(to_email_list)>=40:
             while len(to_email_list)!=0:
                 # print(f"to_email_list only more than {len(to_email_list)}")
-                if PRT_Email_System.send_email_confirmation(request, to_email_list[:40],cc_email_list,bcc_email_list,subject,mail_body,is_scheduled,attachment):
+                if PRT_Email_System.send_email_confirmation(request, primary, to_email_list[:40],cc_email_list,bcc_email_list,subject,mail_body,is_scheduled,attachment):
                     to_email_list = to_email_list[40:]
                 else:
                     return False
@@ -339,7 +339,7 @@ class PRT_Email_System:
         if len(bcc_email_list)>=40:
             while len(bcc_email_list)!=0:
                 # print(f"bcc_email_list only more than {len(bcc_email_list)}")
-                if PRT_Email_System.send_email_confirmation(request, to_email_list,cc_email_list,bcc_email_list[:40],subject,mail_body,is_scheduled,attachment):
+                if PRT_Email_System.send_email_confirmation(request, primary, to_email_list,cc_email_list,bcc_email_list[:40],subject,mail_body,is_scheduled,attachment):
                     bcc_email_list = bcc_email_list[40:]
                 else:
                     return False
@@ -349,7 +349,7 @@ class PRT_Email_System:
         #changes in the lists'''
         if (len(to_email_list)>0 and len(to_email_list)<40) or (len(bcc_email_list)>0 and len(bcc_email_list)<40):
             # print(f"Outside, less than 40")
-            if PRT_Email_System.send_email_confirmation(request, to_email_list,cc_email_list,bcc_email_list,subject,mail_body,is_scheduled,attachment):
+            if PRT_Email_System.send_email_confirmation(request, primary, to_email_list,cc_email_list,bcc_email_list,subject,mail_body,is_scheduled,attachment):
                 return True
             else:
                 return False
@@ -357,14 +357,21 @@ class PRT_Email_System:
         if len(to_email_list)==0 and len(bcc_email_list)==0 and len(cc_email_list)>0:
             return True
 
-    def send_email_confirmation(request, to_email_list_final,cc_email_list_final,bcc_email_list_final,subject,mail_body,is_scheduled,attachment):
+    def send_email_confirmation(request, primary, to_email_list_final,cc_email_list_final,bcc_email_list_final,subject,mail_body,is_scheduled,attachment):
             email_from = settings.EMAIL_HOST_USER 
             # to_email_list_final=["skmdsakib2186@gmail.com"]
             # cc_email_list_final=[]
             # bcc_email_list_final=[]    
             # print(cc_email_list_final)
             if attachment is None:
-                credentials = GoogleAuthorisationHandler.get_credentials(request)
+                if primary:
+                    if primary == 1:
+                        credentials = GoogleAuthorisationHandler.get_credentials(request)
+                    else:
+                        credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
+                else:
+                    credentials = GoogleAuthorisationHandler.get_credentials(request)
+
                 if not credentials:
                     print("NOT OKx")
                     return False
@@ -378,7 +385,7 @@ class PRT_Email_System:
                     # print(cc_email_list_final)
                     # print(bcc_email_list_final)
 
-                    message["From"] = "IEEE NSU SB Portal <ieeensusb.portal@gmail.com>"
+                    # message["From"] = "IEEE NSU SB Portal <ieeensusb.portal@gmail.com>"
                     message["To"] = ','.join(to_email_list_final)
                     message["Cc"] = ','.join(cc_email_list_final)
                     message["Bcc"] = ','.join(bcc_email_list_final)

@@ -5993,8 +5993,9 @@ def mail(request, primary=None):
         if primary == None:
             has_access=Branch_View_Access.get_manage_email_access(request)
             get_sc_ag_info=None
+            primary=1
         else:
-            has_access=SC_Ag_Render_Access.get_sc_ag_common_access(request, primary)
+            has_access=SC_Ag_Render_Access.access_for_sc_ag_email(request, primary)
             get_sc_ag_info=SC_AG_Info.get_sc_ag_details(request,primary)
         
         if has_access:
@@ -6016,7 +6017,7 @@ def mail(request, primary=None):
                     pg_token = ''
 
                 global gmail_service
-                if primary == None:
+                if primary == 1:
 
                     if not gmail_service:
                         credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
@@ -6180,7 +6181,7 @@ def mail(request, primary=None):
 
                 try:
                     service = None
-                    if primary == None:                        
+                    if primary == 1:                        
                         if not gmail_service:
                             credentials = GoogleAuthorisationHandler.get_credentials(request, primary)
                             if not credentials:
@@ -6216,9 +6217,7 @@ def mail(request, primary=None):
                         else:
                             service = sc_ag_gmail_service
                             GmailHandler.update_sc_ag_gmail_service(primary, sc_ag_gmail_service)
-                            # print(sc_ag_gmail_service)
 
-                    print(service)
 
                     if section == 'inbox':
                         threads = service.users().threads().list(userId='me', maxResults=10, q="category:primary -label:dev-mail",pageToken='').execute()
@@ -6517,7 +6516,7 @@ def view_mail(request, mail_id):
         return custom_500(request)
     
 class SendMailAjax(View):
-    def post(self, request):
+    def post(self, request, primary=None):
         try:
             '''
             The recruitment sessions "option value" from html comes
@@ -6554,7 +6553,7 @@ class SendMailAjax(View):
             email_attachment=request.FILES.getlist('attachments')                       
             email_schedule_date_time = request.POST['dateTime']
             print("HERE COMING")
-            response = GmailHandler.send_mail(request, email_single_email, email_to_list, email_cc_list, email_bcc_list, email_subject, email_body, email_attachment, email_schedule_date_time)
+            response = GmailHandler.send_mail(request, primary, email_single_email, email_to_list, email_cc_list, email_bcc_list, email_subject, email_body, email_attachment, email_schedule_date_time)
             
             return response
         

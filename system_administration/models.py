@@ -251,6 +251,7 @@ class SC_AG_Data_Access(models.Model):
     panel_edit_access=models.BooleanField(null=False,blank=False,default=False)
     membership_renewal_access=models.BooleanField(null=False,blank=False,default=False)
     manage_web_access=models.BooleanField(null=False,blank=False,default=False)
+    manage_email_access=models.BooleanField(null=False,blank=False,default=False)
     manage_access=models.BooleanField(null=False,blank=False,default=False)
     
     class Meta:
