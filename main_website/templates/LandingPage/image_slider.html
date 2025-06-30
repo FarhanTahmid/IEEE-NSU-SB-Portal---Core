@@ -11,7 +11,7 @@
     #image-slider {
         display: flex;
         transition: transform 0.5s ease-in-out;
-        height: 90vh;
+        height: 100vh;
         width: 100%; /* Ensure the slider takes the full width */
     }
 
@@ -58,9 +58,6 @@
         text-align: left;
         z-index: 1;
     }
-
-    .title,
-    .subtitle,
     .paragraph {
         margin-bottom: 10px;
     }
@@ -205,6 +202,86 @@
         transform: translateX(calc(var(--width) + 110px)) skewX(30deg);
     }
 
+    /* video slide css starts here */
+
+    .slide_video {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        flex: 0 0 100%; /* Each slide takes 100% of the width */
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        transition: opacity 0.5s ease-in-out;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    }
+
+    .slide_video.active {
+        opacity: 1;
+        visibility: visible; /* show active */
+        pointer-events: auto;
+    }
+
+    .slider-content_video {
+        margin: 0 auto;
+        color: white;
+        text-align: center;
+        z-index: 2;
+        max-width: 90vw;
+    }
+    .slider-content_video .title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 5vw;
+        font-weight: 700;
+        color: #ffffff;
+        max-width: 800px;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        margin: 0 auto; 
+        margin-top: 10vh;
+    }
+
+    .slider-content_video .title span {
+        color: #FFC72C;
+    }
+
+    .video_slide {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+    .background_video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 0;
+    }
+
+    .typewriter-text::after {
+        content: '|';
+        animation: blink 0.8s infinite;
+        margin-left: 2px;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
+    /* video slide css ends here */
+
     @media screen and (max-width: 900px) {
         .slider-content .title {
             font-size: 7vw;
@@ -213,9 +290,13 @@
         .slider-content .paragraph {
             width: 90%;
         }
+
+        .slider-content_video .title {
+            margin-top: 0vh;
+        }
     }
     @media screen and (max-width: 767px) {
-        #slider-container, #image-slider {
+        #slider-container, #image-slider, .video_slide{
             height: 70vh;
         }
         .slider-content .paragraph{
@@ -223,7 +304,9 @@
         }
     }
 </style>
-<div id="slider-container">
+
+<!-- image slider -->
+<!-- <div id="slider-container">
     <button id="prev-btn" class="slider-btn" onclick="prevSlide()">❮</button>
     <button id="next-btn" class="slider-btn" onclick="nextSlide()">❯</button>
     <div id="image-slider">
@@ -240,7 +323,54 @@
         {% endfor %}
     </div>
     <div class="slider-indicators" id="slider-indicators"></div>
+</div> -->
+
+<!-- previous video slider with slides-->
+<!-- <div class="video_slide">
+    <button id="prev-btn" class="slider-btn" onclick="prevSlide()">❮</button>
+    <button id="next-btn" class="slider-btn" onclick="nextSlide()">❯</button>
+  <video autoplay muted loop playsinline class="background_video">
+    <source src="{% static 'videos/rr.mp4' %}" type="video/mp4">
+  </video>
+    <div id="image-slider">
+        {% for i in banner_item %}
+        <div class="slide_video">
+            <div class="overlay"></div>
+            <div class="slider-content">
+                <div class="title">{{i.first_layer_text}} <span>{{i.first_layer_text_colored}}</span></div>
+                <div class="title">{{ i.first_layer_text }} <span class="typewriter-text" data-text="{{ i.first_layer_text_colored }}"></span></div>
+
+                <div class="paragraph">{{i.third_layer_text}}</div>
+                <a href="{{i.button_url}}" class="links">{{i.button_text}} <span><ion-icon name="arrow-forward-outline"></ion-icon></span></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="slider-indicators" id="slider-indicators"></div>
+</div> -->
+
+<!-- video slider [USE THIS]-->
+<div class="video_slide">
+  <video autoplay muted loop playsinline class="background_video">
+    <source src="{% static 'videos/rr.mp4' %}" type="video/mp4">
+  </video>
+    <div id="image-slider">
+        {% for i in banner_item %}
+        <div class="slide_video">
+            <div class="overlay"></div>
+            <div class="slider-content_video">
+               <div class="title">
+                Idk <span class="typewriter-text" data-texts='["dummy text 1 oapincacpiac", "dummy text 2 panfuaoicn", "dummy text 3 apicnac"]'></span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="slider-indicators" id="slider-indicators" style="display: none;"></div>
 </div>
+
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script>
@@ -267,6 +397,7 @@
         imageSlider.style.transform = `translateX(${-currentSlide * 100}%)`;
         fadeInCurrentSlide();
         updateIndicators();
+        // runTypewriterEffect(); 
     }
 
     function fadeInCurrentSlide() {
@@ -274,8 +405,10 @@
         slides.forEach((slide, index) => {
             if (index === currentSlide) {
                 slide.style.opacity = 1;
+                // slide.classList.add('active');
             } else {
                 slide.style.opacity = 0;
+                // slide.classList.remove('active');
             }
         });
     }
@@ -357,5 +490,112 @@
     createIndicators();
     updateIndicators();
     startAutoSwipe();
+    // showSlide();
 </script>
+
+<!-- typewriter script -->
+<script>
+    function typeWriter(element, text, speed = 100, callback = () => {}) {
+    let i = 0;
+    function typing() {
+        if (i <= text.length) {
+        element.innerHTML = text.slice(0, i);
+        i++;
+        setTimeout(typing, speed);
+        } else {
+        callback(); // Call next when done
+        }
+    }
+    typing();
+    }
+
+    function eraseText(element, speed = 50, callback = () => {}) {
+    let text = element.textContent;
+    let i = text.length;
+    function erasing() {
+        if (i >= 0) {
+        element.innerHTML = text.slice(0, i);
+        i--;
+        setTimeout(erasing, speed);
+        } else {
+        callback(); // Call next when done
+        }
+    }
+    erasing();
+    }
+
+    function cycleTexts() {
+    const span = document.querySelector('.typewriter-text');
+    if (!span || !span.dataset.texts) return;
+
+    const texts = JSON.parse(span.dataset.texts);
+    let currentIndex = 0;
+
+    function run() {
+        typeWriter(span, texts[currentIndex], 100, () => {
+        setTimeout(() => {
+            eraseText(span, 50, () => {
+            currentIndex = (currentIndex + 1) % texts.length;
+            run();
+            });
+        }, 1500); // Delay before erasing
+        });
+    }
+
+    run();
+    }
+
+    document.addEventListener('DOMContentLoaded', cycleTexts);
+</script>
+
+
+<!-- <script>  // previous typewriter script for video with slides
+let typingTimeout; // global or closure variable to track timeout ID
+
+    function typeWriter(element, text, speed = 100) {
+        if (!element) return;
+
+        element.textContent = ''; // Reset content
+        let i = 0;
+
+        function typing() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                typingTimeout = setTimeout(typing, speed);
+            }
+        }
+
+        typing();
+    }
+    // Run the typewriter on the active slide after each slide change
+    function runTypewriterEffect() {
+    if (typingTimeout) {
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+    }
+
+    const slides = document.querySelectorAll('.slide');
+    const current = slides[currentSlide];
+
+    // Clear all typewriter texts
+    document.querySelectorAll('.typewriter-text').forEach(span => {
+        span.textContent = '';
+    });
+
+    const typeSpan = current.querySelector('.typewriter-text');
+    if (typeSpan) {
+        const text = typeSpan.dataset.text;
+        // delay typewriter start a bit after slide visibility
+        setTimeout(() => {
+            typeWriter(typeSpan, text);
+        }, 500); // matches CSS transition time
+    }
+    }
+
+
+    // Run it on page load too
+    document.addEventListener('DOMContentLoaded', runTypewriterEffect);
+</script> -->
+
 {% endblock image_slider %}

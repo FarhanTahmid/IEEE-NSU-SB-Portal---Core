@@ -89,6 +89,219 @@
         /* .tab.active{
           background-color: #FFC72C;
         } */
+
+        /* modal CSS starts here */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 20vh;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+        }
+
+        .modal_content {
+            background-color: white;
+            width: 40%;
+            border-radius: 10px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            margin: auto;
+            padding: 20px 30px;
+        }
+        .modal_content h1{
+            font-size: 25px;
+            margin: 0px;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .text_fld {
+            display: grid;
+            grid-template-columns: 0.2fr 10px 1fr;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+        .text_fld_ip{
+            flex: 1;
+            border: none;
+            border-bottom: 1px solid #ccc;
+        }
+        .colon {
+            font-size: 20px;
+            text-align: center;
+        }
+        .x_btn{
+          text-decoration: none;
+          border: none;
+          background-color: white;
+          transition: 0.5s;
+          font-size: 20px;
+          border-bottom: solid 1px white;
+          color: #ccc;
+        }
+        .x_btn:hover{
+          color: black;
+        }
+        .confirm_btn{
+            padding: 5px 30px;
+            color: #d5f5e3;
+            background-color: #2ecc71;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            
+        }
+        .confirm_btn:hover{
+            background-color: #d5f5e3;
+            color: #2ecc71;
+        }
+        .delete_btn{
+            padding: 5px 30px;
+            color: #fadbd8;
+            background-color: #FF5959;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            
+        }
+        .delete_btn:hover{
+            background-color: #fadbd8;
+            color: #FF5959;
+        }
+        .close_btn{
+            padding: 5px 30px;
+            color: gray;
+            background-color: #ccc;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: 0.5s;
+            margin-top: 10px;
+            
+        }
+        .close_btn:hover{
+            background-color: gray ;
+            color: #ccc;
+        }
+        .desc_fld{
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+            margin: 5px 0px;
+            min-height: 100px;
+        }    
+
+        .image-input {
+            display: none;
+        }
+        #video-input {
+            display: none;
+        }
+          .video-wrapper {
+          width: 100%;
+          max-width: 500px; /* set max width */
+          margin: auto;
+          aspect-ratio: 16 / 9; /* keeps it responsive */
+          position: relative;
+        }
+
+        #uploadable-video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border: 2px dashed #ccc;
+          border-radius: 8px;
+          cursor: pointer;
+          display: block;
+        }
+
+
+        #checkbox-buttons input[type="checkbox"] {
+          display: none;
+        }
+
+        .access_fld_ip {
+          display: block;
+          padding: 10px 16px;
+          margin: 5px;
+          border-bottom: solid 1px #ccc;
+          cursor: pointer;
+          position: relative;
+          background-color: white;
+          font-family: sans-serif;
+          transition: all 0.2s ease-in-out;
+          color: gray;
+        }
+
+        .access_fld_ip::before {
+          content: "";
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          margin-right: 10px;
+          vertical-align: middle;
+          border: 2px solid #ccc;
+          border-radius: 3px;
+          background-color: white;
+        }
+
+        #checkbox-buttons input[type="checkbox"]:checked + .access_fld_ip {
+          color: black;
+        }
+
+        #checkbox-buttons input[type="checkbox"]:checked + .access_fld_ip::before {
+          content: "✔";
+          color: black;
+          font-size: 14px;
+          font-weight: bold;
+          text-align: center;
+          line-height: 16px;
+        }
+        .checkbox_btns{
+          border: 1px solid #ccc;
+          border-radius: 10px;
+          display: block;
+        }
+
+        @media (max-width: 600px){
+            .modal_content {
+            width: 70%;
+            }
+        }
+        @media (max-width: 500px){
+            .modal_content {
+            width: 75%;
+            }
+        }
+        @media (max-width: 425px){
+            .modal_content {
+            width: 80%;
+            }
+        }
+        /* modal CSS ends here */
+
     </style>
 </head>
 <body>
@@ -120,6 +333,278 @@
             <br>
             <h2 style="text-align: center;">Manage the <b>Homepage</b> of the Central Website of <span style="color:#00629B;"><b>IEEE NSU Student Branch</b></span></h2>
             <br>
+
+            <!--btns for testing-->
+            <button class="open_modal_btn" data-target="#add_img_modal">Add image</button>
+            <button class="open_modal_btn" data-target="#add_video_modal">Add video</button>
+            <button class="open_modal_btn" data-target="#delete_image_modal"> Delete image</button>
+            <button class="open_modal_btn" data-target="#update_banner_modal"> Update banner</button>
+            <button class="open_modal_btn" data-target="#add_thought_modal"> Add thought</button>
+            <button class="open_modal_btn" data-target="#delete_thought_modal"> Delete thought</button>
+            <button class="open_modal_btn" data-target="#view_access_modal"> View access</button>
+            <div style="margin-bottom: 20px;"></div>
+            <!--btns for testing-->
+
+            <!-- modals-->
+             
+                <div id="add_img_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h1>Add image</h1>
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <div>
+                        <img class="uploadable-image" src="{% static 'images/homepage_banner_tutorial.png'%}" alt="" style="max-width: 100%; height: auto; border-radius: 10px;">
+                      </div>
+
+                      <!-- Hidden file input -->
+                      <input type="file" class="image-input" accept="image/*">
+
+                      <div class="container" style="margin-top: 40px;">
+                        <div class="text_fld">  
+                        <h2 style="font-size: 15px; margin:0px;">Hero Image</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">First text</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div class="text_fld">
+                            <h2 style="font-size: 15px; margin:0px;">Second text</h2>
+                            <div class="colon">:</div>
+                            <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div class="text_fld">
+                            <h2 style="font-size: 15px; margin:0px;">Third text</h2>
+                            <div class="colon">:</div>
+                            <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div class="text_fld">
+                            <h2 style="font-size: 15px; margin:0px;">Button text</h2>
+                            <div class="colon">:</div>
+                            <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div class="text_fld">
+                            <h2 style="font-size: 15px; margin:0px;">Button link</h2>
+                            <div class="colon">:</div>
+                            <input type="text" class="text_fld_ip">
+                        </div>
+                      </div>
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+                      </div>
+                      </div>
+
+                    </div>
+                    </form>
+                </div>
+
+                <div id="add_video_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h1>Add video</h1>
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <div class="video-wrapper">
+                      <video id="uploadable-video" controls muted>
+                        <source src="{% static 'videos/placeholder.mp4' %}" type="video/mp4">
+                      </video>
+                      </div>
+
+                      <!-- Hidden file input -->
+                      <input type="file" id="video-input" accept="video/*">
+
+                      <div class="container" style="margin-top: 40px;">
+                        <div class="text_fld">  
+                        <h2 style="font-size: 15px; margin:0px;">Hero Video</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div class="text_fld">
+                        <h2 style="font-size: 15px; margin:0px;">Text</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip">
+                        </div>
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+                      </div>
+                      </div>
+
+                    </div>
+                </div>
+                </form>
+                </div>
+
+                <div id="delete_image_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h1>Delete Image</h1>
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <h2 style="font-size: 20px; margin-top: 20px;">Are you sure you want to delete this image?</h2>
+
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="delete_btn" style="margin-left: 10px;">Yes, delete</button>
+                      </div>
+                      </div>
+
+                    </div>
+                    </form>
+                </div>
+
+                <div id="update_banner_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h1>Update Banner</h1>
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <div>
+                        <img class="uploadable-image" src="{% static 'images/homepage_banner_tutorial.png'%}" alt="" style="max-width: 100%; height: auto; border-radius: 10px;">
+                      </div>
+
+                      <!-- Hidden file input -->
+                      <input type="file" class="image-input" accept="image/*">
+
+                      <div class="container" style="margin-top: 40px;">
+                        <div class="text_fld" style="grid-template-columns: 0.25fr 10px 1fr;">  
+                        <h2 style="font-size: 15px; margin:0px;">Banner image</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip">
+                        </div>
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+                      </div>
+                      </div>
+
+                    </div>
+                </div>
+                </form>
+                </div>
+
+                <div id="add_thought_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h1>Add Thought</h1>
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <div class="container" style="margin-top: 40px;">
+                        <div class="text_fld" style="grid-template-columns: 0.5fr 10px 1fr;">  
+                        <h2 style="font-size: 15px; margin:0px;">Author Name & Position</h2>
+                        <div class="colon">:</div>
+                        <input type="text" class="text_fld_ip">
+                        </div>
+
+                        <div>
+                          <h2 style="font-size: 15px; margin:0px;">Your Thoughts:</h2>
+                          <textarea name="discussion" class="desc_fld"></textarea>
+                        </div>
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+                      </div>
+                      </div>
+
+                    </div>
+                </div>
+                </form>
+                </div>
+
+                <div id="delete_thought_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h1>Delete Thought</h1>
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <h2 style="font-size: 20px; margin-top: 20px;">Are you sure you want to delete this thought?</h2>
+
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="delete_btn" style="margin-left: 10px;">Yes, delete</button>
+                      </div>
+                      </div>
+
+                    </div>
+                    </form>
+                </div>
+
+                <div id="view_access_modal" class="modal">
+                    <form method="post" id="form">
+                      {% csrf_token %}
+                    <div class="modal_content">
+                      <div style="display: flex; justify-content: end; align-items: center; margin-bottom: 10px;">
+                        <button type="button" class="x_btn"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <h1 style="margin-bottom: 10px;">Control what John Doe can access:</h1>
+
+                        <div id="checkbox-buttons" class="checkbox_btns">
+                            <input type="checkbox" id="event" value="Event Create Access">
+                            <label for="event" class="access_fld_ip">Event Create Access</label>
+
+                            <input type="checkbox" id="edit" value="Event Details Edit Permission">
+                            <label for="edit" class="access_fld_ip">Event Details Edit Permission</label>
+
+                            <input type="checkbox" id="task" value="Create Individual Task Permission">
+                            <label for="task" class="access_fld_ip">Create Individual Task Permission</label>
+
+                            <input type="checkbox" id="panel" value="Create Panel Access">
+                            <label for="panel" class="access_fld_ip" style="border: none;">Create Panel Access</label>
+                        </div>
+
+                      <div style="display: flex; justify-content: end; padding-top: 20px;">
+                      <div style="display: flex;">
+                        <button class="close_btn">Cancel</button>
+                        <button class="confirm_btn" style="margin-left: 10px;">Confirm</button>
+                      </div>
+                      </div>
+
+                    </div>
+                    </form>
+                  </div>
+
+                 
             <!--Message Section-->
             {% if messages %}
                {% for message in messages %}
@@ -134,9 +619,8 @@
             <!--Tab view-->
             {% block web_home_tab %}
               {% include "Manage Website/Homepage/web_homepage_tab.html" %}
-            {% endblock web_home_tab %}
-            
-        </div>
+            {% endblock web_home_tab %} 
+          </div>
         <!--PAGE END-->
 
         <!--Theme Switcher-->
@@ -145,8 +629,80 @@
             {% include "theme_switcher.html" %}
         {% endblock theme_switcher %}
     
-    </div>
+        </div>
     <!-- app end-->
+
+    <script>
+      const openBtns = document.querySelectorAll(".open_modal_btn");
+      openBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const modalId = btn.getAttribute("data-target");
+          const modal = document.querySelector(modalId);
+          if (modal) modal.style.display = "block";
+        });
+      });
+
+      const closeBtns = document.querySelectorAll(".x_btn, .close_btn");
+      closeBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const modal = btn.closest(".modal");
+          if (modal) modal.style.display = "none";
+        });
+      });
+
+      window.addEventListener("click", (event) => {
+        document.querySelectorAll(".modal").forEach(modal => {
+          if (event.target === modal) {
+            modal.style.display = "none";
+          }
+        });
+      });
+    </script>
+
+    <script>
+      const imgs = document.querySelectorAll('.uploadable-image'); 
+      const inputs = document.querySelectorAll('.image-input'); 
+
+      imgs.forEach((img, index) => {
+        const input = inputs[index];
+        
+        img.addEventListener('click', () => {
+          input.click(); // trigger file input when image is clicked
+        });
+
+        input.addEventListener('change', (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            img.src = e.target.result; // Set the selected image as src
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+    </script>
+
+    <script>
+      const video = document.getElementById('uploadable-video');
+      const input2 = document.getElementById('video-input');
+
+      video.addEventListener('click', () => {
+        input2.click(); // trigger file input when video is clicked
+      });
+
+      input2.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const videoURL = URL.createObjectURL(file);
+        video.src = videoURL;
+        video.load();  // reload the video element
+        video.play();
+      });
+    </script>
+
 
     {% block common_js %}
         {% include "common_js.html" %}
