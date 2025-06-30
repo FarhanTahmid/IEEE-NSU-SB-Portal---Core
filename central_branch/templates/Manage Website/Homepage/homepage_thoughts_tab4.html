@@ -1,406 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Manage Homepage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Homepage - Thoughts</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
       font-family: 'Poppins', sans-serif;
-      background: #ffffff;
+    }
+
+    body {
+      position: relative;
+      width: 1728px;
+      height: 1117px;
+      background: #FFFFFF;
     }
 
     .sidebar {
       position: absolute;
-      left: 0;
-      top: 0;
       width: 307px;
       height: 1117px;
-      background: url('image.png');
+      left: 0px;
+      top: 0px;
+      background: url(image.png);
     }
 
-    .topbar {
+    .top-banner {
       position: absolute;
-      left: 307px;
-      top: 0;
       width: 1421px;
       height: 60px;
-      background: url('image.png');
+      left: 307px;
+      top: 0.5px;
+      background: url(image.png);
     }
 
-    .main-title {
+    .main-content {
       position: absolute;
-      left: 673px;
-      top: 110px;
-      font-weight: 500;
+      left: 307px;
+      top: 60px;
+      padding: 40px;
+      width: 1421px;
+    }
+
+    .header {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 50px;
       font-size: 32px;
+      font-weight: 500;
       color: #000;
     }
 
-    .tab-bar {
+    .top-bar-controls {
       position: absolute;
-      top: 208px;
+      top: 160px;
       left: 718px;
       width: 535px;
       height: 43px;
       background: #fff;
       box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
       border-radius: 11px;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      gap: 20px;
     }
 
-    .tab-bar span {
+    .nav-tabs {
+      position: absolute;
+      top: 166px;
+      left: 50%;
+      
+      display: flex;
+      gap: 50px;
+      padding: 5px 30px;
+      background: #fff;
+      box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+      border-radius: 11px;
+    }
+
+    .nav-tab {
       font-size: 16px;
       font-weight: 500;
-      color: #8A8A8A;
-      cursor: pointer;
+      color: #8a8a8a;
     }
 
-    .tab-bar .active {
+    .nav-tab.active {
       color: #fff;
       background: rgba(0, 40, 85, 0.9);
-      padding: 4px 12px;
       border-radius: 7px;
+      padding: 4px 12px;
     }
 
     .add-thought-btn {
       position: absolute;
-      left: 1494px;
-      top: 336px;
       width: 177px;
       height: 42px;
+      left: 1494px;
+      top: 336px;
       background: rgba(0, 98, 155, 0.05);
       border-radius: 10px;
       font-size: 20px;
-      font-weight: 400;
       color: rgba(0, 40, 85, 0.9);
-      text-align: center;
-      line-height: 42px;
+      border: none;
       cursor: pointer;
     }
 
-    .thoughts-section {
+    .thoughts-container {
       position: absolute;
-      top: 400px;
+      top: 397px;
       left: 366px;
+      width: 1296px;
       display: flex;
       flex-wrap: wrap;
       gap: 30px;
-      max-width: 1300px;
     }
 
     .thought-card {
-      width: 423px;
-      height: 200px;
-      background: rgba(0, 98, 155, 0.05);
-      border: 1px solid #FFFFFF;
+      background-color: rgba(0, 98, 155, 0.05);
+      border: 1px solid #ffffff;
       box-shadow: 0px 1px 4px 1px rgba(0, 0, 0, 0.25);
       border-radius: 11px;
-      padding: 10px 10px 0;
+      width: 423px;
+      height: auto;
+      padding: 10px;
       position: relative;
     }
 
-    .thought-card h4 {
-      font-size: 20px;
+    .thought-author {
       font-weight: 500;
+      font-size: 20px;
       color: #000;
-      margin: 10px 0 5px 10px;
+      margin-bottom: 10px;
     }
 
-    .thought-card p {
-      width: 95%;
-      background: rgba(0, 98, 155, 0.21);
-      border-radius: 5px;
-      margin-left: 10px;
+    .thought-message {
+      background-color: rgba(0, 98, 155, 0.21);
       padding: 10px;
+      border-radius: 5px;
       font-size: 16px;
       color: #000;
     }
 
-    .delete-icon {
+    .delete-btn {
       position: absolute;
-      right: 10px;
       top: 10px;
-      width: 36px;
-      height: 32px;
-      background: #FF5959;
+      right: 10px;
+      background-color: #ff5959;
+      color: white;
       border: 1px solid #000;
       border-radius: 10px;
+      width: 36px;
+      height: 32px;
       cursor: pointer;
-      font-size: 18px;
-      color: white;
+    }
+
+    .modal-overlay,
+    .confirm-overlay {
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Modal Overlay */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      width: 1728px;
+      height: 1116px;
+      left: 0px;
+      top: 1px;
       background: rgba(5, 5, 5, 0.34);
+      z-index: 1000;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
     }
 
-    .modal {
+    .modal,
+    .confirm-modal {
       width: 762px;
-      height: 513px;
-      background: #fff;
+      background: #ffffff;
       border-radius: 7px;
-      position: relative;
       padding: 30px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
-    .modal h2 {
+    .modal h2,
+    .confirm-modal h2 {
       font-size: 32px;
-      font-weight: 500;
+      color: #000;
       margin-bottom: 20px;
     }
 
-    .modal .close-btn {
-      position: absolute;
-      right: 20px;
-      top: 20px;
-      font-size: 32px;
-      cursor: pointer;
-    }
-
-    .modal label {
-      display: block;
+    .modal label,
+    .confirm-modal p {
       font-size: 20px;
       font-weight: 500;
-      margin: 20px 0 8px;
+      color: #1e1e1e;
+      margin-top: 20px;
     }
 
-    .modal input, .modal textarea {
-      width: 685px;
-      border: 1px solid #ddd;
-      border-radius: 7px;
+    .modal textarea,
+    .modal input {
+      width: 100%;
+      margin-top: 10px;
       padding: 10px;
-      font-size: 16px;
+      border: 1px solid #dddddd;
+      border-radius: 7px;
+      resize: none;
     }
 
-    .modal textarea {
-      height: 157px;
-    }
-
-    .modal .actions {
+    .modal-buttons {
       display: flex;
       justify-content: flex-end;
-      margin-top: 30px;
-      gap: 15px;
+      gap: 10px;
+      margin-top: 20px;
     }
 
-    .cancel-btn {
+    .modal-buttons button {
       width: 177px;
       height: 42px;
-      background: #F3F3F3;
-      border-radius: 5px;
-      color: #A4A4A4;
       font-size: 20px;
+      border-radius: 5px;
+      border: none;
       cursor: pointer;
     }
 
-    .confirm-btn {
-      width: 177px;
-      height: 42px;
+    .modal .cancel-btn,
+    .confirm-modal .cancel-btn {
+      background: #f3f3f3;
+      color: #a4a4a4;
+    }
+
+    .modal .confirm-btn {
       background: rgba(0, 132, 61, 0.6);
-      border-radius: 5px;
-      color: white;
-      font-size: 20px;
+      color: #ffffff;
+    }
+
+    .confirm-modal .confirm-btn {
+      background: #ff5959;
+      color: #992323;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 32px;
       cursor: pointer;
     }
   </style>
 </head>
+
 <body>
-  <!-- Sidebar and Topbar -->
   <div class="sidebar"></div>
-  <div class="topbar"></div>
-
-  <!-- Main Title -->
-  <div class="main-title">Manage Homepage of the Central Website</div>
-
-  <!-- Tabs -->
-  <div class="tab-bar">
-    <span>Hero Image/Video</span>
-    <span>Middle Banner Picture</span>
-    <span class="active">Thoughts</span>
+  <div class="top-banner"></div>
+  <div class="main-content">
+    <div class="header">Manage Homepage of the Central Website</div>
+    <div class="top-bar-controls"></div>
+    <div class="nav-tabs">
+      <div class="nav-tab">Hero Image/Video</div>
+      <div class="nav-tab">Middle Banner Picture</div>
+      <div class="nav-tab active">Thoughts</div>
+    </div>
+    <button class="add-thought-btn" onclick="openModal()">Add Thought</button>
+    <div class="thoughts-container" id="thoughtsContainer"></div>
   </div>
 
-  <!-- Add Thought Button -->
-  <div class="add-thought-btn" onclick="openModal()">Add Thought</div>
-
-  <!-- Thoughts Section -->
-  <div class="thoughts-section" id="thoughtsSection">
-    <!-- Example Thought Card -->
-    <div class="thought-card">
-      <h4>John Doe</h4>
-      <p>A good branch</p>
-      <div class="delete-icon" onclick="deleteThought(this)">🗑️</div>
+  <div class="modal-overlay" id="modalOverlay" style="display: none">
+    <div class="modal">
+      <div class="close-btn" onclick="closeModal()">X</div>
+      <h2>Add Your Thoughts</h2>
+      <label for="author">Author Name & Position :</label>
+      <input type="text" id="author">
+      <label for="thought">Your Thoughts:</label>
+      <textarea id="thought"></textarea>
+      <div class="modal-buttons">
+        <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+        <button class="confirm-btn" onclick="addThought()">Confirm</button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal -->
-  <!-- Modal -->
-<div class="modal-overlay" id="addModal">
-  <div class="modal">
-    <div class="close-btn" onclick="closeModal()">×</div>
-    <h2 style="margin-top: 0;">Add Your Thoughts</h2>
-
-    <label for="author" style="font-size: 16px;">Author Name & Position :</label>
-    <input type="text" id="author" style="
-      border: none;
-      border-bottom: 1px solid #e0e0e0;
-      padding: 8px 5px;
-      width: 100%;
-      font-size: 16px;
-      margin-bottom: 16px;
-      outline: none;
-    ">
-
-    <label for="message" style="font-size: 16px;">Your Thoughts:</label>
-    <textarea id="message" style="
-      width: 100%;
-      height: 100px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #e0e0e0;
-      border-radius: 5px;
-      resize: vertical;
-      outline: none;
-    "></textarea>
-
-    <div class="actions" style="
-      margin-top: 20px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    ">
-      <button class="cancel-btn" onclick="closeModal()" style="
-        background-color: #f3f3f3;
-        border: none;
-        border-radius: 5px;
-        color: #a4a4a4;
-        padding: 10px 18px;
-        font-size: 16px;
-        cursor: pointer;
-      ">Cancel</button>
-
-      <button class="confirm-btn" onclick="addThought()" style="
-        background-color: #4CAF50;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-        padding: 10px 18px;
-        font-size: 16px;
-        cursor: pointer;
-      ">Confirm</button>
+  <div class="confirm-overlay" id="confirmOverlay" style="display: none">
+    <div class="confirm-modal">
+      <div class="close-btn" onclick="closeConfirm()">X</div>
+      <h2>Delete Thought</h2>
+      <p>Are you sure you want to delete this thought?</p>
+      <div class="modal-buttons">
+        <button class="cancel-btn" onclick="closeConfirm()">Cancel</button>
+        <button class="confirm-btn" onclick="confirmDelete()">Yes, Delete</button>
+      </div>
     </div>
   </div>
-</div>
-<div class="modal-overlay" id="deleteModal" style="display: none;">
-  <div class="modal" style="width: 500px;">
-    <div class="close-btn" onclick="closeDeleteModal()">×</div>
-    <h2 style="margin-top: 0;">Delete Thought</h2>
 
-    <p style="margin-bottom: 20px; font-size: 16px;">
-      Are you sure you want to delete this thought?
-    </p>
-
-    <div class="actions" style="
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    ">
-      <button onclick="closeDeleteModal()" style="
-        background-color: #f3f3f3;
-        border: none;
-        border-radius: 5px;
-        color: #a4a4a4;
-        padding: 10px 18px;
-        font-size: 16px;
-        cursor: pointer;
-      ">Cancel</button>
-
-      <button onclick="confirmDelete()" style="
-        background-color: #FF5959;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-        padding: 10px 18px;
-        font-size: 16px;
-        cursor: pointer;
-      ">Yes, Delete</button>
-    </div>
-  </div>
-</div>
-
-  <!-- Script -->
   <script>
+    let toDelete = null;
+
     function openModal() {
-      document.getElementById("addModal").style.display = "flex";
+      document.getElementById('modalOverlay').style.display = 'flex';
     }
 
     function closeModal() {
-      document.getElementById("addModal").style.display = "none";
+      document.getElementById('modalOverlay').style.display = 'none';
     }
 
     function addThought() {
-      const author = document.getElementById("author").value.trim();
-      const message = document.getElementById("message").value.trim();
-
-      if (!author || !message) {
-        alert("Please fill in both fields.");
-        return;
-      }
-
-      const card = document.createElement("div");
-      card.className = "thought-card";
+      const author = document.getElementById('author').value;
+      const thought = document.getElementById('thought').value;
+      if (!author || !thought) return;
+      const container = document.getElementById('thoughtsContainer');
+      const card = document.createElement('div');
+      card.className = 'thought-card';
       card.innerHTML = `
-        <h4>${author}</h4>
-        <p>${message}</p>
-        <div class="delete-icon" onclick="deleteThought(this)">🗑️</div>
+        <div class="thought-author">${author}</div>
+        <div class="thought-message">${thought}</div>
+        <button class="delete-btn" onclick="triggerDelete(this.parentElement)">X</button>
       `;
-
-      document.getElementById("thoughtsSection").appendChild(card);
-
-      document.getElementById("author").value = "";
-      document.getElementById("message").value = "";
+      container.appendChild(card);
       closeModal();
     }
 
-    function deleteThought(elem) {
-      const card = elem.closest(".thought-card");
-      if (card) card.remove();
+    function triggerDelete(card) {
+      toDelete = card;
+      document.getElementById('confirmOverlay').style.display = 'flex';
     }
-    function showDeleteModal(index) {
-  // store the index globally so we know which one to delete
-  selectedIndex = index;
-  document.getElementById('deleteModal').style.display = 'flex';
-}
 
-function closeDeleteModal() {
-  document.getElementById('deleteModal').style.display = 'none';
-}
+    function closeConfirm() {
+      document.getElementById('confirmOverlay').style.display = 'none';
+      toDelete = null;
+    }
 
-function confirmDelete() {
-  if (selectedIndex !== null) {
-    thoughts.splice(selectedIndex, 1);
-    renderThoughts();
-    closeDeleteModal();
-  }
-}
-
+    function confirmDelete() {
+      if (toDelete) {
+        toDelete.remove();
+        toDelete = null;
+      }
+      closeConfirm();
+    }
   </script>
 </body>
+
 </html>
