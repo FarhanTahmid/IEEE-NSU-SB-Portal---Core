@@ -1,183 +1,406 @@
-{% block homepage_thoughts_tab %}
-{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Homepage</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #ffffff;
+    }
 
+    .sidebar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 307px;
+      height: 1117px;
+      background: url('image.png');
+    }
 
-<div id="tab4" class="tab-content" style="    margin-right: 0px;">
-    <h2 style="text-align:center;">HomePage Thoughts</h2>
-    <br>
-    <div ui-view class="app-body" style="justify-content:center; margin-left:15%; margin-right:15%;" id="view">
-        <div class="container">
-            <div class="box">
-                    <div class="box-body">
-                
-                        <div class="form-group row">
-                            <label for="captions" class="col-sm-3 form-control-label">Add Thoughts:</label>
-                            <div class="col-sm-7">
-                                <!-- Add input field for captions here if needed -->
-                            </div>
-                            <div class="col-sm-2 d-flex align-items-center justify-content-center">
-                                <button type="button" class="circle-btn plus-sign" data-toggle="modal" data-target="#AddThoughtsModal"></button>
-                            </div>
-                        </div>
-                        
-                        <hr>
-                    <div id="captions-container" class="mt-3">
-                            <label class="mb-0">Added Thoughts:</label> 
-                            {% for thought in all_thoughts%}
-                            <div class="row container-fluid bg-light mt-3" style="margin:auto;">
-                                <div class="col-sm-11">
-                                    <a href="#" class="btn btn-link btn-block" data-toggle="modal" data-target="#EditCaptionModal{{thought.pk}}">{{thought.author}}</a>
-                                </div>
-                                <div class="col-sm-1 d-flex align-items-center justify-content-center">
-                                    <button type="button" class="close" aria-label="Close" data-toggle="modal" data-target="#ConfirmDeleteModalForThoughts"  onclick="openModal('{{thought.pk}}')">✖</button>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-        
-                        <br>
-                        <div class="footer" style="position:right;">
-                        </div>
-                    </div>
-            </div>
+    .topbar {
+      position: absolute;
+      left: 307px;
+      top: 0;
+      width: 1421px;
+      height: 60px;
+      background: url('image.png');
+    }
 
-            <div class="modal fade" id="AddThoughtsModal" tabindex="-1" role="dialog" aria-labelledby="AddCategoryModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="AddCategoryModalLabel">Add Thoughts:</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="myForm" method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="box-body">
-                                    <br>
-                                        <br>
-            
-                                        <div class="form-group">
-                                            <label>Author<span style="color:red">*<span></label>
-                                            <input
-                                            type="text" 
-                                            class="form-control"
-                                            name="author" 
-                                            placeholder="Enter your name" 
-                                            maxlength="100"
-                                            required
-                                            >
-                                        </div>
-                                        <br>
-                        
-                                        <div class="form-group">
-                                            <label>Your Thoughts (you can put them in " ")<span style="color:red">*<span></label> 
-                                            <input 
-                                            class="form-control" 
-                                            name="your_thoughts"
-                                            placeholder="Express your inner thoughts" 
-                                            required
-                                            >
-                                        </div>
-                                        <br>
-                                        <div class="form-group text-center">
-                                            <input type="submit" name="save" class="btn btn-outline-success p-x-md" value="Save">
-                                        </div>
-                                        <br>
-                                </div>
-                            </form>
-                    </div>
-                </div>
-            </div>
+    .main-title {
+      position: absolute;
+      left: 673px;
+      top: 110px;
+      font-weight: 500;
+      font-size: 32px;
+      color: #000;
+    }
 
+    .tab-bar {
+      position: absolute;
+      top: 208px;
+      left: 718px;
+      width: 535px;
+      height: 43px;
+      background: #fff;
+      box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 20px;
+    }
 
-        </div>
-        {% for thought in all_thoughts %}
-            <div class="modal fade" id="EditCaptionModal{{thought.pk}}" tabindex="-1" role="dialog" aria-labelledby="EditCaptionModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editCaptionModalLabel{{thought.pk}}">Edit Thoughts</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Display existing caption in a textarea for editing -->
-                            <form id="myForm" method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="box-body">
-                                    <br>
-                                        <br>
-            
-                                        <div class="form-group">
-                                            <label>Author<span style="color:red">*<span></label>
-                                            <input
-                                            type="text" 
-                                            class="form-control"
-                                            name="author_edit" 
-                                            placeholder="Enter your name" 
-                                            maxlength="100"
-                                            required
-                                            value="{{thought.author}}"
-                                            >
-                                        </div>
-                                        <br>
-                        
-                                        <div class="form-group">
-                                            <label>Your Thoughts (you can put them in " ")<span style="color:red">*<span></label> 
-                                            <input 
-                                            class="form-control" 
-                                            name="your_thoughts_edit"
-                                            placeholder="Express your inner thoughts" 
-                                            required
-                                            value="{{thought.quote}}"
-                                            >
-                                        </div>
-                                        <br>
-                                        <div class="form-group text-center">
-                                            <input type = "hidden" value="{{thought.pk}}" name="thought_id">
-                                            <input type="submit" name="update" class="btn btn-outline-success p-x-md" value="Update">
-                                        </div>
-                                        <br>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+    .tab-bar span {
+      font-size: 16px;
+      font-weight: 500;
+      color: #8A8A8A;
+      cursor: pointer;
+    }
 
-        <div class="modal fade" id="ConfirmDeleteModalForThoughts" tabindex="-1" role="dialog" aria-labelledby="ConfirmDeleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-top" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Delete</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form method="POST">
-                    <div class="modal-body">
-                        
-                            {% csrf_token %}
-                            <p><input id="delete_thought" name="delete_thought" type="hidden"></p>
-                            Are you sure you want to delete this ?
-                     
-                    </div>
-                    <div class="modal-footer">
-                        <input type="submit" class="btn btn-outline-danger" value="Confirm" name="thought_delete">
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
-                </form>
-                </div>
-            </div>
-        </div>
+    .tab-bar .active {
+      color: #fff;
+      background: rgba(0, 40, 85, 0.9);
+      padding: 4px 12px;
+      border-radius: 7px;
+    }
+
+    .add-thought-btn {
+      position: absolute;
+      left: 1494px;
+      top: 336px;
+      width: 177px;
+      height: 42px;
+      background: rgba(0, 98, 155, 0.05);
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: 400;
+      color: rgba(0, 40, 85, 0.9);
+      text-align: center;
+      line-height: 42px;
+      cursor: pointer;
+    }
+
+    .thoughts-section {
+      position: absolute;
+      top: 400px;
+      left: 366px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      max-width: 1300px;
+    }
+
+    .thought-card {
+      width: 423px;
+      height: 200px;
+      background: rgba(0, 98, 155, 0.05);
+      border: 1px solid #FFFFFF;
+      box-shadow: 0px 1px 4px 1px rgba(0, 0, 0, 0.25);
+      border-radius: 11px;
+      padding: 10px 10px 0;
+      position: relative;
+    }
+
+    .thought-card h4 {
+      font-size: 20px;
+      font-weight: 500;
+      color: #000;
+      margin: 10px 0 5px 10px;
+    }
+
+    .thought-card p {
+      width: 95%;
+      background: rgba(0, 98, 155, 0.21);
+      border-radius: 5px;
+      margin-left: 10px;
+      padding: 10px;
+      font-size: 16px;
+      color: #000;
+    }
+
+    .delete-icon {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 36px;
+      height: 32px;
+      background: #FF5959;
+      border: 1px solid #000;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 5, 5, 0.34);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      width: 762px;
+      height: 513px;
+      background: #fff;
+      border-radius: 7px;
+      position: relative;
+      padding: 30px;
+    }
+
+    .modal h2 {
+      font-size: 32px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .modal .close-btn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      font-size: 32px;
+      cursor: pointer;
+    }
+
+    .modal label {
+      display: block;
+      font-size: 20px;
+      font-weight: 500;
+      margin: 20px 0 8px;
+    }
+
+    .modal input, .modal textarea {
+      width: 685px;
+      border: 1px solid #ddd;
+      border-radius: 7px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .modal textarea {
+      height: 157px;
+    }
+
+    .modal .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 30px;
+      gap: 15px;
+    }
+
+    .cancel-btn {
+      width: 177px;
+      height: 42px;
+      background: #F3F3F3;
+      border-radius: 5px;
+      color: #A4A4A4;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .confirm-btn {
+      width: 177px;
+      height: 42px;
+      background: rgba(0, 132, 61, 0.6);
+      border-radius: 5px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar and Topbar -->
+  <div class="sidebar"></div>
+  <div class="topbar"></div>
+
+  <!-- Main Title -->
+  <div class="main-title">Manage Homepage of the Central Website</div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <span>Hero Image/Video</span>
+    <span>Middle Banner Picture</span>
+    <span class="active">Thoughts</span>
+  </div>
+
+  <!-- Add Thought Button -->
+  <div class="add-thought-btn" onclick="openModal()">Add Thought</div>
+
+  <!-- Thoughts Section -->
+  <div class="thoughts-section" id="thoughtsSection">
+    <!-- Example Thought Card -->
+    <div class="thought-card">
+      <h4>John Doe</h4>
+      <p>A good branch</p>
+      <div class="delete-icon" onclick="deleteThought(this)">🗑️</div>
     </div>
-    <br>
+  </div>
 
+  <!-- Modal -->
+  <!-- Modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="close-btn" onclick="closeModal()">×</div>
+    <h2 style="margin-top: 0;">Add Your Thoughts</h2>
 
+    <label for="author" style="font-size: 16px;">Author Name & Position :</label>
+    <input type="text" id="author" style="
+      border: none;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 8px 5px;
+      width: 100%;
+      font-size: 16px;
+      margin-bottom: 16px;
+      outline: none;
+    ">
+
+    <label for="message" style="font-size: 16px;">Your Thoughts:</label>
+    <textarea id="message" style="
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      resize: vertical;
+      outline: none;
+    "></textarea>
+
+    <div class="actions" style="
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    ">
+      <button class="cancel-btn" onclick="closeModal()" style="
+        background-color: #f3f3f3;
+        border: none;
+        border-radius: 5px;
+        color: #a4a4a4;
+        padding: 10px 18px;
+        font-size: 16px;
+        cursor: pointer;
+      ">Cancel</button>
+
+      <button class="confirm-btn" onclick="addThought()" style="
+        background-color: #4CAF50;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        padding: 10px 18px;
+        font-size: 16px;
+        cursor: pointer;
+      ">Confirm</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="deleteModal" style="display: none;">
+  <div class="modal" style="width: 500px;">
+    <div class="close-btn" onclick="closeDeleteModal()">×</div>
+    <h2 style="margin-top: 0;">Delete Thought</h2>
+
+    <p style="margin-bottom: 20px; font-size: 16px;">
+      Are you sure you want to delete this thought?
+    </p>
+
+    <div class="actions" style="
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    ">
+      <button onclick="closeDeleteModal()" style="
+        background-color: #f3f3f3;
+        border: none;
+        border-radius: 5px;
+        color: #a4a4a4;
+        padding: 10px 18px;
+        font-size: 16px;
+        cursor: pointer;
+      ">Cancel</button>
+
+      <button onclick="confirmDelete()" style="
+        background-color: #FF5959;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        padding: 10px 18px;
+        font-size: 16px;
+        cursor: pointer;
+      ">Yes, Delete</button>
+    </div>
+  </div>
 </div>
 
+  <!-- Script -->
+  <script>
+    function openModal() {
+      document.getElementById("addModal").style.display = "flex";
+    }
 
-{% endblock homepage_thoughts_tab %}
+    function closeModal() {
+      document.getElementById("addModal").style.display = "none";
+    }
+
+    function addThought() {
+      const author = document.getElementById("author").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!author || !message) {
+        alert("Please fill in both fields.");
+        return;
+      }
+
+      const card = document.createElement("div");
+      card.className = "thought-card";
+      card.innerHTML = `
+        <h4>${author}</h4>
+        <p>${message}</p>
+        <div class="delete-icon" onclick="deleteThought(this)">🗑️</div>
+      `;
+
+      document.getElementById("thoughtsSection").appendChild(card);
+
+      document.getElementById("author").value = "";
+      document.getElementById("message").value = "";
+      closeModal();
+    }
+
+    function deleteThought(elem) {
+      const card = elem.closest(".thought-card");
+      if (card) card.remove();
+    }
+    function showDeleteModal(index) {
+  // store the index globally so we know which one to delete
+  selectedIndex = index;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'none';
+}
+
+function confirmDelete() {
+  if (selectedIndex !== null) {
+    thoughts.splice(selectedIndex, 1);
+    renderThoughts();
+    closeDeleteModal();
+  }
+}
+
+  </script>
+</body>
+</html>
