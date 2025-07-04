@@ -78,34 +78,47 @@ def recruitee(request, pk):
     '''
     try:
         sc_ag=PortData.get_all_sc_ag(request=request)
-
         #check the users view access
         user=request.user
-        has_access=(MDT_DATA.recruitment_session_view_access_control(user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username))
-        
-        getSession = renderData.Recruitment.getSession(session_id=pk)
-        getMemberCount = renderData.Recruitment.getTotalNumberOfMembers(int(pk))
-        getRecruitedMembers = renderData.Recruitment.getRecruitedMembers(
-            session_id=pk)
-
-        get_total_count_of_ieee_payment_completed=renderData.Recruitment.getTotalCountofIEEE_payment_complete(session_id=pk) 
-        get_total_count_of_ieee_payment_incomplete=renderData.Recruitment.getTotalCountofIEEE_payment_incomplete(session_id=pk) 
         current_user=LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
         user_data=current_user.getUserData() #getting user data as dictionary file
-        context = {
-            'pk':pk,
-            'memberCount': getMemberCount,
-            'session': getSession,
-            'members': getRecruitedMembers,
-            'ieee_payment_complete':get_total_count_of_ieee_payment_completed,
-            'ieee_payment_incomplete':get_total_count_of_ieee_payment_incomplete,
-            'user_data':user_data,
-            'all_sc_ag':sc_ag,
-        }
+
+        has_access=(MDT_DATA.recruitment_session_view_access_control(user.username) or Access_Render.system_administrator_superuser_access(user.username) or Access_Render.system_administrator_staffuser_access(user.username) or Access_Render.eb_access(user.username))
         if(has_access):
+            
+            if request.method == 'POST':
+                if 'save_details' in request.POST:
+                    recruitment_end_datetime = request.POST.get('recruitment_end_datetime')
+                    recruitment_event_link = request.POST.get('recruitment_event_link')
+                    is_active = request.POST.get('is_active')
+
+                    if renderData.Recruitment.update_session_details(pk, recruitment_end_datetime, recruitment_event_link, is_active):
+                        messages.success(request, 'Session details updated successfully!')
+                    else:
+                        messages.warning(request, 'Something went wrong!')
+
+                    return redirect('recruitment:recruitee', pk)
+        
+            getSession = renderData.Recruitment.getSession(session_id=pk)
+            getMemberCount = renderData.Recruitment.getTotalNumberOfMembers(int(pk))
+            getRecruitedMembers = renderData.Recruitment.getRecruitedMembers(
+                session_id=pk)
+
+            get_total_count_of_ieee_payment_completed=renderData.Recruitment.getTotalCountofIEEE_payment_complete(session_id=pk) 
+            get_total_count_of_ieee_payment_incomplete=renderData.Recruitment.getTotalCountofIEEE_payment_incomplete(session_id=pk) 
+            context = {
+                'pk':pk,
+                'memberCount': getMemberCount,
+                'session': getSession,
+                'members': getRecruitedMembers,
+                'ieee_payment_complete':get_total_count_of_ieee_payment_completed,
+                'ieee_payment_incomplete':get_total_count_of_ieee_payment_incomplete,
+                'user_data':user_data,
+                'all_sc_ag':sc_ag,
+            }
             return render(request, 'session_recruitees.html', context=context)
         else:
-            return render(request,'access_denied.html',context)
+            return render(request,'access_denied.html', {'user_data':user_data, 'all_sc_ag':sc_ag})
     except Exception as e:
         logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())

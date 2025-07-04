@@ -1,61 +1,121 @@
 {% load static %}
 {% block web_home_tab %}
 <style>
-    .tabs li.active_tab {
-        background-color: #FFC72C;
-    }
-    .tabs li:hover{
-        transition: all 0.3s ease-in-out;
-    }
-    .circle-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 45px; /* Set minimum width */
-        height: 45px; /* Set minimum height */
-        background-color: transparent; /* Set to transparent or any other color for the inside */
-        border: 2px solid #78BE20; /* Border color is green */
-        border-radius: 50%;
-        color: #78BE20; /* Text color is green */
-        font-size: 24px; /* Adjust the font size as needed */
-        cursor: pointer;
-        transition: background-color 0.3s, color 0.3s; /* Add smooth transition effect */
-    }
+.manage-web-tabs li {
+    padding: 3px 5px !important;
+    /* margin: 0 !important;  */
+    border: none !important; 
+    border-radius: 20px !important; 
+    background-color: transparent !important; 
+    /* font-size: 14px !important; */
+    /* font-weight: 500 !important; */
+    color: #333333b7 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease-in-out !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 150px;
+}
 
-    .circle-btn:hover {
-        background-color: #78BE20; /* Hover background color is green */
-        color: #fff; /* Hover text color is white */
-    }
+/* Active tab styling */
+.manage-web-tabs li.active_tab {
+    background-color: #002954 !important; 
+    color: rgb(255, 255, 255) !important;
+    border-radius: 6px !important; 
+    margin: 0 !important;
+    /* transform: scale(0.99, 0.74) !important; */
+    /* outline: 2px solid #001931 !important;  */
+    /* outline-offset: -2px !important; */
+}
 
-    .plus-sign::before {
-        content: '+';
-    }
+/* Hover effect */
+.manage-web-tabs li:hover {
+    background-color: #00629b3b !important; 
+    border-radius: 6px !important;
+    margin: 0 !important;
+    color: #002855db !important;
+    /* outline: 2px solid #00193100 !important; */
+    /* transform: scale(0.99, 0.74) !important; */
+}   
+
+/* Outer pill wrapper */
+.tab-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+    /* position: relative !important;  */
+    padding: 0 !important; 
+    /* width: fit-content !important; */
+    margin: auto !important;
+    /* transform: scale(1) translateX(5px) translateY(-10px) !important; */
+}
+.circle-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px; /* Set minimum width */
+    height: 45px; /* Set minimum height */
+    background-color: transparent; /* Set to transparent or any other color for the inside */
+    border: 2px solid #78BE20; /* Border color is green */
+    border-radius: 50%;
+    color: #78BE20; /* Text color is green */
+    font-size: 24px; /* Adjust the font size as needed */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* Add smooth transition effect */
+}
+
+.circle-btn:hover {
+    background-color: #78BE20; /* Hover background color is green */
+    color: #fff; /* Hover text color is white */
+}
+
+.plus-sign::before {
+    content: '+';
+}
+.manage-web-tabs{
+    display: flex;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 6px !important;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+@media (max-width: 1024px){
+.manage-web-tabs{
+    flex-direction: column;
+    width: 100%;
+}
+.manage-web-tabs li{
+    width: 100%;
+}
+}
 </style>
-<div class="tabs-container" style="display: flex; flex-direction: column;">
-    <ul class="tabs" style="display: flex; margin-right: 0px; justify-content: center;">
-        <li class="tab active_tab" onclick="showTab('tab1')">Top Banner with Picture & Texts</li>
-        <li class="tab" onclick="showTab('tab2')">Middle Banner Picture With Statistics</li>
-        {% comment %} <li class="tab" onclick="showTab('tab3')" style="border-right: 1px solid #00629B;">Volunteer Recognition</li> {% endcomment %}
-        <li class="tab" onclick="showTab('tab4')" style="border-right: 1px solid #00629B;">HomePage Thoughts</li>
-    </ul>
-    <br>
-    {% block banner_picture_text_tab %}
-        {% include "Manage Website/Homepage/banner_picture_with_text_tab1.html" %}
-    {% endblock banner_picture_text_tab %}
 
-    {% block banner_with_numbers %}
-        {% include "Manage Website/Homepage/banner_with_numbers_tab2.html" %}
-    {% endblock banner_with_numbers %}
-
-    {% comment %} {% block volunteer_recognition %}
-        {% include "Manage Website/Homepage/recognition_table_tab3.html" %}    
-    {% endblock volunteer_recognition %} {% endcomment %}
-
-    {% block homepage_thoughts_tab%}
-        {% include "Manage Website/Homepage/homepage_thoughts_tab4.html"%}
-    {% endblock homepage_thoughts_tab %}
-
+<div class="tab-wrapper">
+  <ul class="manage-web-tabs" style="padding: 4px;">
+    <li class="tab active_tab" onclick="showTab('tab1')">Hero Image/Video</li>
+    <li class="tab" onclick="showTab('tab2')">Middle Banner Picture</li>
+    <li class="tab" onclick="showTab('tab4')">Thoughts</li>
+  </ul>
 </div>
+
+{% block banner_picture_text_tab %}
+    {% include "Manage Website/Homepage/banner_picture_with_text_tab1.html" %}
+{% endblock banner_picture_text_tab %}
+
+{% block banner_with_numbers %}
+    {% include "Manage Website/Homepage/banner_with_numbers_tab2.html" %}
+{% endblock banner_with_numbers %}
+
+{% comment %} {% block volunteer_recognition %}
+    {% include "Manage Website/Homepage/recognition_table_tab3.html" %}    
+{% endblock volunteer_recognition %} {% endcomment %}
+
+{% block homepage_thoughts_tab%}
+    {% include "Manage Website/Homepage/homepage_thoughts_tab4.html"%}
+{% endblock homepage_thoughts_tab %}
+
 <script>
     const linkels = document.querySelectorAll('.tab');
     linkels.forEach(linkels =>{
@@ -64,11 +124,5 @@
             linkels.classList.add('active_tab');
         });
     });
-
-    function openModal(id) {
-        // Set data in the modal
-        var inputElement = document.getElementById('delete_thought');    
-        inputElement.value=id;
-    }
 </script>
 {% endblock web_home_tab %}

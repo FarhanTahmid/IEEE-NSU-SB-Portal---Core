@@ -115,6 +115,7 @@ nashrat_insb_port/
 meem_venv/
 .virtualenvs/
 ieeeworld/
+venv311/
 
 #files
 credentials.json

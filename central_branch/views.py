@@ -2011,6 +2011,46 @@ def faq_preview(request):
         ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
         return custom_500(request)
 
+@login_required
+@member_login_permission  
+def contact(request):
+
+    try:
+        sc_ag=PortData.get_all_sc_ag(request=request)
+        current_user=renderData.LoggedinUser(request.user) #Creating an Object of logged in user with current users credentials
+        user_data=current_user.getUserData() #getting user data as dictionary file
+        has_access = Branch_View_Access.get_manage_web_access(request)
+
+        if has_access:
+
+            if request.method == 'POST':
+                if 'save_info' in request.POST:
+                    address = request.POST.get('address')
+                    nsu_ieee_email = request.POST.get('nsu_ieee_email')
+                    chair_email = request.POST.get('chair_email')
+                    membership_queries_number = request.POST.get('membership_queries_number')
+                    corporate_engagement_number = request.POST.get('corporate_engagement_number')
+
+                    if Branch.update_contact_info(address, nsu_ieee_email, chair_email, membership_queries_number, corporate_engagement_number):
+                        messages.success(request, 'Contact info updated successfully!')
+                    else:
+                        messages.error(request, 'Something went wrong!')
+
+            contact_info, created = Contact_Info.objects.get_or_create(id=1)
+
+            context={
+                    'user_data':user_data,
+                    'all_sc_ag':sc_ag,
+                    'contact_info':contact_info
+                }
+            return render(request,'Manage Website/About/Contact/contact.html',context)
+        else:
+            return render(request, 'access_denied2.html', {'all_sc_ag':sc_ag,'user_data':user_data,})
+    
+    except Exception as e:
+        logger.error("An error occurred at {datetime}".format(datetime=datetime.now()), exc_info=True)
+        ErrorHandling.saveSystemErrors(error_name=e,error_traceback=traceback.format_exc())
+        return custom_500(request)
 
 @login_required
 @member_login_permission

@@ -1,16 +1,84 @@
 {% block banner_picture_text_tab %}
 {% load static %}
+<style>
+    .add-image, .add-video{
+        border-radius: 4px;
+        border: 1px solid transparent;
+        color: #002855d8;
+        background-color: #00629b32;
+        padding: 3px 16px;
+        transition: all .3s ease-in-out;
+        cursor: pointer;
+        margin: 0;
+    }
+    .add-image:hover, .add-video:hover{
+        background-color: #002855d8;
+        color: white;
+    }
+    .add_btn_container{
+        text-align: right;
+        margin-bottom: 12px;
+    }
+    .img_container{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+    .img_inner_container{
+        width: 360px;
+        height: 190px;
+        object-fit: cover;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .img_inner_container > img{
+        width: 100%;
+        height: 100%;
+    }
+    .video_container{
+        width: 100%;
+        height: 290px;
+        object-fit: cover;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .video_container > video{
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<div id="tab1" class="tab-content container">
+        <!-- <h2 style="text-align:center;">Top Banner Picture With Texts & Buttons</h2> -->
 
-
-<div id="tab1" class="tab-content" style="margin-right: 0px;">
-    <h2 style="text-align:center;">Top Banner Picture With Texts & Buttons</h2>
-    <br>
-    <div style="text-align:center;">  
-        <div class="btn-container">
-          <button class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add New Image and Text in Top Banner</button>
+        <div style="margin-top:12px;">  
+            <div class="add_btn_container">  
+                <button class="add-image" id="add-image-btn">Add Image</button>
+            </div>
+            <!-- <div class="btn-container">
+            <button class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add New Image and Text in Top Banner</button>
+            </div> -->
+            <div class="img_container">
+                <div class="img_inner_container"><img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg?crop=0.608xw:0.515xh;0.0992xw,0.400xh&resize=2048:*"></div>
+                <div class="img_inner_container"><img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg?crop=0.608xw:0.515xh;0.0992xw,0.400xh&resize=2048:*"></div>
+                <div class="img_inner_container"><img src="https://hips.hearstapps.com/hmg-prod/images/2025-tesla-cybertruck-3-672e75cce7814.jpg?crop=0.608xw:0.515xh;0.0992xw,0.400xh&resize=2048:*"></div>
+            </div>
         </div>
-    </div>
-    <!--Modal form-->
+
+        <div style="margin-top: 40px;">  
+            <div class="add_btn_container">  
+                <button class="add-video" id="add-video-btn">Add Video</button>
+            </div>
+
+            <div class="video_container">
+                <video controls="" autoplay="">
+                    <source src="https://www.youtube.com/shorts/TlCcJlfWDzc?feature=share" type="video/mp4">
+                </video>
+            </div>
+        </div>
+        <br>
+        <br>
+            <!--Modal form-->
     <div id="m-s-a" class="modal fade animate" data-backdrop="true">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -19,7 +87,6 @@
                     <div class="modal-header">
                     <h5 class="modal-title">Add a New Top Banner Picture & Texts</h5>
                     </div>
-                    
                     <div class="modal-body text-left p-lg">
                         
                         <p>View the Image given below to understand about the fields and fill the Form according to it.</p>
@@ -138,7 +205,7 @@
 
                     <div class="modal-footer">
                     <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">No</button>
-                    <input type="submit" name="add_banner" class="btn btn-success p-x-md" value="Add"></input>               
+                    <input type="submit" name="add_banner" class="btn btn-success p-x-md" value="Add">               
                     </div>
                 </div><!-- /.modal-content -->
             </div>
@@ -149,16 +216,12 @@
             <img id="lightbox-img">
         </div>
     </div>
-    <br>
-
-    <!--Data Table-->
-    <div style="text-align:center; margin-top:30px;">  
-        <div class="container" style="justify-content:center;">
-        <div class="header_wrap" style="padding: 0px;">
+</div>
+        <!-- <div class="header_wrap" style="padding: 0px;">
             <div class="num_rows">
         
             <div class="form-group">
-                <!--		Show Numbers Of Rows 		-->
+                Show Numbers Of Row
                 <select class="form-control" name="state" id="maxRows">
         
                 <option value="10">10</option>
@@ -173,8 +236,8 @@
             <div class="tb_search">
             <input type="text" id="search_input_all" onkeyup="FilterkeyWord_all_table()" placeholder="Search.." class="form-control">
             </div>
-        </div>
-        <div class="table-responsive">
+        </div> -->
+        <!-- <div class="table-responsive">
             <table class="table table-striped table-class" id="table-id">
         
             <thead>
@@ -205,7 +268,7 @@
                             </form>
                                 
 
-                                    <!-- Lightbox overlay (hidden by default) -->
+                                    Lightbox overlay (hidden by default)
                                     <div id="lightbox" class="overlay">
                                         <span class="close-btn" onclick="closeLightbox()">&times;</span>
                                         <img id="lightbox-img">
@@ -220,21 +283,17 @@
                 
             <tbody>
             </table>
-        </div>
+        </div> -->
         <!--		Start Pagination -->
-        <div class='pagination-container'>
+        <!-- <div class='pagination-container'>
             <nav>
             <ul class="pagination">
-                <!--	Here the JS Function Will Add the Rows -->
             </ul>
             </nav>
-        </div>
-        <div class="rows_count">Showing 11 to 20 of 91 entries</div>    
+        </div> -->
+        <!-- <div class="rows_count">Showing 11 to 20 of 91 entries</div>    
                 
-        </div>
-    </div>
-
-</div>
+        </div> -->
 
 <!--Thumbnail Image Script-->
 <script>

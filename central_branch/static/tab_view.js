@@ -22,7 +22,6 @@ function showTab(tabId) {
     if (selectedTab) {
         selectedTab.classList.add('active');
     }
-    console.log(selectedTab);
 }
 
 // Show the initial tab

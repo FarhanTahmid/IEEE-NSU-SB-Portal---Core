@@ -117,6 +117,22 @@
 .app-aside {
   z-index: 1020;
 }
+.nav-icon{
+  position: relative;
+  z-index: 2;
+}
+.nav-icon-society{
+  float: left;
+  line-height: inherit;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  top: 0;
+  min-width: 1.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  left: 8px;
+}
 </style>
     <!-- fluid app aside -->
   <div class="left navside dark dk" data-layout="column">
@@ -206,6 +222,11 @@
                       </a>
                     </li>
                     <li>
+                      <a href="#" >
+                        <span class="nav-text">Meeting Minutes</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'central_branch:members_list' %}">
                         <span class="nav-text">Members</span>
                       </a>
@@ -272,6 +293,11 @@
                     </a>
                   </li>
                   <li>
+                    <a href="#">
+                      <span class="nav-text">Meeting Minutes</span>
+                    </a>
+                  </li>
+                  <li>
                     <a href="{% url 'content_writing_and_publications_team:content_page' %}" >
                       <span class="nav-text">Contents</span>
                     </a>
@@ -309,6 +335,11 @@
                       </a>
                     </li>
                     <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'events_and_management_team:emt_data_access' %}" >
                         <span class="nav-text">Manage Team</span>
                       </a>
@@ -339,6 +370,11 @@
                     <li>
                       <a href="{% url 'logistics_and_operations_team:task_home_team' 4 %}">
                         <span class="nav-text">Tasks</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
                       </a>
                     </li>
                     <li>
@@ -375,6 +411,11 @@
                       </a>
                     </li>
                     <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'promotions_team:manage_team' %}" >
                         <span class="nav-text">Manage Team</span>
                       </a>
@@ -407,6 +448,11 @@
                       </a>
                     </li>
                     <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'public_relation_team:manage_team' %}" >
                         <span class="nav-text">Manage Team</span>
                       </a>
@@ -436,6 +482,11 @@
                     <li>
                       <a href={% url "membership_development_team:task_home_team" 7 %}>
                         <span class="nav-text">Tasks</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
                       </a>
                     </li>
                     <li>
@@ -492,6 +543,11 @@
                       </a>
                     </li>
                     <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'website_development_team:manage_team' %}" >
                         <span class="nav-text">Manage Team</span>
                       </a>
@@ -506,7 +562,7 @@
                     </span>
                     
                     <span class="nav-icon">
-                      <img src={% static 'images/media.gif' %} width="20px" height="20px">
+                      <img src={% static 'images/media.png' %} width="20px" height="20px">
                       <i class="fa-fa-user">
                       </i>
                   </span>
@@ -526,6 +582,11 @@
                     <li>
                       <a href="{% url 'media_team:task_home_team' 9 %}">
                         <span class="nav-text">Tasks</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
                       </a>
                     </li>
                     <li>
@@ -564,6 +625,11 @@
                     <li>
                       <a href="{% url 'graphics_team:task_home_team' 10 %}">
                         <span class="nav-text">Tasks</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
                       </a>
                     </li>
                     <li>
@@ -610,6 +676,11 @@
                       </a>
                     </li>
                     <li>
+                      <a href="#">
+                        <span class="nav-text">Meeting Minutes</span>
+                      </a>
+                    </li>
+                    <li>
                       <a href="{% url 'finance_and_corporate_team:budgetHomePage' %}">
                         <span class="nav-text">Budget</span>
                       </a>
@@ -636,7 +707,7 @@
                     <ul class="nav-sub nav-mega nav-mega-3">
                       {% for i in all_sc_ag %}
                       <li style="margin-left:5px;">
-                        <span class="nav-icon" >
+                        <span class="nav-icon-society" >
                           <img src="/media_files/{{i.logo}}" width="40px" height="40px">
                           <i class="fa-fa-user"></i>
                         </span>

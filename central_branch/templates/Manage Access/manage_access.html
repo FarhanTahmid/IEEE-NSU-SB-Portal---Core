@@ -1,410 +1,399 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <title>Manage View Access | IEEE NSU Student Branch</title>
     <link rel="icon" href="{% static 'logos/logo.gif' %}"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=border_color" />
 
     {% block common_css %}
-        {% include "common_css.html" %}
+    {% include "common_css.html" %}
     {% endblock common_css %}
 
     <style>
-        body, html {
-        
-        margin: 0;
-        
-        align-items: center;
-        justify-content: center;
+        /* Basic Reset */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        .row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
+        html,
+        body {
+            margin: 0%;
+            padding: 0%;
+            background-color: #ffffff;
         }
-        .row {
+
+        .manage-view-body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            /* formerly bg-gray-50 */
             display: flex;
+            /* align-items: center; */
             justify-content: center;
-            align-items: center;
-            height: 100%;
-          }
-          .btn-container {
+            color: #1F2937;
+            padding-top: 2%;
+            /* Default text color */
+        }
+
+
+        .container {
+            width: 95%;
+            /* max-width: 10000px; */
+            /* formerly max-w-4xl */
+            margin: 0 auto;
+            padding: 1rem;
+            /* formerly p-4 */
+        }
+
+        /* Main title */
+        .main-title {
+            font-size: 1.875rem;
+            /* formerly text-3xl */
+            /* font-weight: 700; */
+            /* formerly font-bold */
             text-align: center;
-          }
-          
-          .btn {
+            color: #1F2937;
+            /* formerly text-gray-800 */
+            margin-bottom: 2rem;
+            /* formerly mb-8 */
+        }
+
+        /* The main white card */
+        .content-card {
+            border-radius: 0.25rem;
+            /* formerly rounded-xl */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            /* formerly shadow-md */
+            /* padding: 0.2rem; */
+            /* formerly p-6 */
+        }
+
+        .search-add-container {
+            display: flex;
+            flex-direction: column;
+            padding-top: 2%;
+            padding-bottom: 2%;
+            gap: 15px;
+        }
+
+        .btn {
+            background-color: #e7e7e7;
+            color: black;
+            font-size: 17px;
+            /* margin: 20px; */
             max-width: 100%;
-            width: auto;
-            display: inline-block;
-            white-space: normal; /* Allow text to wrap within the button */
-            word-wrap: break-word; /* Break long words if necessary */
-            font-size: 16px; /* Adjust the font size as needed */
-          }
-          
-          /* Media query for smaller screens (adjust the breakpoint as needed) */
-          @media (max-width: 768px) {
-            .btn {
-              width: 100%; /* Make the button full width on smaller screens */
-            }
-          }
-          .table-container {
-            overflow: hidden; /* Hide table overflow */
-        }
-        
-        .table-wrapper {
-            max-height: 300px; /* Set the maximum height for scrolling */
-            overflow: auto; /* Enable vertical scrolling */
-        }
-        
-        table {
             width: 100%;
-            border-collapse: collapse;
+            border-radius: 5px;
+            transition-duration: 0.4s;
+
         }
-        
-        table, th, td {
-            border: 1px solid #ccc;
+
+        .btn:hover {
+            background-color: #4b5551;
+            color: white;
         }
-        
-        /* Add responsive styling for smaller screens */
-        @media (max-width: 768px) {
-            .table-wrapper {
-                max-height: none; /* Allow table to expand vertically on smaller screens */
+
+        /* Responsive padding for the card */
+        @media (min-width: 640px) {
+            .manage-view-body {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+
+            .search-input:focus {
+                border: none;
+            }
+
+            .search-add-container {
+                display: flex;
+                justify-content: space-between;
+                text-align: center;
+                flex-direction: row;
+
+            }
+
+            .btn {
+                max-width: 10rem;
+                margin-right: 0px;
             }
         }
-        
+
+        @media screen and (max-width: 639px) {}
+
+        /* Search bar container */
+        .search-container {
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Search input field */
+        .search-input {
+            width: 100%;
+            /* formerly max-w-sm */
+            /* formerly py-2.5 px-4 */
+            font-size: 1rem;
+            color: #374151;
+            /* formerly text-gray-700 */
+            background-color: #ffffff;
+            border: 0px;
+            /* formerly border-gray-200 */
+
+            /* formerly rounded-lg */
+            box-shadow: 5px 5px 5px rgb(198, 206, 209);
+            /* formerly shadow-sm */
+            /* transition: box-shadow 0.2s, border-color 0.2s; */
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        /* Table wrapper to handle overflow */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        /* Access table styles */
+        .access-table {
+            background-color: white;
+            width: 100%;
+            text-align: left;
+            border-collapse: collapse;
+            /* Ensures borders are clean */
+
+        }
+
+
+        tbody {
+            background-color: #ffffff;
+        }
+
+        /* Table header and cell styles */
+        .access-table th,
+        .access-table td {
+            padding: 10px 16px;
+            /* formerly p-4 */
+            vertical-align: middle;
+            text-align: center;
+            /* This centers the text in all cells */
+
+        }
+
+        .access-table thead {
+            border-bottom: 1px solid #E5E7EB;
+            /* formerly border-b border-gray-200 */
+
+        }
+
+        .access-table th {
+            font-size: 0.875rem;
+            /* formerly text-sm */
+            font-weight: 1000;
+            /* formerly font-semibold */
+            color: #000000;
+            /* formerly text-gray-600 */
+            letter-spacing: 0.05rem;
+
+        }
+
+        .access-table tbody tr {
+            border-bottom: 1px solid #E5E7EB;
+            cursor: pointer;
+            /* formerly border-b border-gray-200 */
+        }
+
+        .access-table tbody tr:hover {
+            background-color: #f9f9f9;
+            /* formerly border-b border-gray-200 */
+        }
+
+        .access-table tr:nth-child(even) {
+            background-color: white; /* Light gray or any color you prefer */
+        }
+
+        .access-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .access-table td {
+            color: #374151;
+            /* formerly text-gray-700 */
+        }
+
+        .access-table .font-medium {
+            font-weight: 500;
+            /* formerly font-medium */
+        }
+
+        /* Edit access button styles */
+        .edit-access-btn {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: #6B7280;
+            /* formerly text-gray-500 */
+            transition: color 0.2s ease-in-out;
+        }
+
+        .edit-access-btn:hover {
+            color: #002855;
+            /* formerly hover:text-red-600 */
+        }
+
+        .edit-access-btn svg {
+            display: block;
+        }
     </style>
 </head>
+
 <body>
-    <!-- ############ LAYOUT START-->
     <div class="app" id="app">
 
-        <!-- aside -->
         <div id="aside" class="app-aside modal nav-dropdown">
-  
-  	        {% block sidebar %}
-	            {% include 'users/sidebar.html' %}
-  	        {% endblock %}
-  
+
+            {% block sidebar %}
+            {% include 'users/sidebar.html' %}
+            {% endblock %}
+
         </div>
-        <!-- aside end -->
-  
-        <!-- navbar content -->
         <div id="content" class="app-content box-shadow-z0" role="main">
             {% block navbar %}
-                {% include 'navbar.html' %}
+            {% include 'navbar.html' %}
             {% endblock navbar %}
 
         </div>
-        <!--navbar content-->
-        
-        <!-- ############ PAGE START-->
-        <div ui-view class="app-body" style="justify-content:center; margin-left:15%; margin-right:15%;" id="view">
+        <div class="manage-view-body">
 
-            <!--Start from here-->
-            <br>
-            <h2 style="justify-content:center;text-align:center"><span style="color:#00629B"><b>Manage View Access - </b></span>IEEE NSU Student Branch</h2>
-            <br>
-            <!--Messages-->
-            <div style="justify-content:center; text-align:center;">
-                {% if messages %}
-                    {% for message in messages %}
-                        <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
-                    {% endfor %}
-                <br>
-                {% endif %}
-            </div>
-            <!--Messages-->
-            <br>
-            <br>
-            <!--Data Access Table-->
-            <div class="box">
-                <div class="box-header">
-                    
-                    <div style="text-align:right;">
-                    <button type="submit" class="btn btn-outline b-primary text-primary" data-toggle="modal" data-target="#m-s-a" ui-toggle-class="bounce" ui-target="#animate">Add Members to provide Access</button>
-                    </div>
-                    <small>This table holds the data of Executive Members in the panel</small>
-                    <br>
-                    <label style="margin-left:5px;">Search:</label>
-                    <input class="form-control w-75" type="text" id="searchInput" placeholder="Search Member by name" onkeyup="searchTable()">
-                </div>
-                <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
-                <table class="table table-bordered m-0">
-                    <thead>
-                    <tr>
-                        <th style="text-align:center; border:1px solid #ccc;">IEEE ID</th>
-                        <th style="text-align:center; border:1px solid #ccc;">Name</th>
-                        <th style="text-align:center; border:1px solid #ccc;">Team</th>
-                        <th style="text-align:center; border:1px solid #ccc;">Current Position</th>
-                        <th style="text-align:center; border:1px solid #ccc;">Permissions</th>
-                        <th style="text-align:center; border:1px solid #ccc;">Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    
-                        {% for member in branch_data_access %}
-                        <tr style="border:1px solid #ccc;">
-                            <td style="border:1px solid #ccc;text-align:center;"><a style="text-decoration:none;color:#00629B;" href="{% url 'membership_development_team:member_details' member.ieee_id %}">{{member.ieee_id}}</a></td>
-                            <td style="border:1px solid #ccc;text-align:center;">{{ member.ieee_id.name  }}</td>
-                            <td style="border:1px solid #ccc;text-align:center;">{{member.ieee_id.team}}</td>
-                            <td style="border:1px solid #ccc;text-align:center;">{{member.ieee_id.position}}</td>
-                            <td style="border:1px solid #ccc;">
-                                <form method="POST">
-                                {% csrf_token %}
-                                    {% if member.create_event_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="create_event_access" name="create_event_access">
-                                        <label for="create_event_access">Event Create Access
-                                        </label><br>
-                                    {% else %}
-                                        <input type="checkbox" value="create_event_access" name="create_event_access">
-                                        <label for="create_event_access">Event Create Access
-                                        </label><br>                                    
-                                    {% endif %}
+            <div class="container">
+                <h1 class="main-title">
+                   <span style="font-weight: bold; color: #00629B;">Manage View Access</span> - IEEE NSU Student Branch
+                </h1>
 
-
-                                    {% if member.event_details_page_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="event_details_page_access" name="event_details_page_access">
-                                        <label for="event_details_page_access">Event Details Edit Permission</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="event_details_page_access" name="event_details_page_access">
-                                        <label for="event_details_page_access">Event Details Edit Permission</label><br>
-                                    {% endif %}
-
-                                    {% if member.create_individual_task_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="create_individual_task_access" name="create_individual_task_access">
-                                        <label for="create_individual_task_access">Create Individual Task Permission</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="create_individual_task_access" name="create_individual_task_access">
-                                        <label for="create_individual_task_access">Create Individual Task Permission</label><br>
-                                    {% endif %}
-
-                                    {% comment %} {% if member.create_team_task_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="create_team_task_access" name="create_team_task_access">
-                                        <label for="create_team_task_access">Create Team Task Permission</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="create_team_task_access" name="create_team_task_access">
-                                        <label for="create_team_task_access">Create Team Task Permission</label><br>
-                                    {% endif %} {% endcomment %}
-
-
-                                    {% if member.create_panels_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="create_panels_access" name="create_panels_access">
-                                        <label for="create_panels_access">Create Panel Access</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="create_panels_access" name="create_panels_access">
-                                        <label for="create_panels_access">Create Panel Access</label><br>
-                                    {% endif %}
-
-
-                                    {% if member.panel_memeber_add_remove_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="panel_memeber_add_remove_access" name="panel_memeber_add_remove_access">
-                                        <label for="panel_memeber_add_remove_access">Panel Member Add/Remove Access</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="panel_memeber_add_remove_access" name="panel_memeber_add_remove_access">
-                                        <label for="panel_memeber_add_remove_access">Panel Member Add/Remove Access</label><br>
-                                    {% endif %}
-
-                                    {% if member.team_details_page %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="team_details_page" name="team_details_page">
-                                        <label for="team_details_page">Team Details Page Access</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="team_details_page" name="team_details_page">
-                                        <label for="team_details_page">Team Details Page Access</label><br>
-                                    {% endif %}
-
-                                    {% if member.manage_award_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="manage_award_access" name="manage_award_access">
-                                        <label for="manage_award_access">Manage Award Access</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="manage_award_access" name="manage_award_access">
-                                        <label for="manage_award_access">Manage Award Access</label><br>
-                                    {% endif %}
-
-                                    {% if member.manage_web_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="manage_web_access" name="manage_web_access">
-                                        <label for="manage_web_access">Manage Web Access</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="manage_web_access" name="manage_web_access">
-                                        <label for="manage_web_access">Manage Web Access</label><br>
-                                    {% endif %}
-
-                                    {% if member.manage_custom_notification_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="manage_custom_notification_access" name="manage_custom_notification_access">
-                                        <label for="manage_custom_notification_access">Manage Custom Notification</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="manage_custom_notification_access" name="manage_custom_notification_access">
-                                        <label for="manage_custom_notification_access">Manage Custom Notification</label><br>
-                                    {% endif %}
-
-                                    {% if member.manage_email_access %}
-                                        <input type="checkbox" checked="True" class="checkbox" value="manage_email_access" name="manage_email_access">
-                                        <label for="manage_email_access">Manage Email Access</label><br>
-                                    {% else %}
-                                        <input type="checkbox" class="checkbox" value="manage_email_access" name="manage_email_access">
-                                        <label for="manage_email_access">Manage Email Access</label><br>
-                                    {% endif %}
-
-                            </td>
-                            <td style="border:1px solid #ccc;text-align:center;">
-                                    <br>
-                                    <br>
-                                    <br>
-                                    <input class="btn btn-outline b-warn text-warn" style="margin-bottom:10px;" name="update_access" type="submit" value="Update Access">
-                                    <input class="btn btn-outline b-danger text-danger" name="remove_member" type="submit" value="Remove Member">
-                                    <input type="hidden" name="remove_member_data_access" value={{member.ieee_id}}>
-                                </form>
-                            </td>
-                        </tr>
+                <!--Messages-->
+                <div style="justify-content:center; text-align:center;">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    <br>
+                    {% endif %}
                 </div>
-            </div>
-            <!--Data Access Table Ends-->
+                
+                <div class="search-add-container">
+                    <div class="search-container">
+                        <input type="text" placeholder="Search..." class="search-input" id="searchInput">
+                    </div>
+                    <!-- <button class="btn">Add members to provide access</button> -->
+                </div>
 
-            <!--Modal-->
-            <div id="m-s-a" class="modal" data-backdrop="true">
-                <div class="modal-dialog modal-lg">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add member to Central Branch View Access!</h5>
+
+
+                <div class="content-card">
+
+
+                    <div class="table-wrapper">
+                        <table class="access-table">
+                            <thead>
+                                <tr>
+                                    <th style="background-color: #f0f0f0; color: #000000;">SL</th>
+                                    <th style="background-color: #f0f0f0; color: #000000;">Name</th>
+                                    <th style="background-color: #f0f0f0; color: #000000;">Team</th>
+                                    <th style="background-color: #f0f0f0; color: #000000;">Position</th>
+                                    <th style="background-color: #f0f0f0; color: #000000;">Edit Access</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accessTableBody">
+                                <tr>
+                                    <td>1</td>
+                                    <td class="font-medium">John Doe</td>
+                                    <td>Branch</td>
+                                    <td>Chair</td>
+                                    <td>
+                                        <button class="edit-access-btn">
+                                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">
+                                                border_color
+                                            </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td class="font-medium">Jane Smith</td>
+                                    <td>Events</td>
+                                    <td>Coordinator</td>
+                                    <td>
+                                        <button class="edit-access-btn">
+                                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">
+                                                border_color
+                                            </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td class="font-medium">Peter Jones</td>
+                                    <td>Tech Team</td>
+                                    <td>Member</td>
+                                    <td>
+                                        <button class="edit-access-btn">
+                                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">
+                                                border_color
+                                            </span>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="modal-body p-lg">
-                      <p>This will update the Members in the Data Access Table and you can give access to them for different pages.</p>
-                    </div>
-                   
-                    <!--Search table-->
-                    <form method="POST">
-                        {% csrf_token %}
-        
-                        <div class="table-container">
-                            <label style="margin-left: 5px;">Search</label>
-                            <input class="w-75" type="text" id="searchInput2" placeholder="Search Member" onkeyup="searchTable2()">
-                        
-                            <div class="table-wrapper">
-                                <br>
-                                <table style="margin-left:5px;text-align:center;" class="table2" id="data2">
-                                    <thead >
-                                        <tr id="row">
-                                            <th style="text-align:center;">Name</th>
-                                            <th style="text-align:center;">IEEE ID</th>
-                                            <th style="text-align:center;">Current Position</th>
-                                            <th style="text-align:center;">Email</th>
-                                            <th style="text-align:center;">Select</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for member in insb_members %}
-                                        <tr>
-                                            <td>{{ member.name }}</td>
-                                            <td>{{ member.ieee_id }}</td>
-                                            <td>{{ member.position }}</td>
-                                            <td>{{ member.email_ieee }}</td>
-                                            <td>
-                                                <input type="checkbox" id="select" name="member_select" value={{member.ieee_id}}>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    
-                        <div class="modal-footer">
-                        <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">No</button>
-                    
-                            <input type="submit" class="btn primary p-x-md" name="add_member_to_access" value="Add Member"></input>  
-                        </div>
-                    </form>
-        
-                  </div><!-- /.modal-content -->
                 </div>
             </div>
-            <!--Modal Ends-->
 
         </div>
-        <!--PAGE END-->
-
-        <!--Theme Switcher-->
-
-        {% block theme_switcher %}
-            {% include "theme_switcher.html" %}
-        {% endblock theme_switcher %}
-    
     </div>
-    <!-- app end-->
-
     {% block common_js %}
         {% include "common_js.html" %}
     {% endblock common_js %}
-
-    <!--Script to search tables-->
     <script>
-        function searchTable() {
-            // Declare variables
-            var input, filter, table, tr, td, i, j, txtValue;
-            input = document.getElementById("searchInput");
-            filter = input.value.toUpperCase();
-            table = document.querySelector("table");
-            tr = table.getElementsByTagName("tr");
-        
-            // Loop through all table rows
-            for (i = 0; i < tr.length; i++) {
-                var rowVisible = false; // Flag to track if any column matches the search query in the current row
-        
-                // Loop through all columns in the current row
-                for (j = 0; j < tr[i].getElementsByTagName("td").length; j++) {
-                    td = tr[i].getElementsByTagName("td")[j];
-                    if (td) {
-                        txtValue = td.textContent || td.innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            rowVisible = true; // If a match is found in any column, set the flag to true
-                        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const tableBody = document.getElementById('accessTableBody');
+            const tableRows = tableBody.getElementsByTagName('tr');
+
+            searchInput.addEventListener('keyup', function (event) {
+                const searchQuery = event.target.value.toLowerCase();
+
+                for (let i = 0; i < tableRows.length; i++) {
+                    const row = tableRows[i];
+                    const sl = row.cells[0] ? row.cells[0].textContent.toLowerCase() : '';
+                    const name = row.cells[1] ? row.cells[1].textContent.toLowerCase() : '';
+                    const team = row.cells[2] ? row.cells[2].textContent.toLowerCase() : '';
+                    const position = row.cells[3] ? row.cells[3].textContent.toLowerCase() : '';
+
+                    if (sl.includes(searchQuery) || name.includes(searchQuery) || team.includes(searchQuery) || position.includes(searchQuery)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
                     }
                 }
-        
-                // Set the display style for the row based on the flag
-                if (rowVisible) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
-        function searchTable2() {
-            // Declare variables
-            var input, filter, table, tr, td, i, j, txtValue;
-            input = document.getElementById("searchInput2");
-            filter = input.value.toUpperCase();
-            table = document.querySelector(".table2");
-            tr = table.getElementsByTagName("tr");
-        
-            // Loop through all table rows
-            for (i = 0; i < tr.length; i++) {
-                var rowVisible = false; // Flag to track if any column matches the search query in the current row
-        
-                // Loop through all columns in the current row
-                for (j = 0; j < tr[i].getElementsByTagName("td").length; j++) {
-                    td = tr[i].getElementsByTagName("td")[j];
-                    if (td) {
-                        txtValue = td.textContent || td.innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                            rowVisible = true; // If a match is found in any column, set the flag to true
-                        }
-                    }
-                }
-        
-                // Set the display style for the row based on the flag
-                if (rowVisible) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
+            });
+        });
     </script>
+
 </body>
+
 </html>
